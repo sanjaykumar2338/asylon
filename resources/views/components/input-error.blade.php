@@ -1,8 +1,12 @@
 @props(['messages'])
 
-@if ($messages)
+@php
+    $messages = collect($messages)->flatten()->filter();
+@endphp
+
+@if ($messages->isNotEmpty())
     <ul {{ $attributes->merge(['class' => 'text-sm text-red-600 space-y-1']) }}>
-        @foreach ((array) $messages as $message)
+        @foreach ($messages as $message)
             <li>{{ $message }}</li>
         @endforeach
     </ul>

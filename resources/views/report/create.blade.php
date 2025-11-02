@@ -154,15 +154,18 @@
             <p class="mt-1 text-xs text-gray-600">
                 Record up to three minutes of audio. You can play it back before submitting.
             </p>
-            <div class="mt-4 flex flex-wrap items-center gap-3">
-                <button type="button" id="recordStartBtn"
-                    class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Start recording
-                </button>
-                <button type="button" id="recordStopBtn"
-                    class="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled>
-                    Stop
+            <div class="mt-4 voice-recorder-control">
+                <button type="button" id="recorder" class="recorder-button" aria-pressed="false">
+                    <span class="sr-only">Toggle voice recording</span>
+                    <svg class="recorder-icon recorder-icon--record" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    <svg class="recorder-icon recorder-icon--arrow" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M12 3a1 1 0 0 1 1 1v9.586l2.293-2.293a1 1 0 0 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 13.586V4a1 1 0 0 1 1-1Z">
+                        </path>
+                        <path d="M5 19a1 1 0 0 1 1-1h12a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1Z"></path>
+                    </svg>
                 </button>
                 <button type="button" id="recordClearBtn"
                     class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -197,6 +200,129 @@
             <x-primary-button>Submit report</x-primary-button>
         </div>
     </form>
+
+    <style>
+        .voice-recorder-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .voice-recorder-control .recorder-button {
+            position: relative;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            background: #1f2937;
+            border: 1px solid rgba(17, 24, 39, 0.2);
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(12, 12, 13, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.15);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .voice-recorder-control .recorder-button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4);
+        }
+
+        .voice-recorder-control .recorder-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .voice-recorder-control .recorder-icon {
+            pointer-events: none;
+            position: absolute;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .voice-recorder-control .recorder-icon--record {
+            width: 58%;
+            height: 58%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .voice-recorder-control .recorder-icon--record circle {
+            fill: #ef4444;
+        }
+
+        .voice-recorder-control .recorder-icon--arrow {
+            width: 46%;
+            height: 46%;
+            left: 50%;
+            top: 55%;
+            transform: translate(-50%, -10px);
+            opacity: 0;
+            color: #22c55e;
+        }
+
+        .voice-recorder-control .recorder-button.recording .recorder-icon--record {
+            animation: recorder-wiggle 0.8s ease-in-out infinite;
+        }
+
+        .voice-recorder-control .recorder-button.download .recorder-icon--record {
+            transform: translate(-50%, -60%) scale(0.7);
+            opacity: 0;
+        }
+
+        .voice-recorder-control .recorder-button.download .recorder-icon--arrow {
+            opacity: 1;
+            animation: recorder-arrow 0.6s ease-in-out infinite;
+        }
+
+        .voice-recorder-control .recorder-button.out .recorder-icon--record {
+            animation: recorder-out 0.8s ease forwards;
+        }
+
+        @keyframes recorder-wiggle {
+            0%, 100% {
+                transform: translate(-50%, -50%) rotate(8deg);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(-8deg);
+            }
+        }
+
+        @keyframes recorder-arrow {
+            0% {
+                transform: translate(-50%, -12px);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, 4px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes recorder-out {
+            0% {
+                transform: translate(-50%, -60%) scale(0.7);
+                opacity: 0;
+            }
+
+            40% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, 12px);
+                opacity: 0;
+            }
+        }
+    </style>
 
     <script>
         (function () {
@@ -397,50 +523,43 @@
         })();
 
         (function () {
-            const startBtn = document.getElementById('recordStartBtn');
-            const stopBtn = document.getElementById('recordStopBtn');
+            const recorderBtn = document.getElementById('recorder');
             const clearBtn = document.getElementById('recordClearBtn');
             const statusEl = document.getElementById('recordingStatus');
             const previewEl = document.getElementById('voicePreview');
             const fileInput = document.getElementById('voiceRecordingInput');
             const voiceCommentInput = document.getElementById('voice_comment');
 
-            if (!startBtn || !stopBtn || !clearBtn || !statusEl || !previewEl || !fileInput) {
+            if (!recorderBtn || !clearBtn || !statusEl || !previewEl || !fileInput) {
                 return;
             }
 
-            const hasRecordingSupport = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder && window.DataTransfer);
-            if (!hasRecordingSupport) {
-                startBtn.disabled = true;
-                startBtn.classList.add('cursor-not-allowed', 'opacity-60');
+            const recordingSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder && window.DataTransfer);
+            if (!recordingSupported) {
+                recorderBtn.disabled = true;
                 statusEl.textContent = 'Voice recordings are not supported in this browser. You can still upload an audio file instead.';
+                clearBtn.disabled = true;
                 return;
             }
 
-            let mediaRecorder;
+            let mediaRecorder = null;
             let recordedChunks = [];
-            let activeStream;
-            let objectUrl;
-            let autoStopTimer;
+            let activeStream = null;
+            let objectUrl = null;
+            let autoStopTimer = null;
 
-            const resetRecording = () => {
-                recordedChunks = [];
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                    objectUrl = null;
-                }
-                previewEl.src = '';
-                previewEl.classList.add('hidden');
-                statusEl.textContent = '';
-                clearBtn.disabled = true;
-                const emptyTransfer = new DataTransfer();
-                fileInput.files = emptyTransfer.files;
+            const refreshAttachmentPreview = () => {
                 if (typeof window.refreshAttachmentPreview === 'function') {
                     window.refreshAttachmentPreview();
                 }
             };
 
-            const stopStreamTracks = () => {
+            const clearFileInput = () => {
+                const empty = new DataTransfer();
+                fileInput.files = empty.files;
+            };
+
+            const stopStream = () => {
                 if (activeStream) {
                     activeStream.getTracks().forEach(track => track.stop());
                     activeStream = null;
@@ -451,16 +570,75 @@
                 }
             };
 
-            startBtn.addEventListener('click', async () => {
-                resetRecording();
-                startBtn.disabled = true;
-                statusEl.textContent = 'Requesting microphone access...';
+            const revokeObject = () => {
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    objectUrl = null;
+                }
+            };
+
+            const setState = (state, message = '') => {
+                recorderBtn.dataset.state = state;
+                statusEl.textContent = message;
+                recorderBtn.disabled = false;
+                recorderBtn.classList.remove('recording', 'download', 'out');
+
+                if (state === 'idle') {
+                    recorderBtn.setAttribute('aria-pressed', 'false');
+                    clearBtn.disabled = !fileInput.files.length;
+                } else if (state === 'recording') {
+                    recorderBtn.classList.add('recording');
+                    recorderBtn.setAttribute('aria-pressed', 'true');
+                    clearBtn.disabled = true;
+                } else if (state === 'processing') {
+                    recorderBtn.disabled = true;
+                    clearBtn.disabled = true;
+                } else if (state === 'captured') {
+                    recorderBtn.setAttribute('aria-pressed', 'false');
+                    clearBtn.disabled = false;
+                    recorderBtn.classList.add('download');
+                    setTimeout(() => {
+                        recorderBtn.classList.remove('download');
+                        recorderBtn.classList.add('out');
+                        setTimeout(() => recorderBtn.classList.remove('out'), 800);
+                    }, 900);
+                }
+            };
+
+            const clearCurrentRecording = (message = '') => {
+                recordedChunks = [];
+                stopStream();
+                revokeObject();
+                mediaRecorder = null;
+                previewEl.src = '';
+                previewEl.classList.add('hidden');
+                clearFileInput();
+                refreshAttachmentPreview();
+                setState('idle', message);
+            };
+
+            recorderBtn.addEventListener('click', async () => {
+                const currentState = recorderBtn.dataset.state || 'idle';
+
+                if (currentState === 'processing') {
+                    return;
+                }
+
+                if (currentState === 'recording') {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        setState('processing', 'Processing recording...');
+                    }
+                    return;
+                }
+
+                clearCurrentRecording('');
+                setState('processing', 'Requesting microphone access...');
 
                 try {
                     activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 } catch (error) {
-                    startBtn.disabled = false;
-                    statusEl.textContent = 'Microphone permission was denied. Please allow access or upload an audio file.';
+                    setState('idle', 'Microphone permission was denied. Please allow access or upload an audio file.');
                     return;
                 }
 
@@ -474,80 +652,64 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    stopStreamTracks();
+                    stopStream();
 
-                    if (!recordedChunks.length) {
-                        startBtn.disabled = false;
-                        stopBtn.disabled = true;
-                        statusEl.textContent = 'No audio recorded. Try again.';
+                    const chunks = recordedChunks.slice();
+                    recordedChunks = [];
+                    mediaRecorder = null;
+
+                    if (!chunks.length) {
+                        setState('idle', 'No audio recorded. Try again.');
                         return;
                     }
 
-                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
                     const fileName = `voice-report-${Date.now()}.webm`;
                     const file = new File([blob], fileName, { type: blob.type, lastModified: Date.now() });
 
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
+                    const transfer = new DataTransfer();
+                    transfer.items.add(file);
+                    fileInput.files = transfer.files;
 
+                    revokeObject();
                     objectUrl = URL.createObjectURL(blob);
                     previewEl.src = objectUrl;
                     previewEl.classList.remove('hidden');
                     previewEl.currentTime = 0;
 
-                    startBtn.disabled = false;
-                    stopBtn.disabled = true;
-                    clearBtn.disabled = false;
-                    statusEl.textContent = 'Recording captured. Use the player above to listen before submitting.';
-                    if (typeof window.refreshAttachmentPreview === 'function') {
-                        window.refreshAttachmentPreview();
-                    }
+                    refreshAttachmentPreview();
+                    setState('captured', 'Recording captured. Use the player above to listen before submitting.');
+                };
+
+                mediaRecorder.onerror = () => {
+                    recordedChunks = [];
+                    setState('idle', 'Recording failed. Please try again.');
                 };
 
                 mediaRecorder.start();
-                statusEl.textContent = 'Recording... speak clearly into your microphone.';
-                stopBtn.disabled = false;
-                clearBtn.disabled = true;
+                setState('recording', 'Recording... speak clearly into your microphone.');
 
                 autoStopTimer = setTimeout(() => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
+                        setState('processing', 'Processing recording...');
                     }
-                }, 3 * 60 * 1000); // 3 minutes
-            });
-
-            stopBtn.addEventListener('click', () => {
-                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                    mediaRecorder.stop();
-                    stopBtn.disabled = true;
-                    statusEl.textContent = 'Processing recording...';
-                }
+                }, 3 * 60 * 1000);
             });
 
             clearBtn.addEventListener('click', () => {
-                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                    mediaRecorder.stop();
-                }
-                stopStreamTracks();
-                resetRecording();
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-                statusEl.textContent = 'Recording removed.';
+                clearCurrentRecording('Recording removed.');
                 if (voiceCommentInput) {
                     voiceCommentInput.value = '';
-                }
-                if (typeof window.refreshAttachmentPreview === 'function') {
-                    window.refreshAttachmentPreview();
                 }
             });
 
             window.addEventListener('beforeunload', () => {
-                stopStreamTracks();
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                }
+                stopStream();
+                revokeObject();
             });
+
+            setState('idle', '');
         })();
     </script>
 </x-guest-layout>

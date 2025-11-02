@@ -59,7 +59,7 @@ class StoreReportRequest extends FormRequest
                 'nullable',
                 'file',
                 'max:51200',
-                'mimes:mp3,wav,aac,ogg,m4a,webm',
+                'mimetypes:audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/aac,audio/ogg,audio/webm,audio/mp4,audio/x-m4a,video/webm',
             ],
             'voice_comment' => ['nullable', 'string', 'max:500'],
         ];
@@ -88,5 +88,18 @@ class StoreReportRequest extends FormRequest
                 $validator->errors()->add('voice_recording', 'Please record or upload audio before adding a comment.');
             }
         });
+    }
+
+    /**
+     * Custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'voice_recording.file' => 'The voice recording must be a valid audio file.',
+            'voice_recording.mimetypes' => 'The voice recording must be an audio file (MP3, WAV, AAC, OGG, M4A, or WEBM).',
+        ];
     }
 }
