@@ -1,4 +1,17 @@
 <x-guest-layout>
+    <header class="mb-8 border-b border-gray-200 pb-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-xs uppercase tracking-widest text-indigo-500">Asylon</p>
+                <h1 class="text-xl font-semibold text-gray-900">Safety Reporting Portal</h1>
+            </div>
+            <a href="{{ route('login') }}"
+                class="inline-flex items-center justify-center rounded-md border border-indigo-500 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                <i class="fas fa-sign-in-alt mr-2"></i> Reviewer login
+            </a>
+        </div>
+    </header>
+
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Submit a Security Concern</h1>
         <p class="mt-2 text-sm text-gray-600">
@@ -712,4 +725,12 @@
             setState('idle', '');
         })();
     </script>
+
+    <footer class="mt-16 border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
+        <p>
+            This portal is monitored by your organization&rsquo;s safety team. For emergencies, contact local authorities
+            immediately.
+        </p>
+        <p class="mt-2">&copy; {{ now()->year }} Asylon Safety Portal</p>
+    </footer>
 </x-guest-layout>

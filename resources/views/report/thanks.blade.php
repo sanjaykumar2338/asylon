@@ -28,6 +28,10 @@
             <a href="{{ route('report.create') }}" class="text-sm font-medium text-indigo-600 hover:underline">
                 Submit another report
             </a>
+            <span class="mx-2 text-gray-400">|</span>
+            <a href="{{ route('login') }}" class="text-sm font-medium text-indigo-600 hover:underline">
+                Reviewer login
+            </a>
         </div>
     </div>
 </x-guest-layout>
