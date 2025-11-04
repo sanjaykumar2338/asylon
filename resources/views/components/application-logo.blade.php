@@ -3,13 +3,14 @@
 ])
 
 @php
-    $existingStyle = trim((string) $attributes->get('style'));
-    $style = 'background-color: currentColor;' . ($existingStyle !== '' ? ' ' . $existingStyle : '');
+    $style = trim((string) $attributes->get('style'));
 @endphp
 
 <img
     src="{{ asset('assets/images/new-logo.png') }}"
     alt="{{ $alt }}"
     {{ $attributes->merge(['class' => 'h-10 w-auto'])->except('style') }}
-    style="{{ $style }}"
+    @if ($style !== '')
+        style="{{ $style }}"
+    @endif
 >
