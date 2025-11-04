@@ -22,7 +22,12 @@
                 <dl class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500">{{ __('Category') }}</dt>
-                        <dd class="mt-1 text-sm text-gray-800">{{ $report->category }}</dd>
+                        <dd class="mt-1 text-sm text-gray-800">
+                            {{ $report->category }}
+                            <span class="block text-xs text-gray-500">
+                                {{ $report->subcategory ?? __('Not provided') }}
+                            </span>
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500">{{ __('Urgent flag') }}</dt>
@@ -34,6 +39,12 @@
                             @else
                                 <span class="text-xs text-gray-500">{{ __('Not marked urgent') }}</span>
                             @endif
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs uppercase tracking-wide text-gray-500">{{ __('Violation date') }}</dt>
+                        <dd class="mt-1 text-sm text-gray-800">
+                            {{ $report->violation_date?->format('M d, Y') ?? __('Not provided') }}
                         </dd>
                     </div>
                     <div class="sm:col-span-2">

@@ -40,13 +40,27 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="category">{{ __('Category') }}</label>
-                        <input list="categories" id="category" name="category" value="{{ $category }}" class="form-control"
-                            placeholder="{{ __('Any category') }}">
-                        <datalist id="categories">
-                            @foreach ($categories as $item)
-                                <option value="{{ $item }}"></option>
+                        <select id="category" name="category" class="form-control">
+                            <option value="">{{ __('Any category') }}</option>
+                            @foreach ($categoriesMap as $categoryName => $subcategories)
+                                <option value="{{ $categoryName }}" @selected($category === $categoryName)>{{ $categoryName }}</option>
                             @endforeach
-                        </datalist>
+                            @if ($category !== '' && ! array_key_exists($category, $categoriesMap))
+                                <option value="{{ $category }}" selected>{{ $category }} ({{ __('archived') }})</option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="subcategory">{{ __('Subcategory') }}</label>
+                        <select id="subcategory" name="subcategory" class="form-control" {{ $category === '' ? 'disabled' : '' }}>
+                            <option value="">{{ __('Any subcategory') }}</option>
+                            @foreach ($subcategoryOptions as $option)
+                                <option value="{{ $option }}" @selected($subcategory === $option)>{{ $option }}</option>
+                            @endforeach
+                            @if ($subcategory !== '' && ! in_array($subcategory, $subcategoryOptions, true))
+                                <option value="{{ $subcategory }}" selected>{{ $subcategory }} ({{ __('archived') }})</option>
+                            @endif
+                        </select>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="from">{{ __('Submitted From') }}</label>
@@ -55,6 +69,19 @@
                     <div class="form-group col-md-3">
                         <label for="to">{{ __('Submitted To') }}</label>
                         <input type="date" id="to" name="to" value="{{ $to }}" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="sort">{{ __('Sort by') }}</label>
+                        <select id="sort" name="sort" class="form-control">
+                            <option value="submitted_desc" @selected($sort === 'submitted_desc')>{{ __('Submitted date (newest first)') }}</option>
+                            <option value="submitted_asc" @selected($sort === 'submitted_asc')>{{ __('Submitted date (oldest first)') }}</option>
+                            <option value="violation_desc" @selected($sort === 'violation_desc')>{{ __('Violation date (newest first)') }}</option>
+                            <option value="violation_asc" @selected($sort === 'violation_asc')>{{ __('Violation date (oldest first)') }}</option>
+                            <option value="category_asc" @selected($sort === 'category_asc')>{{ __('Category A→Z') }}</option>
+                            <option value="category_desc" @selected($sort === 'category_desc')>{{ __('Category Z→A') }}</option>
+                            <option value="subcategory_asc" @selected($sort === 'subcategory_asc')>{{ __('Subcategory A→Z') }}</option>
+                            <option value="subcategory_desc" @selected($sort === 'subcategory_desc')>{{ __('Subcategory Z→A') }}</option>
+                        </select>
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-sm-row justify-content-end mt-3">
@@ -87,10 +114,11 @@
                         @can('view-all')
                             <th scope="col">{{ __('Organization') }}</th>
                         @endcan
-                        <th scope="col">{{ __('Category') }}</th>
+                        <th scope="col">{{ __('Category / Subcategory') }}</th>
                         <th scope="col">{{ __('Urgent') }}</th>
                         <th scope="col">{{ __('Status') }}</th>
                         <th scope="col">{{ __('Attachments') }}</th>
+                        <th scope="col">{{ __('Violation date') }}</th>
                         <th scope="col">{{ __('Submitted') }}</th>
                         <th scope="col" class="text-right">{{ __('Actions') }}</th>
                     </tr>
@@ -105,7 +133,12 @@
                             @can('view-all')
                                 <td>{{ $report->org?->name ?? __('Unknown') }}</td>
                             @endcan
-                            <td class="font-weight-bold">{{ $report->category }}</td>
+                            <td class="font-weight-bold">
+                                {{ $report->category }}
+                                @if ($report->subcategory)
+                                    <div class="small text-muted">{{ $report->subcategory }}</div>
+                                @endif
+                            </td>
                             <td>
                                 @if ($report->urgent)
                                     <span class="badge badge-danger">{{ __('Yes') }}</span>
@@ -128,6 +161,13 @@
                                 <span class="badge badge-light">
                                     <i class="fas fa-paperclip mr-1"></i> {{ $report->files_count }}
                                 </span>
+                            </td>
+                            <td>
+                                @if ($report->violation_date)
+                                    {{ $report->violation_date->format('M d, Y') }}
+                                @else
+                                    <span class="text-muted">&mdash;</span>
+                                @endif
                             </td>
                             <td>{{ $report->created_at->format('M d, Y H:i') }}</td>
                             <td class="text-right">
@@ -182,7 +222,7 @@
                                                                 <div>
                                                                     <p class="mb-1 font-weight-bold">{{ $file->original_name }}</p>
                                                                     <p class="mb-0 text-xs text-muted">
-                                                                        {{ $mime ?: __('Unknown type') }} • {{ number_format($size, 2) }} {{ __('MB') }}
+                                                                        {{ $mime ?: __('Unknown type') }} - {{ number_format($size, 2) }} {{ __('MB') }}
                                                                     </p>
                                                                 </div>
                                                                 <div class="btn-group btn-group-sm" role="group">
@@ -244,7 +284,7 @@
                         @endpush
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->can('view-all') ? 8 : 7 }}" class="text-center text-muted py-4">
+                            <td colspan="{{ auth()->user()->can('view-all') ? 9 : 8 }}" class="text-center text-muted py-4">
                                 {{ __('No reports match the selected filters.') }}
                             </td>
                         </tr>
@@ -259,4 +299,76 @@
     </div>
 
     @stack('modals')
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const categoriesMap = @json($categoriesMap);
+                const categorySelect = document.getElementById('category');
+                const subcategorySelect = document.getElementById('subcategory');
+                const placeholder = @json(__('Any subcategory'));
+                const initialCategory = @json($category);
+                const initialSubcategory = @json($subcategory);
+                const archivedLabel = @json(__('archived'));
+
+                function renderOptions(selectedCategory, chosenSubcategory = '') {
+                    if (!subcategorySelect) {
+                        return;
+                    }
+
+                    subcategorySelect.innerHTML = '';
+
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = placeholder;
+                    subcategorySelect.appendChild(defaultOption);
+
+                    const options = categoriesMap[selectedCategory];
+                    if (!selectedCategory || !Array.isArray(options)) {
+                        if (selectedCategory && selectedCategory === initialCategory && initialSubcategory) {
+                            const archivedOption = document.createElement('option');
+                            archivedOption.value = initialSubcategory;
+                            archivedOption.textContent = `${initialSubcategory} (${archivedLabel})`;
+                            archivedOption.selected = true;
+                            subcategorySelect.appendChild(archivedOption);
+                        }
+                        subcategorySelect.value = '';
+                        subcategorySelect.disabled = true;
+                        return;
+                    }
+
+                    options.forEach(function (item) {
+                        const option = document.createElement('option');
+                        option.value = item;
+                        option.textContent = item;
+                        subcategorySelect.appendChild(option);
+                    });
+
+                    subcategorySelect.disabled = false;
+
+                    if (chosenSubcategory && options.includes(chosenSubcategory)) {
+                        subcategorySelect.value = chosenSubcategory;
+                    } else if (chosenSubcategory) {
+                        const archivedOption = document.createElement('option');
+                        archivedOption.value = chosenSubcategory;
+                        archivedOption.textContent = `${chosenSubcategory} (${archivedLabel})`;
+                        archivedOption.selected = true;
+                        subcategorySelect.appendChild(archivedOption);
+                    } else {
+                        subcategorySelect.value = '';
+                    }
+                }
+
+                renderOptions(categorySelect?.value, @json($subcategory));
+
+                categorySelect?.addEventListener('change', function (event) {
+                    renderOptions(event.target.value);
+                });
+            });
+        </script>
+    @endpush
 </x-admin-layout>
+
+
+
+

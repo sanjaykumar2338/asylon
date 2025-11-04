@@ -35,12 +35,15 @@ class UrgentReportEmail extends Notification implements ShouldQueue
         $report = $this->report;
         $orgName = $report->org?->name ?? 'Unassigned organization';
         $reportUrl = route('reports.show', $report);
+        $categoryLabel = $report->subcategory
+            ? "{$report->category} - {$report->subcategory}"
+            : $report->category;
 
         return (new MailMessage())
             ->subject("Urgent report for {$orgName}")
             ->greeting('Attention required')
             ->line("An urgent report was submitted for {$orgName}.")
-            ->line("Category: {$report->category}")
+            ->line("Category: {$categoryLabel}")
             ->line('Submitted at: '.$report->created_at?->format('M d, Y H:i'))
             ->action('View report', $reportUrl)
             ->line('Please log in to review and respond as soon as possible.');

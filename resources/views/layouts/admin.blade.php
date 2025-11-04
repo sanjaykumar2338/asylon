@@ -94,6 +94,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('admin.report-categories.index') }}" class="nav-link {{ request()->routeIs('admin.report-categories.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-tags"></i>
+                                        <p>{{ __('Report Categories') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-chart-line"></i>
                                         <p>{{ __('Analytics') }}</p>

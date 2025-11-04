@@ -37,13 +37,16 @@ class UrgentReportSms extends Notification implements ShouldQueue
     {
         $report = $this->report;
         $orgName = $report->org?->name ?? 'Unknown org';
+        $categoryLabel = $report->subcategory
+            ? "{$report->category} - {$report->subcategory}"
+            : $report->category;
 
         return [
             'to' => $this->phoneNumber,
             'body' => sprintf(
                 'Urgent report for %s (%s) at %s. Review ASAP.',
                 $orgName,
-                $report->category,
+                $categoryLabel,
                 $report->created_at?->format('M d H:i')
             ),
         ];

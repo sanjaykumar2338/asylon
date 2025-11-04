@@ -49,6 +49,13 @@
                             {{ $byCategory->first()->category }}
                         </h3>
                         <span class="text-muted">{{ $byCategory->first()->total }} {{ __('reports') }}</span>
+                        @if ($bySubcategory->isNotEmpty())
+                            <p class="mt-2 mb-0 text-muted small">
+                                {{ __('Top subcategory') }}: {{ $bySubcategory->first()->subcategory }}
+                                <span class="d-block">{{ __('Within') }} {{ $bySubcategory->first()->category }}</span>
+                                <span class="d-block">{{ $bySubcategory->first()->total }} {{ __('reports') }}</span>
+                            </p>
+                        @endif
                     @else
                         <h3 class="font-weight-bold mb-1">{{ __('N/A') }}</h3>
                         <span class="text-muted">{{ __('No submissions yet') }}</span>
@@ -84,6 +91,44 @@
                                 <div class="progress-bar bg-primary" role="progressbar"
                                     style="width: {{ max(($category->total / $maxTotal) * 100, 5) }}%;"
                                     aria-valuenow="{{ $category->total }}" aria-valuemin="0" aria-valuemax="{{ $maxTotal }}">
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="card card-outline card-primary mt-4">
+        <div class="card-header">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-stream mr-2"></i> {{ __('Top subcategories') }}
+            </h3>
+        </div>
+        <div class="card-body">
+            @if ($bySubcategory->isEmpty())
+                <p class="text-muted mb-0">
+                    {{ __('Submissions will populate this list once available.') }}
+                </p>
+            @else
+                @php
+                    $maxSubcategoryTotal = max($bySubcategory->max('total'), 1);
+                @endphp
+                <div class="list-group list-group-flush">
+                    @foreach ($bySubcategory as $item)
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ $item->subcategory }}</strong>
+                                    <div class="small text-muted">{{ $item->category }}</div>
+                                </div>
+                                <span class="badge badge-light">{{ $item->total }}</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-info" role="progressbar"
+                                    style="width: {{ max(($item->total / $maxSubcategoryTotal) * 100, 5) }}%;"
+                                    aria-valuenow="{{ $item->total }}" aria-valuemin="0" aria-valuemax="{{ $maxSubcategoryTotal }}">
                                 </div>
                             </div>
                         </div>

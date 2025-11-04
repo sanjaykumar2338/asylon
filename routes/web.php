@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AlertController as AdminAlertController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
+use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
+use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -67,6 +69,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', AdminUserController::class);
         Route::resource('alerts', AdminAlertController::class)
             ->parameters(['alerts' => 'alert']);
+        Route::resource('report-categories', AdminReportCategoryController::class);
+        Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
+            ->name('report-categories.subcategories.store');
+        Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
+            ->name('report-categories.subcategories.update');
+        Route::delete('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'destroy'])
+            ->name('report-categories.subcategories.destroy');
         Route::get('analytics', [AdminAnalyticsController::class, 'index'])
             ->name('analytics');
     });

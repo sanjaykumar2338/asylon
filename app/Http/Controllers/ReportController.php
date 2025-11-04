@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ReportSubmitted;
 use App\Http\Requests\StoreReportRequest;
 use App\Models\Org;
+use App\Models\ReportCategory;
 use App\Models\Report;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,21 @@ class ReportController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return view('report.create', compact('orgs'));
+        $categories = ReportCategory::query()
+            ->with(['subcategories'])
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(function (ReportCategory $category): array {
+                $subcategories = $category->subcategories
+                    ->map(fn ($sub) => $sub->name)
+                    ->all();
+
+                return [$category->name => $subcategories];
+            })
+            ->toArray();
+
+        return view('report.create', compact('orgs', 'categories'));
     }
 
     /**

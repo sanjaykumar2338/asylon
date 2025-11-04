@@ -20,6 +20,11 @@
                         <span class="badge badge-secondary mr-2 text-uppercase">
                             {{ $report->category }}
                         </span>
+                        @if ($report->subcategory)
+                            <span class="badge badge-light text-uppercase mr-2 text-dark">
+                                {{ $report->subcategory }}
+                            </span>
+                        @endif
                         @if ($report->urgent)
                             <span class="badge badge-danger mr-2">{{ __('Urgent') }}</span>
                         @endif
@@ -47,12 +52,25 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-1">{{ __('Category') }}</h6>
+                            <p class="mb-1">{{ $report->category }}</p>
+                            <p class="mb-0 text-muted">
+                                <small>{{ $report->subcategory ?? __('Not provided') }}</small>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('Organization') }}</h6>
                             <p class="mb-0">{{ $report->org?->name ?? __('Unknown') }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('Submitted') }}</h6>
                             <p class="mb-0">{{ $report->created_at->format('M d, Y H:i') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-1">{{ __('Violation date') }}</h6>
+                            <p class="mb-0">
+                                {{ $report->violation_date?->format('M d, Y') ?? __('Not provided') }}
+                            </p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('First response') }}</h6>

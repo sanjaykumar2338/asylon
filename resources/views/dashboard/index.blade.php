@@ -3,10 +3,102 @@
         {{ __('Reviewer Dashboard') }}
     </x-slot>
 
+    <div class="card card-outline card-primary mb-4">
+        <div class="card-header">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-filter mr-2"></i> {{ __('Filter reports') }}
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ route('dashboard') }}">
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="status">{{ __('Status') }}</label>
+                        <select id="status" name="status" class="form-control">
+                            <option value="">{{ __('All') }}</option>
+                            <option value="open" @selected($status === 'open')>{{ __('Open') }}</option>
+                            <option value="in_review" @selected($status === 'in_review')>{{ __('In review') }}</option>
+                            <option value="closed" @selected($status === 'closed')>{{ __('Closed') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="urgent">{{ __('Urgent') }}</label>
+                        <select id="urgent" name="urgent" class="form-control">
+                            <option value="">{{ __('All') }}</option>
+                            <option value="1" @selected($urgent === '1')>{{ __('Yes') }}</option>
+                            <option value="0" @selected($urgent === '0')>{{ __('No') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="category">{{ __('Category') }}</label>
+                        <select id="category" name="category" class="form-control">
+                            <option value="">{{ __('Any category') }}</option>
+                            @foreach ($categoriesMap as $categoryName => $subcategories)
+                                <option value="{{ $categoryName }}" @selected($category === $categoryName)>{{ $categoryName }}</option>
+                            @endforeach
+                            @if ($category !== '' && ! array_key_exists($category, $categoriesMap))
+                                <option value="{{ $category }}" selected>{{ $category }} ({{ __('archived') }})</option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="subcategory">{{ __('Subcategory') }}</label>
+                        <select id="subcategory" name="subcategory" class="form-control" {{ $category === '' ? 'disabled' : '' }}>
+                            <option value="">{{ __('Any subcategory') }}</option>
+                            @foreach ($subcategoryOptions as $option)
+                                <option value="{{ $option }}" @selected($subcategory === $option)>{{ $option }}</option>
+                            @endforeach
+                            @if ($subcategory !== '' && ! in_array($subcategory, $subcategoryOptions, true))
+                                <option value="{{ $subcategory }}" selected>{{ $subcategory }} ({{ __('archived') }})</option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="from">{{ __('Submitted from') }}</label>
+                        <input type="date" id="from" name="from" value="{{ $from }}" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="to">{{ __('Submitted to') }}</label>
+                        <input type="date" id="to" name="to" value="{{ $to }}" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="violation_from">{{ __('Violation from') }}</label>
+                        <input type="date" id="violation_from" name="violation_from" value="{{ $violationFrom }}" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="violation_to">{{ __('Violation to') }}</label>
+                        <input type="date" id="violation_to" name="violation_to" value="{{ $violationTo }}" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="sort">{{ __('Sort by') }}</label>
+                        <select id="sort" name="sort" class="form-control">
+                            <option value="submitted_desc" @selected($sort === 'submitted_desc')>{{ __('Submitted date (newest first)') }}</option>
+                            <option value="submitted_asc" @selected($sort === 'submitted_asc')>{{ __('Submitted date (oldest first)') }}</option>
+                            <option value="violation_desc" @selected($sort === 'violation_desc')>{{ __('Violation date (newest first)') }}</option>
+                            <option value="violation_asc" @selected($sort === 'violation_asc')>{{ __('Violation date (oldest first)') }}</option>
+                            <option value="category_asc" @selected($sort === 'category_asc')>{{ __('Category A→Z') }}</option>
+                            <option value="category_desc" @selected($sort === 'category_desc')>{{ __('Category Z→A') }}</option>
+                            <option value="subcategory_asc" @selected($sort === 'subcategory_asc')>{{ __('Subcategory A→Z') }}</option>
+                            <option value="subcategory_desc" @selected($sort === 'subcategory_desc')>{{ __('Subcategory Z→A') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-sm-row justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary mr-sm-2 mb-2 mb-sm-0">
+                        <i class="fas fa-search mr-1"></i> {{ __('Apply') }}
+                    </button>
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
+                        {{ __('Reset') }}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card card-outline card-primary">
         <div class="card-header d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
             <h3 class="card-title mb-0">
-                <i class="fas fa-clipboard-list mr-2"></i> {{ __('Latest Reports') }}
+                <i class="fas fa-clipboard-list mr-2"></i> {{ __('Latest reports') }}
             </h3>
             <span class="badge badge-info badge-pill px-3 py-2 mt-3 mt-lg-0">
                 {{ __('Total') }}: {{ number_format($reports->total()) }}
@@ -18,10 +110,11 @@
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">{{ __('Category') }}</th>
+                            <th scope="col">{{ __('Category / Subcategory') }}</th>
                             <th scope="col">{{ __('Urgent') }}</th>
                             <th scope="col">{{ __('Status') }}</th>
                             <th scope="col">{{ __('Attachments') }}</th>
+                            <th scope="col">{{ __('Violation date') }}</th>
                             <th scope="col">{{ __('Created') }}</th>
                             <th scope="col" class="text-right">{{ __('Actions') }}</th>
                         </tr>
@@ -33,7 +126,12 @@
                             @endphp
                             <tr>
                                 <td class="text-muted font-weight-bold">#{{ $report->id }}</td>
-                                <td>{{ $report->category }}</td>
+                                <td>
+                                    {{ $report->category }}
+                                    @if ($report->subcategory)
+                                        <div class="small text-muted">{{ $report->subcategory }}</div>
+                                    @endif
+                                </td>
                                 <td>
                                     @if ($report->urgent)
                                         <span class="badge badge-danger">{{ __('Yes') }}</span>
@@ -47,6 +145,13 @@
                                         <i class="fas fa-paperclip mr-1"></i> {{ $report->files_count }}
                                     </span>
                                 </td>
+                                <td>
+                                    @if ($report->violation_date)
+                                        {{ $report->violation_date->format('M d, Y') }}
+                                    @else
+                                        <span class="text-muted">&mdash;</span>
+                                    @endif
+                                </td>
                                 <td>{{ $report->created_at->format('M d, Y H:i') }}</td>
                                 <td class="text-right">
                                     <div class="d-flex flex-wrap justify-content-end">
@@ -58,8 +163,7 @@
                                             data-toggle="modal" data-target="#{{ $modalId }}">
                                             <i class="fas fa-paperclip mr-1"></i> {{ __('View attachments') }}
                                         </a>
-                                        <form method="POST" action="{{ route('reports.destroy', $report) }}"
-                                            class="mb-1"
+                                        <form method="POST" action="{{ route('reports.destroy', $report) }}" class="mb-1"
                                             onsubmit="return confirm('{{ __('Are you sure you want to move this report to the trash?') }}');">
                                             @csrf
                                             @method('DELETE')
@@ -97,7 +201,7 @@
                                                                     <div>
                                                                         <p class="mb-1 font-weight-bold">{{ $file->original_name }}</p>
                                                                         <p class="mb-0 text-xs text-muted">
-                                                                            {{ $mime ?: __('Unknown type') }} • {{ number_format($size, 2) }} {{ __('MB') }}
+                                                                            {{ $mime ?: __('Unknown type') }} - {{ number_format($size, 2) }} {{ __('MB') }}
                                                                         </p>
                                                                     </div>
                                                                     <div class="btn-group btn-group-sm" role="group">
@@ -159,7 +263,7 @@
                             @endpush
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     {{ __('No reports found for your organization yet.') }}
                                 </td>
                             </tr>
@@ -172,5 +276,74 @@
             {{ $reports->links('pagination::bootstrap-4') }}
         </div>
     </div>
+
     @stack('modals')
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const categoriesMap = @json($categoriesMap);
+                const categorySelect = document.getElementById('category');
+                const subcategorySelect = document.getElementById('subcategory');
+                const placeholder = @json(__('Any subcategory'));
+                const archivedLabel = @json(__('archived'));
+                const initialSubcategory = @json($subcategory);
+
+                const renderSubcategories = (selectedCategory, chosen = '') => {
+                    if (!subcategorySelect) {
+                        return;
+                    }
+
+                    subcategorySelect.innerHTML = '';
+
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = placeholder;
+                    subcategorySelect.appendChild(defaultOption);
+
+                    const options = categoriesMap[selectedCategory];
+                    if (!selectedCategory || !Array.isArray(options)) {
+                        if (chosen) {
+                            const archivedOption = document.createElement('option');
+                            archivedOption.value = chosen;
+                            archivedOption.textContent = chosen + ' (' + archivedLabel + ')';
+                            archivedOption.selected = true;
+                            subcategorySelect.appendChild(archivedOption);
+                        }
+
+                        subcategorySelect.value = '';
+                        subcategorySelect.disabled = true;
+                        return;
+                    }
+
+                    options.forEach((item) => {
+                        const option = document.createElement('option');
+                        option.value = item;
+                        option.textContent = item;
+                        subcategorySelect.appendChild(option);
+                    });
+
+                    subcategorySelect.disabled = false;
+
+                    if (chosen && options.includes(chosen)) {
+                        subcategorySelect.value = chosen;
+                    } else if (chosen) {
+                        const archivedOption = document.createElement('option');
+                        archivedOption.value = chosen;
+                        archivedOption.textContent = chosen + ' (' + archivedLabel + ')';
+                        archivedOption.selected = true;
+                        subcategorySelect.appendChild(archivedOption);
+                    } else {
+                        subcategorySelect.value = '';
+                    }
+                };
+
+                renderSubcategories(categorySelect?.value, initialSubcategory);
+
+                categorySelect?.addEventListener('change', (event) => {
+                    renderSubcategories(event.target.value);
+                });
+            });
+        </script>
+    @endpush
 </x-admin-layout>

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostChatMessageRequest;
 use App\Http\Requests\UpdateReportRequest;
 use App\Models\Report;
+use App\Models\ReportCategory;
 use App\Models\ReportFile;
 use App\Services\Audit;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -25,13 +27,14 @@ class ReviewController extends Controller
         $status = (string) $request->query('status', '');
         $urgent = (string) $request->query('urgent', '');
         $category = (string) $request->query('category', '');
+        $subcategory = (string) $request->query('subcategory', '');
         $from = (string) $request->query('from', '');
         $to = (string) $request->query('to', '');
+        $sort = (string) $request->query('sort', 'submitted_desc');
 
         $query = Report::query()
             ->with(['org', 'files'])
-            ->withCount('files')
-            ->latest();
+            ->withCount('files');
 
         if (! $user->can('view-all')) {
             $query->where('org_id', $user->org_id);
@@ -46,7 +49,11 @@ class ReviewController extends Controller
         }
 
         if ($category !== '') {
-            $query->where('category', 'like', "%{$category}%");
+            $query->where('category', $category);
+        }
+
+        if ($subcategory !== '') {
+            $query->where('subcategory', $subcategory);
         }
 
         if ($from !== '' && Carbon::hasFormat($from, 'Y-m-d')) {
@@ -57,24 +64,73 @@ class ReviewController extends Controller
             $query->whereDate('created_at', '<=', Carbon::createFromFormat('Y-m-d', $to));
         }
 
-        $reports = $query->paginate(20)->withQueryString();
+        $reports = $this->applySorting($query, $sort)
+            ->paginate(20)
+            ->withQueryString();
 
-        $categories = Report::query()
-            ->select('category')
-            ->when(! $user->can('view-all'), fn ($q) => $q->where('org_id', $user->org_id))
-            ->distinct()
-            ->orderBy('category')
-            ->pluck('category');
+        $categoriesMap = ReportCategory::query()
+            ->with('subcategories')
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(function (ReportCategory $categoryModel): array {
+                $subcategories = $categoryModel->subcategories
+                    ->map(fn ($sub) => $sub->name)
+                    ->all();
 
-        return view('reviews.index', compact(
-            'reports',
-            'status',
-            'urgent',
-            'category',
-            'from',
-            'to',
-            'categories'
-        ));
+                return [$categoryModel->name => $subcategories];
+            })
+            ->toArray();
+
+        $subcategoryOptions = $category !== '' ? ($categoriesMap[$category] ?? []) : [];
+
+        return view('reviews.index', [
+            'reports' => $reports,
+            'status' => $status,
+            'urgent' => $urgent,
+            'category' => $category,
+            'subcategory' => $subcategory,
+            'from' => $from,
+            'to' => $to,
+            'sort' => $sort,
+            'categoriesMap' => $categoriesMap,
+            'subcategoryOptions' => $subcategoryOptions,
+        ]);
+    }
+
+    /**
+     * Apply sorting to the review query.
+     */
+    protected function applySorting(Builder $query, string $sort): Builder
+    {
+        return match ($sort) {
+            'submitted_asc' => $query->orderBy('created_at', 'asc'),
+            'violation_desc' => $query
+                ->orderByRaw('violation_date IS NULL')
+                ->orderBy('violation_date', 'desc')
+                ->orderBy('created_at', 'desc'),
+            'violation_asc' => $query
+                ->orderByRaw('violation_date IS NULL')
+                ->orderBy('violation_date', 'asc')
+                ->orderBy('created_at', 'desc'),
+            'category_asc' => $query
+                ->orderBy('category')
+                ->orderBy('subcategory')
+                ->orderBy('created_at', 'desc'),
+            'category_desc' => $query
+                ->orderBy('category', 'desc')
+                ->orderBy('subcategory', 'desc')
+                ->orderBy('created_at', 'desc'),
+            'subcategory_asc' => $query
+                ->orderBy('subcategory')
+                ->orderBy('category')
+                ->orderBy('created_at', 'desc'),
+            'subcategory_desc' => $query
+                ->orderBy('subcategory', 'desc')
+                ->orderBy('category', 'desc')
+                ->orderBy('created_at', 'desc'),
+            default => $query->orderBy('created_at', 'desc'),
+        };
     }
 
     /**
@@ -114,6 +170,19 @@ class ReviewController extends Controller
 
         return view('reviews.edit', [
             'report' => $report,
+            'categories' => ReportCategory::query()
+                ->with('subcategories')
+                ->orderBy('position')
+                ->orderBy('name')
+                ->get()
+                ->mapWithKeys(function (ReportCategory $categoryModel): array {
+                    $subcategories = $categoryModel->subcategories
+                        ->map(fn ($sub) => $sub->name)
+                        ->all();
+
+                    return [$categoryModel->name => $subcategories];
+                })
+                ->toArray(),
         ]);
     }
 
@@ -131,7 +200,9 @@ class ReviewController extends Controller
         $validated = $request->validated();
 
         $report->category = $validated['category'];
+        $report->subcategory = $validated['subcategory'];
         $report->description = $validated['description'];
+        $report->violation_date = $validated['violation_date'] ?? null;
         $report->contact_name = $validated['contact_name'] ?? null;
         $report->contact_email = $validated['contact_email'] ?? null;
         $report->contact_phone = $validated['contact_phone'] ?? null;

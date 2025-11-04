@@ -31,12 +31,14 @@ class Report extends Model
     protected $fillable = [
         'org_id',
         'category',
+        'subcategory',
         'description',
         'contact_name',
         'contact_email',
         'contact_phone',
         'urgent',
         'status',
+        'violation_date',
         'first_response_at',
         'chat_token',
     ];
@@ -51,6 +53,7 @@ class Report extends Model
         'contact_phone' => 'encrypted',
         'urgent' => 'boolean',
         'first_response_at' => 'datetime',
+        'violation_date' => 'date',
     ];
 
     /**

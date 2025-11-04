@@ -1,0 +1,82 @@
+<?php
+
+return [
+    'Safety & Threat-Related' => [
+        'Weapons / Dangerous Objects',
+        'Physical Altercation / Fighting',
+        'Threats of Violence',
+        'Suspicious Behavior or Person',
+        'Vandalism / Property Damage',
+        'Trespassing / Unauthorized Entry',
+        'Safety Hazard (Building, Playground, etc.)',
+    ],
+    'Bullying & Harassment' => [
+        'Verbal / Emotional Bullying',
+        'Cyberbullying / Online Harassment',
+        'Physical Bullying',
+        'Social Exclusion / Group Targeting',
+        'Harassment (Student or Staff)',
+        'Hate / Bias Incident (Race, Religion, Gender, etc.)',
+    ],
+    'Student Mental & Emotional Health' => [
+        'Self-Harm / Suicide Concern',
+        'Depression / Anxiety Concern',
+        'Grief / Emotional Distress',
+        'Peer Relationship Conflict',
+        'Request for Counselor Support',
+        'Behavioral Change / Withdrawal',
+    ],
+    'Substance Use & Risk Behaviors' => [
+        'Drugs / Vaping / Alcohol Possession',
+        'Distribution or Influence on Campus',
+        'Tobacco / E-Cigarette Use',
+        'Substance Paraphernalia Found',
+    ],
+    'Sexual Misconduct & Abuse' => [
+        'Sexual Harassment or Assault',
+        'Inappropriate Touching / Behavior',
+        'Sexting / Explicit Image Sharing',
+        'Suspected Abuse (Home or School)',
+        'Human Trafficking Indicators',
+    ],
+    'Academic Integrity & Conduct' => [
+        'Cheating / Plagiarism',
+        'Classroom Disruption',
+        'Defiance / Disrespect',
+        'Theft / Stealing',
+        'Academic Dishonesty',
+        'Forgery / Altered Documents',
+    ],
+    'Attendance & Behavior Support' => [
+        'Truancy / Skipping',
+        'Tardiness Patterns',
+        'Behavioral Outbursts',
+        'Non-Compliance with School Rules',
+    ],
+    'Digital & Online Safety' => [
+        'Inappropriate Internet Use',
+        'Social Media Threat or Post',
+        'Unauthorized Recording / Photos',
+        'Identity Theft / Impersonation',
+        'Online Predatory Behavior',
+    ],
+    'Health & Wellness' => [
+        'Illness / Injury on Campus',
+        'Communicable Disease Concern',
+        'Poor Hygiene / Neglect Concern',
+        'Nutrition / Food-Related Issue',
+    ],
+    'Staff / Campus Concerns' => [
+        'Staff Misconduct or Inappropriate Behavior',
+        'Equity / Bias Concern',
+        'Facilities Issue (lighting, locks, safety equipment)',
+        'Bus or Transportation Concern',
+        'Visitor / Vendor Issue',
+    ],
+    'Positive Reporting' => [
+        'Acts of Kindness / Leadership',
+        'Peer Support / Mentorship',
+        'Student Achievement / Recognition',
+        'Staff Appreciation / Encouragement',
+    ],
+];

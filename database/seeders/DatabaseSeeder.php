@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Models\Org;
 use App\Models\OrgAlertContact;
 use App\Models\Report;
+use App\Models\ReportCategory;
 use App\Models\ReportChatMessage;
+use App\Models\ReportSubcategory;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -91,36 +93,70 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $categorySeedPath = config_path('report_categories.php');
+        $categorySeedData = is_file($categorySeedPath) ? include $categorySeedPath : [];
+
+        $categoryPosition = 1;
+        foreach ($categorySeedData as $categoryName => $subcategoryNames) {
+            $category = ReportCategory::updateOrCreate(
+                ['name' => $categoryName],
+                [
+                    'description' => null,
+                    'position' => $categoryPosition++,
+                ],
+            );
+
+            $subcategoryPosition = 1;
+            foreach ($subcategoryNames as $subcategoryName) {
+                ReportSubcategory::updateOrCreate(
+                    [
+                        'report_category_id' => $category->id,
+                        'name' => $subcategoryName,
+                    ],
+                    [
+                        'description' => null,
+                        'position' => $subcategoryPosition++,
+                    ],
+                );
+            }
+        }
+
         if (! Report::where('org_id', $org->id)->exists()) {
             $sampleReports = [
                 [
-                    'category' => 'Unauthorized Access',
+                    'category' => 'Safety & Threat-Related',
+                    'subcategory' => 'Trespassing / Unauthorized Entry',
                     'description' => 'Motion sensors triggered near the server room after hours. Security footage shows an unidentified individual tailgating through the loading dock.',
                     'urgent' => true,
                     'status' => 'open',
                     'contact_email' => 'anon1@example.com',
+                    'violation_date' => now()->subDays(1),
                     'messages' => [
                         ['from' => 'reporter', 'body' => 'I heard alarms and saw someone running out of the side exit.'],
                     ],
                 ],
                 [
-                    'category' => 'Phishing Email',
-                    'description' => 'Multiple staff members received an email claiming to be from IT requesting password resets. Links point to an external domain.',
+                    'category' => 'Digital & Online Safety',
+                    'subcategory' => 'Identity Theft / Impersonation',
+                    'description' => 'Multiple staff members received an email claiming to be from IT requesting password resets. Links point to an external domain and spoof the technology director.',
                     'urgent' => false,
                     'status' => 'in_review',
                     'contact_email' => 'teacher@example.com',
+                    'violation_date' => now()->subDays(2),
                     'messages' => [
                         ['from' => 'reporter', 'body' => 'Email subject was "Urgent Password Reset Required".'],
-                        ['from' => 'reviewer', 'body' => 'Thanks for flagging—please forward one of the emails to security.'],
+                        ['from' => 'reviewer', 'body' => 'Thanks for flagging - please forward one of the emails to security.'],
                     ],
                     'first_response_minutes' => 120,
                 ],
                 [
-                    'category' => 'Device Theft',
+                    'category' => 'Academic Integrity & Conduct',
+                    'subcategory' => 'Theft / Stealing',
                     'description' => 'A Chromebook cart is missing from the science wing. Last seen during evening cleanup on Tuesday.',
                     'urgent' => true,
                     'status' => 'in_review',
                     'contact_phone' => '+15551230001',
+                    'violation_date' => now()->subDays(3),
                     'messages' => [
                         ['from' => 'reporter', 'body' => 'We noticed the missing cart during first period.'],
                         ['from' => 'reviewer', 'body' => 'We are reviewing badge access logs for the wing.'],
@@ -128,31 +164,37 @@ class DatabaseSeeder extends Seeder
                     'first_response_minutes' => 90,
                 ],
                 [
-                    'category' => 'Bullying',
+                    'category' => 'Bullying & Harassment',
+                    'subcategory' => 'Cyberbullying / Online Harassment',
                     'description' => 'Student reports ongoing harassment on social media involving threatening language and sharing of private photos.',
                     'urgent' => true,
                     'status' => 'open',
                     'contact_name' => 'Concerned Student',
+                    'violation_date' => now()->subDays(4),
                     'messages' => [],
                 ],
                 [
-                    'category' => 'Network Outage',
-                    'description' => 'Library Wi-Fi dropped for 30 minutes on Monday. Suspect misconfigured switch after maintenance.',
+                    'category' => 'Digital & Online Safety',
+                    'subcategory' => 'Inappropriate Internet Use',
+                    'description' => 'Students discovered a proxy site on library computers that bypassed web filters and disrupted service for 30 minutes on Monday.',
                     'urgent' => false,
                     'status' => 'closed',
                     'contact_email' => 'librarian@example.com',
+                    'violation_date' => now()->subDays(5),
                     'messages' => [
                         ['from' => 'reporter', 'body' => 'Outage occurred around 10:15 AM.'],
-                        ['from' => 'reviewer', 'body' => 'Resolved—switch stack rebooted and firmware updated.'],
+                        ['from' => 'reviewer', 'body' => 'Resolved - switch stack rebooted and firmware updated.'],
                     ],
                     'first_response_minutes' => 45,
                 ],
                 [
-                    'category' => 'Vandalism',
+                    'category' => 'Safety & Threat-Related',
+                    'subcategory' => 'Vandalism / Property Damage',
                     'description' => 'Graffiti found on the north stairwell referencing a potential fight after school.',
                     'urgent' => true,
                     'status' => 'open',
                     'contact_phone' => '+15551230099',
+                    'violation_date' => now()->subDays(1),
                     'messages' => [
                         ['from' => 'reporter', 'body' => 'Message said "See you at 4 by the parking lot".'],
                     ],
@@ -163,7 +205,9 @@ class DatabaseSeeder extends Seeder
                 $report = Report::create([
                     'org_id' => $org->id,
                     'category' => $data['category'],
+                    'subcategory' => $data['subcategory'] ?? null,
                     'description' => $data['description'],
+                    'violation_date' => $data['violation_date'] ?? null,
                     'contact_name' => $data['contact_name'] ?? null,
                     'contact_email' => $data['contact_email'] ?? null,
                     'contact_phone' => $data['contact_phone'] ?? null,
@@ -186,3 +230,4 @@ class DatabaseSeeder extends Seeder
         }
     }
 }
+

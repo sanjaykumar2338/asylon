@@ -31,6 +31,20 @@
         </div>
     @endif
 
+    @php
+        $hasCategories = ! empty($categories);
+        $selectedCategory = $hasCategories ? old('category') : null;
+        $initialSubcategories = $selectedCategory && isset($categories[$selectedCategory])
+            ? $categories[$selectedCategory]
+            : [];
+    @endphp
+
+    @unless ($hasCategories)
+        <div class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-700">
+            {{ __('No reporting categories are configured yet. Please contact your administrator to enable submissions.') }}
+        </div>
+    @endunless
+
     <form method="POST" action="{{ route('report.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
@@ -47,9 +61,28 @@
 
         <div>
             <x-input-label for="category" value="Category" />
-            <x-text-input id="category" name="category" type="text" class="mt-1 block w-full"
-                value="{{ old('category') }}" maxlength="100" required />
+            <select id="category" name="category"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                {{ $hasCategories ? '' : 'disabled' }} required>
+                <option value="">{{ __('Select a category') }}</option>
+                @foreach ($categories as $categoryName => $subcategoryList)
+                    <option value="{{ $categoryName }}" @selected($selectedCategory === $categoryName)>{{ $categoryName }}</option>
+                @endforeach
+            </select>
             <x-input-error class="mt-2" :messages="$errors->get('category')" />
+        </div>
+
+        <div>
+            <x-input-label for="subcategory" value="Subcategory" />
+            <select id="subcategory" name="subcategory"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                {{ $hasCategories && $selectedCategory ? '' : 'disabled' }} required>
+                <option value="">{{ __('Select a subcategory') }}</option>
+                @foreach ($initialSubcategories as $subcategory)
+                    <option value="{{ $subcategory }}" @selected(old('subcategory') === $subcategory)>{{ $subcategory }}</option>
+                @endforeach
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('subcategory')" />
         </div>
 
         <div>
@@ -57,6 +90,13 @@
             <textarea id="description" name="description" rows="6" required
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
             <x-input-error class="mt-2" :messages="$errors->get('description')" />
+        </div>
+
+        <div>
+            <x-input-label for="violation_date" value="Violation date (optional)" />
+            <x-text-input id="violation_date" name="violation_date" type="date"
+                class="mt-1 block w-full" value="{{ old('violation_date') }}" />
+            <x-input-error class="mt-2" :messages="$errors->get('violation_date')" />
         </div>
 
         <div class="grid gap-4 md:grid-cols-2">
@@ -213,6 +253,74 @@
             <x-primary-button>Submit report</x-primary-button>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const categoriesMap = @json($categories);
+            const categorySelect = document.getElementById('category');
+            const subcategorySelect = document.getElementById('subcategory');
+            const subcategoryPlaceholder = @json(__('Select a subcategory'));
+            let initialSubcategory = @json(old('subcategory'));
+
+            if (!categoriesMap || Object.keys(categoriesMap).length === 0) {
+                if (subcategorySelect) {
+                    subcategorySelect.innerHTML = '';
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.value = '';
+                    placeholderOption.textContent = subcategoryPlaceholder;
+                    subcategorySelect.appendChild(placeholderOption);
+                    subcategorySelect.disabled = true;
+                }
+                if (categorySelect) {
+                    categorySelect.value = '';
+                    categorySelect.disabled = true;
+                }
+                return;
+            }
+
+            function populateSubcategories(selectedCategory, targetSubcategory = '') {
+                if (!subcategorySelect) {
+                    return;
+                }
+
+                subcategorySelect.innerHTML = '';
+
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = subcategoryPlaceholder;
+                subcategorySelect.appendChild(placeholderOption);
+
+                const options = categoriesMap[selectedCategory];
+                if (!selectedCategory || !Array.isArray(options)) {
+                    subcategorySelect.value = '';
+                    subcategorySelect.disabled = true;
+                    return;
+                }
+
+                options.forEach(function (subcategory) {
+                    const option = document.createElement('option');
+                    option.value = subcategory;
+                    option.textContent = subcategory;
+                    subcategorySelect.appendChild(option);
+                });
+
+                subcategorySelect.disabled = false;
+
+                if (targetSubcategory && options.includes(targetSubcategory)) {
+                    subcategorySelect.value = targetSubcategory;
+                } else {
+                    subcategorySelect.value = '';
+                }
+            }
+
+            populateSubcategories(categorySelect?.value, initialSubcategory);
+            initialSubcategory = '';
+
+            categorySelect?.addEventListener('change', function (event) {
+                populateSubcategories(event.target.value);
+            });
+        });
+    </script>
 
     <style>
         .voice-recorder-control {
