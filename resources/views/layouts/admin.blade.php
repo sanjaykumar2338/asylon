@@ -114,6 +114,16 @@
                                     </a>
                                 </li>
                             @endif
+
+                            <li class="nav-item mt-3">
+                                <form method="POST" action="{{ route('logout') }}" onsubmit="return window.confirm('{{ __('Are you sure you want to log out?') }}');">
+                                    @csrf
+                                    <button type="submit" class="nav-link btn btn-link text-left text-white">
+                                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                                        <p>{{ __('Log Out') }}</p>
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </nav>
                 </div>

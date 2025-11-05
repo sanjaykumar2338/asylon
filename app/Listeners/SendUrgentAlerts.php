@@ -45,6 +45,11 @@ class SendUrgentAlerts
                     Notification::route('mail', $contact->value)
                         ->notify(new UrgentReportEmail($report));
                     $emailCount++;
+                    Log::info('Urgent report email notification sent.', [
+                        'report_id' => $report->getKey(),
+                        'contact' => $contact->value,
+                        'org_id' => $report->org_id,
+                    ]);
                 } catch (Throwable $e) {
                     $emailFailures[] = $contact->value;
                     Log::error('Failed to send urgent report email notification.', [
@@ -59,6 +64,11 @@ class SendUrgentAlerts
                     Notification::route(TwilioChannel::class, $contact->value)
                         ->notify(new UrgentReportSms($report, $contact->value));
                     $smsCount++;
+                    Log::info('Urgent report SMS notification sent.', [
+                        'report_id' => $report->getKey(),
+                        'contact' => $contact->value,
+                        'org_id' => $report->org_id,
+                    ]);
                 } catch (Throwable $e) {
                     $smsFailures[] = $contact->value;
                     Log::error('Failed to send urgent report SMS notification.', [
@@ -76,6 +86,11 @@ class SendUrgentAlerts
             try {
                 $onCallReviewer->notify(new AssignedUrgentReportNotification($report));
                 $onCallNotified = true;
+                Log::info('Urgent report assignment email sent to on-call reviewer.', [
+                    'report_id' => $report->getKey(),
+                    'on_call_user_id' => $onCallReviewer->getKey(),
+                    'org_id' => $report->org_id,
+                ]);
             } catch (Throwable $e) {
                 Log::error('Failed to notify on-call reviewer about an urgent report.', [
                     'report_id' => $report->getKey(),
