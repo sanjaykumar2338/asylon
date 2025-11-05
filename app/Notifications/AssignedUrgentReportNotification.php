@@ -6,7 +6,7 @@ use App\Models\Report;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class UrgentReportEmail extends Notification
+class AssignedUrgentReportNotification extends Notification
 {
     public function __construct(protected Report $report)
     {
@@ -27,24 +27,29 @@ class UrgentReportEmail extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $report = $this->report;
+        $report = $this->report->loadMissing('org');
         $orgName = $report->org?->name ?? 'Unassigned organization';
-        $reportUrl = route('reports.show', $report);
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;
-        $submittedAt = $report->created_at?->timezone(config('app.timezone'))->format('M d, Y H:i');
-        $violationDate = $report->violation_date?->format('M d, Y') ?? 'Not provided';
+        $reportUrl = route('reports.show', $report);
+        $submittedAt = $report->created_at
+            ? $report->created_at->timezone(config('app.timezone'))->format('M d, Y H:i')
+            : 'recently';
+        $violationDate = $report->violation_date
+            ? $report->violation_date->format('M d, Y')
+            : 'Not provided';
 
         return (new MailMessage())
-            ->subject("URGENT: New {$report->category} report")
-            ->greeting('Attention required')
+            ->subject("Assigned urgent report: {$report->category}")
+            ->greeting("Hello {$notifiable->name},")
+            ->line('You have been assigned as the on-call reviewer for a new urgent report.')
             ->line("Organization: {$orgName}")
             ->line("Category: {$categoryLabel}")
             ->line("Submitted at: {$submittedAt}")
             ->line("Violation date: {$violationDate}")
-            ->action('Open in dashboard', $reportUrl)
-            ->line('Please review and respond as soon as possible.')
+            ->action('Open report', $reportUrl)
+            ->line('Please review and respond promptly.')
             ->line(config('asylon.privacy.email_footer'));
     }
 }

@@ -9,13 +9,6 @@
                 {{ __('Submitted on') }} {{ $report->created_at->format('M d, Y H:i') }}
             </p>
         </div>
-
-        @if (session('ok'))
-            <div class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                {{ session('ok') }}
-            </div>
-        @endif
-
         <div class="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <div>
                 <h2 class="text-lg font-semibold text-gray-900">{{ __('Report Details') }}</h2>

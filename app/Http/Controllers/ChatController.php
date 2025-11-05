@@ -20,14 +20,13 @@ class ChatController extends Controller
     public function thread(string $token): View
     {
         $report = Report::where('chat_token', $token)
-            ->with(['files'])
+            ->with([
+                'files',
+                'messages' => fn ($query) => $query->orderBy('created_at'),
+            ])
             ->firstOrFail();
 
-        $messages = $report->messages()
-            ->latest('id')
-            ->get()
-            ->reverse()
-            ->values();
+        $messages = $report->messages->values();
 
         Audit::log('reporter', 'view_chat', 'report', $report->getKey());
 

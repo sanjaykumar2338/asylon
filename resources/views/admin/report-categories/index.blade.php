@@ -9,25 +9,6 @@
             <li class="breadcrumb-item active">{{ __('Report Categories') }}</li>
         </ol>
     @endsection
-
-    @if (session('ok'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle mr-2"></i>{{ session('ok') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     <div class="card card-outline card-primary">
         <div class="card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between">
             <h3 class="card-title mb-0">
@@ -67,8 +48,12 @@
                                             <i class="fas fa-edit mr-1"></i>{{ __('Edit') }}
                                         </a>
                                         <form method="POST" action="{{ route('admin.report-categories.destroy', $category) }}"
-                                            onsubmit="return confirm('{{ __('Are you sure you want to delete this category? This cannot be undone.') }}');"
-                                            class="d-inline-block ml-1">
+                                            class="d-inline-block ml-1"
+                                            data-swal-confirm
+                                            data-swal-title="{{ __('Delete category') }}"
+                                            data-swal-message="{{ __('Are you sure you want to delete this category? This cannot be undone.') }}"
+                                            data-swal-confirm-button="{{ __('Yes, delete') }}"
+                                            data-swal-icon="warning">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger">

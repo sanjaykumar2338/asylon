@@ -18,6 +18,9 @@
             Use this form to anonymously report a security issue or concern. Only the reviewing team for your
             organization will be able to access the information you provide.
         </p>
+        <p class="mt-3 text-sm font-medium text-indigo-700">
+            {{ config('asylon.privacy.form_header') }}
+        </p>
     </div>
 
     @if ($errors->any())
@@ -32,6 +35,7 @@
     @endif
 
     @php
+        $descriptionMinWords = (int) config('asylon.reports.description_min_words', 20);
         $hasCategories = ! empty($categories);
         $selectedCategory = $hasCategories ? old('category') : null;
         $initialSubcategories = $selectedCategory && isset($categories[$selectedCategory])
@@ -87,8 +91,12 @@
 
         <div>
             <x-input-label for="description" value="Describe the issue" />
-            <textarea id="description" name="description" rows="6" required
+            <textarea id="description" name="description" rows="6" required data-min-words="{{ $descriptionMinWords }}"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
+            <p id="description-word-helper" data-min-words="{{ $descriptionMinWords }}"
+                class="mt-2 text-xs text-gray-500">
+                {{ __('Minimum :count words required. Currently 0 words.', ['count' => $descriptionMinWords]) }}
+            </p>
             <x-input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
@@ -104,6 +112,7 @@
                 <x-input-label for="contact_name" value="Contact name (optional)" />
                 <x-text-input id="contact_name" name="contact_name" type="text" class="mt-1 block w-full"
                     value="{{ old('contact_name') }}" maxlength="150" />
+                <p class="mt-1 text-xs text-gray-500">{{ config('asylon.privacy.contact_hint') }}</p>
                 <x-input-error class="mt-2" :messages="$errors->get('contact_name')" />
             </div>
 
@@ -111,6 +120,7 @@
                 <x-input-label for="contact_email" value="Contact email (optional)" />
                 <x-text-input id="contact_email" name="contact_email" type="email" class="mt-1 block w-full"
                     value="{{ old('contact_email') }}" />
+                <p class="mt-1 text-xs text-gray-500">{{ config('asylon.privacy.contact_hint') }}</p>
                 <x-input-error class="mt-2" :messages="$errors->get('contact_email')" />
             </div>
 
@@ -118,6 +128,7 @@
                 <x-input-label for="contact_phone" value="Contact phone (optional)" />
                 <x-text-input id="contact_phone" name="contact_phone" type="text" class="mt-1 block w-full"
                     value="{{ old('contact_phone') }}" maxlength="30" />
+                <p class="mt-1 text-xs text-gray-500">{{ config('asylon.privacy.contact_hint') }}</p>
                 <x-input-error class="mt-2" :messages="$errors->get('contact_phone')" />
             </div>
 
@@ -319,6 +330,39 @@
             categorySelect?.addEventListener('change', function (event) {
                 populateSubcategories(event.target.value);
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var textarea = document.getElementById('description');
+            var helper = document.getElementById('description-word-helper');
+
+            if (!textarea || !helper) {
+                return;
+            }
+
+            var minWords = parseInt(helper.dataset.minWords || textarea.dataset.minWords || '20', 10);
+
+            var updateHelper = function () {
+                var value = textarea.value.trim();
+                var tokens = value === '' ? [] : value.split(/\s+/).filter(function (token) {
+                    return token.length > 0;
+                });
+                var count = tokens.length;
+                helper.textContent = 'Minimum ' + minWords + ' words required. Currently ' + count + ' word' + (count === 1 ? '' : 's') + '.';
+
+                if (count < minWords) {
+                    helper.classList.remove('text-gray-500');
+                    helper.classList.add('text-red-600');
+                } else {
+                    helper.classList.remove('text-red-600');
+                    helper.classList.add('text-gray-500');
+                }
+            };
+
+            updateHelper();
+            textarea.addEventListener('input', updateHelper);
         });
     </script>
 

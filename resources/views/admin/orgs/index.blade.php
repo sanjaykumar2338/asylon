@@ -79,7 +79,11 @@
                                         </a>
                                         @if (auth()->user()?->hasRole('platform_admin'))
                                             <form action="{{ route('admin.orgs.destroy', $org) }}" method="POST"
-                                                onsubmit="return confirm('{{ __('Delete this organization? This cannot be undone.') }}');">
+                                                data-swal-confirm
+                                                data-swal-title="{{ __('Delete organization') }}"
+                                                data-swal-message="{{ __('Delete this organization? This cannot be undone.') }}"
+                                                data-swal-confirm-button="{{ __('Yes, delete') }}"
+                                                data-swal-icon="warning">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-danger">

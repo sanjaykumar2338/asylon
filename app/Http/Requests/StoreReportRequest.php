@@ -84,11 +84,26 @@ class StoreReportRequest extends FormRequest
             ->values()
             ->all();
 
+        $minWords = $this->minimumDescriptionWords();
+
         return [
             'org_id' => ['required', 'exists:orgs,id'],
             'category' => ['required', 'string', 'max:100', Rule::in($categoryOptions)],
             'subcategory' => ['required', 'string', 'max:100', Rule::in($subcategoryOptions)],
-            'description' => ['required', 'string', 'min:20'],
+            'description' => [
+                'required',
+                'string',
+                'min:20',
+                function (string $attribute, mixed $value, \Closure $fail) use ($minWords): void {
+                    $wordCount = str_word_count(trim((string) $value));
+                    if ($wordCount < $minWords) {
+                        $fail(__('Describe the issue must be at least :count words. You have provided :current words.', [
+                            'count' => $minWords,
+                            'current' => $wordCount,
+                        ]));
+                    }
+                },
+            ],
             'violation_date' => ['nullable', 'date'],
             'contact_name' => ['nullable', 'string', 'max:150'],
             'contact_email' => ['nullable', 'email'],
@@ -163,5 +178,10 @@ class StoreReportRequest extends FormRequest
             'category.in' => 'Select a valid category option.',
             'subcategory.in' => 'Select a valid subcategory option.',
         ];
+    }
+
+    protected function minimumDescriptionWords(): int
+    {
+        return (int) config('asylon.reports.description_min_words', 20);
     }
 }

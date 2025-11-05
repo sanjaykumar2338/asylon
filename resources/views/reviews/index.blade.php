@@ -3,15 +3,6 @@
         {{ __('Review Queue') }}
     </x-slot>
 
-    @if (session('ok'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle mr-2"></i> {{ session('ok') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
@@ -98,9 +89,14 @@
 
     <div class="card card-outline card-primary">
         <div class="card-header d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
-            <h3 class="card-title mb-0">
-                <i class="fas fa-clipboard-list mr-2"></i> {{ __('Reports') }}
-            </h3>
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-clipboard-list mr-2"></i> {{ __('Reports') }}
+                </h3>
+                <a href="{{ route('reviews.trash') }}" class="btn btn-outline-secondary btn-sm mt-3 mt-lg-0 ml-lg-3">
+                    <i class="fas fa-trash-alt mr-1"></i> {{ __('View trash') }}
+                </a>
+            </div>
             <span class="badge badge-info badge-pill px-3 py-2 mt-3 mt-lg-0">
                 {{ __('Results') }}: {{ number_format($reports->total()) }}
             </span>
@@ -183,7 +179,12 @@
                                     <a href="{{ route('reports.edit', $report) }}" class="btn btn-outline-warning btn-sm ml-1 mb-1">
                                         <i class="fas fa-edit mr-1"></i> {{ __('Edit') }}
                                     </a>
-                                    <form method="POST" action="{{ route('reports.destroy', $report) }}" class="ml-1 mb-1" onsubmit="return confirm('{{ __('Are you sure you want to move this report to the trash?') }}');">
+                                    <form method="POST" action="{{ route('reports.destroy', $report) }}" class="ml-1 mb-1"
+                                        data-swal-confirm
+                                        data-swal-title="{{ __('Move to trash') }}"
+                                        data-swal-message="{{ __('Are you sure you want to move this report to the trash?') }}"
+                                        data-swal-confirm-button="{{ __('Yes, move') }}"
+                                        data-swal-icon="warning">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">

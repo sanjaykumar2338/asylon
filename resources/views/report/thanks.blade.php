@@ -5,6 +5,9 @@
             Your report has been submitted successfully. If follow-up is required, keep this reference ID for future
             communication.
         </p>
+        <p class="mt-3 text-sm font-medium text-indigo-700">
+            {{ config('asylon.privacy.confirm') }}
+        </p>
 
         <div class="mt-6 rounded-md border border-indigo-200 bg-indigo-50 p-4">
             <p class="text-sm font-medium text-indigo-900">Reference ID</p>

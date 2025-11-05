@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\RoleMiddleware;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
@@ -20,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'can' => Authorize::class,
         ]);
+
+        $middleware->append(ContentSecurityPolicy::class);
     })
     ->withProviders([
         AppServiceProvider::class,

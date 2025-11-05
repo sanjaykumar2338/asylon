@@ -65,7 +65,11 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                                            onsubmit="return confirm('{{ __('Delete this user?') }}');">
+                                            data-swal-confirm
+                                            data-swal-title="{{ __('Delete user') }}"
+                                            data-swal-message="{{ __('Delete this user?') }}"
+                                            data-swal-confirm-button="{{ __('Yes, delete') }}"
+                                            data-swal-icon="warning">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger">

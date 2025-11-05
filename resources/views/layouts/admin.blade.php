@@ -57,8 +57,8 @@
                 <div class="sidebar">
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
                         <div class="image">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff"
-                                class="img-circle elevation-2" alt="{{ Auth::user()->name }}">
+                            <img src="{{ Auth::user()->profile_photo_url }}"
+                                class="img-circle elevation-2" alt="{{ Auth::user()->name }}" width="40" height="40">
                         </div>
                         <div class="info">
                             <span class="d-block text-white">{{ Auth::user()->name }}</span>
@@ -72,6 +72,13 @@
                                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-home"></i>
                                     <p>{{ __('Dashboard') }}</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('reviews.index') }}" class="nav-link {{ request()->routeIs('reviews.*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-alt"></i>
+                                    <p>{{ __('Reports') }}</p>
                                 </a>
                             </li>
 
@@ -150,6 +157,39 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
         @vite(['resources/js/app.js'])
+        @php
+            $flashOk = session('ok');
+            $flashError = session('error');
+        @endphp
+        @if ($flashOk || $flashError)
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (window.Swal) {
+                        @if ($flashOk)
+                            Swal.fire({
+                                icon: 'success',
+                                title: @json($flashOk),
+                                confirmButtonColor: '#2563eb',
+                                customClass: {
+                                    popup: 'shadow-lg'
+                                }
+                            });
+                        @endif
+
+                        @if ($flashError)
+                            Swal.fire({
+                                icon: 'error',
+                                title: @json($flashError),
+                                confirmButtonColor: '#dc2626',
+                                customClass: {
+                                    popup: 'shadow-lg'
+                                }
+                            });
+                        @endif
+                    }
+                });
+            </script>
+        @endif
         @stack('scripts')
     </body>
 </html>

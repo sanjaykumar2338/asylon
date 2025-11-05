@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\UpdateOrgRequest;
 use App\Models\Org;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class OrgController extends AdminController
@@ -50,7 +51,9 @@ class OrgController extends AdminController
     {
         $this->ensurePlatformAdmin();
 
-        return view('admin.orgs.create');
+        return view('admin.orgs.create', [
+            'eligibleUsers' => collect(),
+        ]);
     }
 
     /**
@@ -76,7 +79,10 @@ class OrgController extends AdminController
     {
         $this->authorizeOrgAccess($org);
 
-        return view('admin.orgs.edit', compact('org'));
+        return view('admin.orgs.edit', [
+            'org' => $org,
+            'eligibleUsers' => $this->eligibleOnCallUsers($org),
+        ]);
     }
 
     /**
@@ -135,5 +141,19 @@ class OrgController extends AdminController
         if ($user->org_id !== $org->id) {
             abort(403);
         }
+    }
+
+    /**
+     * Get active reviewers for the given org that can be assigned as on-call.
+     *
+     * @return Collection<int, \App\Models\User>
+     */
+    protected function eligibleOnCallUsers(Org $org): Collection
+    {
+        return $org->users()
+            ->whereIn('role', ['reviewer', 'security_lead'])
+            ->where('active', true)
+            ->orderBy('name')
+            ->get();
     }
 }

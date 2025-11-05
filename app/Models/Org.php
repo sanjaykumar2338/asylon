@@ -21,6 +21,7 @@ class Org extends Model
         'slug',
         'status',
         'created_by',
+        'on_call_user_id',
     ];
 
     /**
@@ -61,5 +62,13 @@ class Org extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * On-call reviewer assigned to urgent alerts.
+     */
+    public function onCallReviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'on_call_user_id');
     }
 }

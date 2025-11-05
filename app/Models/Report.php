@@ -97,4 +97,14 @@ class Report extends Model
             ->where($field ?? $this->getRouteKeyName(), $value)
             ->firstOrFail();
     }
+
+    /**
+     * Determine whether the report is anonymous or confidential based on provided contact details.
+     */
+    public function getPrivacyStatusAttribute(): string
+    {
+        return ($this->contact_email || $this->contact_phone || $this->contact_name)
+            ? 'CONFIDENTIAL'
+            : 'ANONYMOUS';
+    }
 }

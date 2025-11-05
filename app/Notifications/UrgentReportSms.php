@@ -4,17 +4,12 @@ namespace App\Notifications;
 
 use App\Models\Report;
 use App\Notifications\Channels\TwilioChannel;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class UrgentReportSms extends Notification implements ShouldQueue
+class UrgentReportSms extends Notification
 {
-    use Queueable;
-
     public function __construct(protected Report $report, protected string $phoneNumber)
     {
-        $this->queue = 'notifications';
     }
 
     /**
@@ -40,14 +35,17 @@ class UrgentReportSms extends Notification implements ShouldQueue
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;
+        $reportUrl = route('reports.show', $report);
+        $submittedAt = $report->created_at?->format('M d H:i');
 
         return [
             'to' => $this->phoneNumber,
             'body' => sprintf(
-                'Urgent report for %s (%s) at %s. Review ASAP.',
+                'URGENT %s at %s (%s). Review: %s',
+                $report->category,
                 $orgName,
-                $categoryLabel,
-                $report->created_at?->format('M d H:i')
+                $submittedAt ?? 'recent',
+                $reportUrl
             ),
         ];
     }

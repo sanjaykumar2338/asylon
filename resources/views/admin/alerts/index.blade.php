@@ -73,7 +73,11 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('admin.alerts.destroy', $alert) }}" method="POST"
-                                            onsubmit="return confirm('{{ __('Delete this contact?') }}');">
+                                            data-swal-confirm
+                                            data-swal-title="{{ __('Delete contact') }}"
+                                            data-swal-message="{{ __('Delete this contact?') }}"
+                                            data-swal-confirm-button="{{ __('Yes, delete') }}"
+                                            data-swal-icon="warning">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger">
@@ -100,4 +104,3 @@
         </div>
     </div>
 </x-admin-layout>
-

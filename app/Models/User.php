@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role',
         'org_id',
         'active',
+        'profile_photo_path',
     ];
 
     /**
@@ -67,5 +68,35 @@ class User extends Authenticatable
     public function hasRole(string|array $roles): bool
     {
         return in_array($this->role, (array) $roles, true);
+    }
+
+    /**
+     * Resolve URL for the user's profile photo with fallback avatar.
+     */
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        if ($this->profile_photo_path && Storage::disk('public')->exists($this->profile_photo_path)) {
+            return $this->makePublicUrl('/storage/'.$this->profile_photo_path);
+        }
+
+        return $this->makePublicUrl('/assets/images/avatar-default.svg');
+    }
+
+    /**
+     * Build an absolute URL using the current request host when possible.
+     */
+    protected function makePublicUrl(string $path): string
+    {
+        $normalizedPath = '/'.ltrim($path, '/');
+
+        if (app()->bound('request')) {
+            $request = request();
+
+            if ($request) {
+                return rtrim($request->getSchemeAndHttpHost(), '/').$normalizedPath;
+            }
+        }
+
+        return url($normalizedPath);
     }
 }

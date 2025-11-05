@@ -27,5 +27,32 @@
                 {{ $slot }}
             </div>
         </div>
+        @php
+            $flashOk = session('ok');
+            $flashError = session('error');
+        @endphp
+        @if ($flashOk || $flashError)
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (window.Swal) {
+                        @if ($flashOk)
+                            Swal.fire({
+                                icon: 'success',
+                                title: @json($flashOk),
+                                confirmButtonColor: '#2563eb'
+                            });
+                        @endif
+
+                        @if ($flashError)
+                            Swal.fire({
+                                icon: 'error',
+                                title: @json($flashError),
+                                confirmButtonColor: '#dc2626'
+                            });
+                        @endif
+                    }
+                });
+            </script>
+        @endif
     </body>
 </html>

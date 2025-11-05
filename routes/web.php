@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AlertController as AdminAlertController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\TrashReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/report');
@@ -34,6 +36,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reviews', [ReviewController::class, 'index'])
         ->middleware('can:review-reports')
         ->name('reviews.index');
+    Route::get('/reviews/trash', TrashReportController::class)
+        ->middleware('can:review-reports')
+        ->name('reviews.trash');
+    Route::patch('/reviews/trash/{report}', [TrashReportController::class, 'restore'])
+        ->middleware('can:review-reports')
+        ->name('reviews.trash.restore');
 
     Route::post('/reports/{report}/message', [ReviewController::class, 'messageReporter'])
         ->middleware('can:review-reports')
@@ -70,6 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('alerts', AdminAlertController::class)
             ->parameters(['alerts' => 'alert']);
         Route::resource('report-categories', AdminReportCategoryController::class);
+        Route::get('reports/export', [AdminExportController::class, 'reports'])
+            ->name('reports.export');
         Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
             ->name('report-categories.subcategories.store');
         Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])

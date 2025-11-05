@@ -29,9 +29,30 @@
             </div>
         @endif
 
-        <form method="post" action="{{ route('profile.update') }}">
+        <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
             @csrf
             @method('patch')
+
+            <div class="form-group">
+                <label>{{ __('Profile photo') }}</label>
+                <div class="d-flex align-items-center">
+                    <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="rounded-circle border"
+                        style="width: 70px; height: 70px; object-fit: cover;">
+                    <div class="ml-3 flex-grow-1">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input @error('avatar') is-invalid @enderror"
+                                id="avatar" name="avatar" accept="image/*">
+                            <label class="custom-file-label" for="avatar">{{ __('Choose image') }}</label>
+                        </div>
+                        <small class="form-text text-muted">
+                            {{ __('Accepted formats: JPG, PNG, GIF. Max size 2 MB.') }}
+                        </small>
+                        @error('avatar')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
 
             <div class="form-group">
                 <label for="name">{{ __('Name') }}</label>

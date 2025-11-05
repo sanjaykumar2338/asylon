@@ -10,16 +10,6 @@
             <li class="breadcrumb-item active">{{ $category->name }}</li>
         </ol>
     @endsection
-
-    @if (session('ok'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle mr-2"></i>{{ session('ok') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle mr-2"></i>{{ __('Please review the highlighted fields.') }}
@@ -107,8 +97,12 @@
                                             <i class="fas fa-edit mr-1"></i>{{ __('Edit') }}
                                         </button>
                                         <form method="POST" action="{{ route('admin.report-categories.subcategories.destroy', [$category, $subcategory]) }}"
-                                            onsubmit="return confirm('{{ __('Delete this subcategory? This cannot be undone.') }}');"
-                                            class="d-inline-block ml-1">
+                                            class="d-inline-block ml-1"
+                                            data-swal-confirm
+                                            data-swal-title="{{ __('Delete subcategory') }}"
+                                            data-swal-message="{{ __('Delete this subcategory? This cannot be undone.') }}"
+                                            data-swal-confirm-button="{{ __('Yes, delete') }}"
+                                            data-swal-icon="warning">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger">
