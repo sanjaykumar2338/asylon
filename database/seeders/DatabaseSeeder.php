@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
                 'created_by' => $platformAdmin->id,
             ],
         );
+        $this->ensureOrgHasReportCode($org);
 
         $orgAdmin = User::updateOrCreate(
             ['email' => 'orgadmin@example.com'],
@@ -227,6 +228,16 @@ class DatabaseSeeder extends Seeder
                     ]);
                 }
             }
+        }
+    }
+
+    /**
+     * Ensure the seeded organization has a public report link.
+     */
+    protected function ensureOrgHasReportCode(Org $org): void
+    {
+        if (blank($org->org_code)) {
+            $org->regenerateReportCode();
         }
     }
 }

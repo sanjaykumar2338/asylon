@@ -55,6 +55,7 @@
                             <th scope="col">#</th>
                             <th scope="col">{{ __('Name') }}</th>
                             <th scope="col">{{ __('Status') }}</th>
+                            <th scope="col">{{ __('Public link') }}</th>
                             <th scope="col">{{ __('Created') }}</th>
                             <th scope="col" class="text-right">{{ __('Actions') }}</th>
                         </tr>
@@ -69,6 +70,21 @@
                                         <span class="badge badge-success">{{ __('Active') }}</span>
                                     @else
                                         <span class="badge badge-secondary">{{ __('Inactive') }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($org->org_code)
+                                        <div class="small">
+                                            <a href="{{ $org->reportUrl(true) }}" target="_blank" rel="noopener">
+                                                {{ $org->reportUrl() }}
+                                            </a>
+                                            <button type="button" class="btn btn-light btn-sm ml-1"
+                                                onclick="navigator.clipboard.writeText('{{ $org->reportUrl(true) }}')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <span class="text-muted">{{ __('Pending') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $org->created_at?->format('M d, Y H:i') }}</td>
