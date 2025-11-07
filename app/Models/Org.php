@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Org extends Model
 {
@@ -19,6 +20,7 @@ class Org extends Model
     protected $fillable = [
         'name',
         'slug',
+        'org_code',
         'status',
         'created_by',
         'on_call_user_id',
@@ -70,5 +72,52 @@ class Org extends Model
     public function onCallReviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'on_call_user_id');
+    }
+
+    /**
+     * Generate a report submission URL for the organization.
+     */
+    public function reportUrl(bool $absolute = true): string
+    {
+        return route('report.by_code', ['org_code' => $this->org_code], $absolute);
+    }
+
+    /**
+     * Regenerate the public report submission code for the organization.
+     */
+    public function regenerateReportCode(): void
+    {
+        $this->org_code = static::generateUniqueOrgCode();
+        $this->save();
+    }
+
+    /**
+     * Automatically generate a report code when creating or clearing the value.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Org $org): void {
+            if (blank($org->org_code)) {
+                $org->org_code = static::generateUniqueOrgCode();
+            }
+        });
+
+        static::updating(function (Org $org): void {
+            if ($org->isDirty('org_code') && blank($org->org_code)) {
+                $org->org_code = static::generateUniqueOrgCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique 6-character alphanumeric organization code.
+     */
+    protected static function generateUniqueOrgCode(int $length = 6): string
+    {
+        do {
+            $code = Str::upper(Str::random($length));
+        } while (static::withTrashed()->where('org_code', $code)->exists());
+
+        return $code;
     }
 }

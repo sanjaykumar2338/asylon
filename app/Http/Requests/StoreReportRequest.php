@@ -43,6 +43,12 @@ class StoreReportRequest extends FormRequest
                 'violation_date' => null,
             ]);
         }
+
+        if ($this->filled('org_code')) {
+            $this->merge([
+                'org_code' => strtoupper(trim((string) $this->input('org_code'))),
+            ]);
+        }
     }
 
     /**
@@ -87,7 +93,8 @@ class StoreReportRequest extends FormRequest
         $minWords = $this->minimumDescriptionWords();
 
         return [
-            'org_id' => ['required', 'exists:orgs,id'],
+            'org_id' => ['nullable', 'required_without:org_code', 'exists:orgs,id'],
+            'org_code' => ['nullable', 'required_without:org_id', 'string', 'max:12', 'exists:orgs,org_code'],
             'category' => ['required', 'string', 'max:100', Rule::in($categoryOptions)],
             'subcategory' => ['required', 'string', 'max:100', Rule::in($subcategoryOptions)],
             'description' => [
@@ -177,6 +184,9 @@ class StoreReportRequest extends FormRequest
             'voice_recording.mimetypes' => 'The voice recording must be an audio file (MP3, WAV, AAC, OGG, M4A, or WEBM).',
             'category.in' => 'Select a valid category option.',
             'subcategory.in' => 'Select a valid subcategory option.',
+            'org_id.required_without' => 'Please select an organization or use a direct report link.',
+            'org_code.required_without' => 'Please select an organization or use a direct report link.',
+            'org_code.exists' => 'That organization link is no longer valid. Request a new link from your administrator.',
         ];
     }
 

@@ -6,7 +6,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Twilio\Rest\Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,14 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(Client::class, function (): Client {
-            $config = config('services.twilio');
-
-            return new Client(
-                $config['sid'] ?? '',
-                $config['token'] ?? ''
-            );
-        });
+        //
     }
 
     /**

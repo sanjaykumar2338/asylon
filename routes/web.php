@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/report');
 
 Route::get('/report', [ReportController::class, 'create'])->name('report.create');
+Route::get('/report/{org_code}', [ReportController::class, 'createByCode'])->name('report.by_code');
 Route::post('/report', [ReportController::class, 'store'])->middleware('throttle:report-submit')->name('report.store');
 Route::get('/report/thanks/{id}', [ReportController::class, 'thanks'])->name('report.thanks');
 
@@ -88,6 +90,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('report-categories.subcategories.destroy');
         Route::get('analytics', [AdminAnalyticsController::class, 'index'])
             ->name('analytics');
+
+        Route::middleware('can:manage-platform')->group(function () {
+            Route::get('settings', [AdminSettingsController::class, 'edit'])
+                ->name('settings.edit');
+            Route::post('settings', [AdminSettingsController::class, 'update'])
+                ->name('settings.update');
+        });
     });
 
     Route::middleware('can:manage-org')->group(function () {

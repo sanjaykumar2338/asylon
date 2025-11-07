@@ -52,16 +52,24 @@
     <form method="POST" action="{{ route('report.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        <div>
-            <x-input-label for="org_id" value="Organization" />
-            <select id="org_id" name="org_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="">Select an organization</option>
-                @foreach ($orgs as $org)
-                    <option value="{{ $org->id }}" @selected(old('org_id') == $org->id)>{{ $org->name }}</option>
-                @endforeach
-            </select>
-            <x-input-error class="mt-2" :messages="$errors->get('org_id')" />
-        </div>
+        @if (isset($lockedOrg))
+            <input type="hidden" name="org_code" value="{{ old('org_code', $lockedOrg->org_code) }}">
+            <div class="rounded-md border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-700">
+                Reporting to: <strong>{{ $lockedOrg->name }}</strong>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('org_code')" />
+        @else
+            <div>
+                <x-input-label for="org_id" value="Organization" />
+                <select id="org_id" name="org_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Select an organization</option>
+                    @foreach ($orgs as $org)
+                        <option value="{{ $org->id }}" @selected(old('org_id') == $org->id)>{{ $org->name }}</option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('org_id')" />
+            </div>
+        @endif
 
         <div>
             <x-input-label for="category" value="Category" />

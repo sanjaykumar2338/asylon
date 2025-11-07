@@ -7,6 +7,24 @@
         <div class="col-lg-8">
             @include('admin.partials.flash')
 
+            @if ($org->org_code)
+                <div class="card card-outline card-secondary mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ __('Public report link') }}</h5>
+                        <p class="card-text text-muted">
+                            {{ __('Share this link with team members to route reports directly to this organization.') }}
+                        </p>
+                        <div class="d-flex flex-column flex-md-row align-items-md-center">
+                            <input type="text" class="form-control mb-2 mb-md-0" readonly value="{{ $org->reportUrl(true) }}">
+                            <button type="button" class="btn btn-primary ml-md-2" onclick="navigator.clipboard.writeText('{{ $org->reportUrl(true) }}')">
+                                <i class="fas fa-copy mr-1"></i> {{ __('Copy link') }}
+                            </button>
+                        </div>
+                        {{-- {!! QrCode::size(160)->generate($org->reportUrl(true)) !!} --}}
+                    </div>
+                </div>
+            @endif
+
             <div class="card card-outline card-primary">
                 <div class="card-body">
                     <form method="POST" action="{{ route('admin.orgs.update', $org) }}">
@@ -29,4 +47,3 @@
         </div>
     </div>
 </x-admin-layout>
-

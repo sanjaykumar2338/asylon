@@ -22,6 +22,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::define('view-all', static fn ($user): bool => $user->role === 'platform_admin');
 
+        Gate::define('manage-platform', static fn ($user): bool => $user->role === 'platform_admin');
+
         Gate::define('manage-org', static fn ($user): bool => in_array($user->role, [
             'org_admin',
             'platform_admin',

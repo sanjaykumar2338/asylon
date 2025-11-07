@@ -20,26 +20,30 @@ class ReportController extends Controller
      */
     public function create(): View
     {
-        $orgs = Org::query()
-            ->where('status', 'active')
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $orgs = $this->loadActiveOrgs();
+        $categories = $this->loadCategories();
 
-        $categories = ReportCategory::query()
-            ->with(['subcategories'])
-            ->orderBy('position')
-            ->orderBy('name')
-            ->get()
-            ->mapWithKeys(function (ReportCategory $category): array {
-                $subcategories = $category->subcategories
-                    ->map(fn ($sub) => $sub->name)
-                    ->all();
+        return view('report.create', [
+            'orgs' => $orgs,
+            'categories' => $categories,
+            'lockedOrg' => null,
+            'types' => $this->availableTypesFor(null),
+        ]);
+    }
 
-                return [$category->name => $subcategories];
-            })
-            ->toArray();
+    /**
+     * Show the report form for a specific organization code.
+     */
+    public function createByCode(string $org_code): View
+    {
+        $org = Org::where('org_code', $org_code)->firstOrFail();
 
-        return view('report.create', compact('orgs', 'categories'));
+        return view('report.create', [
+            'orgs' => null,
+            'categories' => $this->loadCategories(),
+            'lockedOrg' => $org,
+            'types' => $this->availableTypesFor($org),
+        ]);
     }
 
     /**
@@ -51,8 +55,14 @@ class ReportController extends Controller
             $validated = $request->validated();
             $attachments = $validated['attachments'] ?? [];
             $voiceComment = $validated['voice_comment'] ?? null;
+            if ($request->filled('org_code')) {
+                $orgCode = trim((string) $request->input('org_code'));
+                $validated['org_id'] = Org::where('org_code', $orgCode)->firstOrFail()->id;
+            }
+
             unset($validated['attachments']);
             unset($validated['voice_comment']);
+            unset($validated['org_code']);
 
             $report = Report::create($validated);
             $report->chat_token = (string) Str::uuid();
@@ -112,5 +122,48 @@ class ReportController extends Controller
             'id' => $id,
             'chatToken' => $report->chat_token,
         ]);
+    }
+
+    /**
+     * Fetch active organizations allowed for public reporting.
+     */
+    protected function loadActiveOrgs()
+    {
+        return Org::query()
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    /**
+     * Load available categories and subcategories for the report form.
+     *
+     * @return array<string, array<int, string>>
+     */
+    protected function loadCategories(): array
+    {
+        return ReportCategory::query()
+            ->with(['subcategories'])
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(function (ReportCategory $category): array {
+                $subcategories = $category->subcategories
+                    ->map(fn ($sub) => $sub->name)
+                    ->all();
+
+                return [$category->name => $subcategories];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Determine which report types are available for the organization.
+     *
+     * @return array<int, string>
+     */
+    protected function availableTypesFor(?Org $org): array
+    {
+        return [];
     }
 }

@@ -3,11 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\ReportSubmitted;
+use App\Jobs\SendUrgentSmsAlerts;
 use App\Models\OrgAlertContact;
-use App\Notifications\Channels\TwilioChannel;
 use App\Notifications\AssignedUrgentReportNotification;
 use App\Notifications\UrgentReportEmail;
-use App\Notifications\UrgentReportSms;
 use App\Services\Audit;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -34,10 +33,9 @@ class SendUrgentAlerts
             ->get();
 
         $emailCount = 0;
-        $smsCount = 0;
+        $smsTargets = collect();
         $onCallNotified = false;
         $emailFailures = [];
-        $smsFailures = [];
 
         foreach ($contacts as $contact) {
             if ($contact->type === 'email') {
@@ -60,25 +58,17 @@ class SendUrgentAlerts
                     ]);
                 }
             } elseif ($contact->type === 'sms') {
-                try {
-                    Notification::route(TwilioChannel::class, $contact->value)
-                        ->notify(new UrgentReportSms($report, $contact->value));
-                    $smsCount++;
-                    Log::info('Urgent report SMS notification sent.', [
-                        'report_id' => $report->getKey(),
-                        'contact' => $contact->value,
-                        'org_id' => $report->org_id,
-                    ]);
-                } catch (Throwable $e) {
-                    $smsFailures[] = $contact->value;
-                    Log::error('Failed to send urgent report SMS notification.', [
-                        'report_id' => $report->getKey(),
-                        'contact' => $contact->value,
-                        'org_id' => $report->org_id,
-                        'exception' => $e,
-                    ]);
-                }
+                $smsTargets->push($contact->value);
             }
+        }
+
+        if ($smsTargets->isNotEmpty()) {
+            SendUrgentSmsAlerts::dispatch($report);
+            Log::info('Queued urgent SMS job for report.', [
+                'report_id' => $report->getKey(),
+                'org_id' => $report->org_id,
+                'recipients' => $smsTargets->unique()->values(),
+            ]);
         }
 
         $onCallReviewer = $report->org?->onCallReviewer;
@@ -108,10 +98,10 @@ class SendUrgentAlerts
             $report->getKey(),
             [
                 'emails' => $emailCount,
-                'sms' => $smsCount,
+                'sms_job_dispatched' => $smsTargets->isNotEmpty(),
+                'sms_recipient_count' => $smsTargets->unique()->count(),
                 'on_call_notified' => $onCallNotified,
                 'email_failures' => $emailFailures,
-                'sms_failures' => $smsFailures,
             ]
         );
     }

@@ -113,6 +113,14 @@
                                         <p>{{ __('Analytics') }}</p>
                                     </a>
                                 </li>
+                                @if(auth()->user()?->hasRole('platform_admin'))
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-tools"></i>
+                                            <p>{{ __('Settings') }}</p>
+                                        </a>
+                                    </li>
+                                @endif
                             @endif
 
                             <li class="nav-item mt-3">

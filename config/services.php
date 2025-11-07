@@ -41,4 +41,12 @@ return [
         'from' => env('TWILIO_FROM'),
     ],
 
+    'telnyx' => [
+        'key' => env('TELNYX_API_KEY'),
+        'from' => env('TELNYX_FROM_NUMBER'),
+        'alpha' => env('TELNYX_ALPHA_SENDER', 'ASYLON'),
+        'enable_alpha' => env('TELNYX_ENABLE_ALPHA', false),
+        'sms_enabled' => env('SMS_ENABLED', true),
+    ],
+
 ];
