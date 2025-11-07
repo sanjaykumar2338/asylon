@@ -24,6 +24,16 @@ class Org extends Model
         'status',
         'created_by',
         'on_call_user_id',
+        'enable_commendations',
+        'enable_hr_reports',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'enable_commendations' => 'boolean',
+        'enable_hr_reports' => 'boolean',
     ];
 
     /**
@@ -119,5 +129,27 @@ class Org extends Model
         } while (static::withTrashed()->where('org_code', $code)->exists());
 
         return $code;
+    }
+
+    /**
+     * Allowed report types for this organization.
+     *
+     * @return array<string, string>
+     */
+    public function enabledTypes(): array
+    {
+        $types = [
+            'safety' => __('Safety & Threat'),
+        ];
+
+        if ($this->enable_commendations) {
+            $types['commendation'] = __('Commendation');
+        }
+
+        if ($this->enable_hr_reports) {
+            $types['hr'] = __('HR Anonymous');
+        }
+
+        return $types;
     }
 }

@@ -35,6 +35,27 @@
 </div>
 
 <div class="form-group">
+    <label class="d-block">{{ __('Report types') }}</label>
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="enable_commendations" name="enable_commendations" value="1"
+            @checked(old('enable_commendations', $org->enable_commendations ?? false))>
+        <label class="custom-control-label" for="enable_commendations">
+            {{ __('Enable commendations') }}
+        </label>
+    </div>
+    <div class="custom-control custom-checkbox mt-2">
+        <input type="checkbox" class="custom-control-input" id="enable_hr_reports" name="enable_hr_reports" value="1"
+            @checked(old('enable_hr_reports', $org->enable_hr_reports ?? false))>
+        <label class="custom-control-label" for="enable_hr_reports">
+            {{ __('Enable HR / anonymous employee reports') }}
+        </label>
+    </div>
+    <small class="form-text text-muted">
+        {{ __('Safety reports are always enabled. Disable other types here if they do not apply to this organization.') }}
+    </small>
+</div>
+
+<div class="form-group">
     <label for="on_call_user_id">{{ __('On-call reviewer') }}</label>
     @if ($eligibleUsers->isEmpty())
         <select id="on_call_user_id" class="form-control" disabled>

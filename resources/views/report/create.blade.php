@@ -71,6 +71,35 @@
             </div>
         @endif
 
+        <div class="grid gap-4 md:grid-cols-2">
+            <div>
+                <x-input-label for="type" value="Report type" />
+                <select id="type" name="type"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required>
+                    @foreach (($types ?? []) as $value => $label)
+                        <option value="{{ $value }}" @selected(old('type', 'safety') === $value)>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('type')" />
+            </div>
+            <div>
+                <x-input-label for="severity" value="Severity" />
+                <select id="severity" name="severity"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required>
+                    @foreach (['low' => 'Low', 'moderate' => 'Moderate', 'high' => 'High', 'critical' => 'Critical'] as $value => $label)
+                        <option value="{{ $value }}" @selected(old('severity', 'moderate') === $value)>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('severity')" />
+            </div>
+        </div>
+
         <div>
             <x-input-label for="category" value="Category" />
             <select id="category" name="category"
@@ -340,6 +369,47 @@
             });
         });
     </script>
+
+    @if (!isset($lockedOrg))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const orgTypeMap = @json($orgTypeMap ?? []);
+                const defaultTypes = @json(array_keys($types ?? []));
+                const orgSelect = document.getElementById('org_id');
+                const typeSelect = document.getElementById('type');
+
+                if (!orgSelect || !typeSelect) {
+                    return;
+                }
+
+                const optionLookup = Array.from(typeSelect.options).reduce((acc, option) => {
+                    acc[option.value] = option;
+                    return acc;
+                }, {});
+
+                function refreshTypeOptions(orgId) {
+                    const allowed = orgTypeMap[orgId] && orgTypeMap[orgId].length
+                        ? orgTypeMap[orgId]
+                        : defaultTypes;
+                    const allowedSet = new Set(allowed);
+
+                    Object.entries(optionLookup).forEach(([value, option]) => {
+                        if (!value) {
+                            return;
+                        }
+                        option.hidden = !allowedSet.has(value);
+                    });
+
+                    if (!allowedSet.has(typeSelect.value)) {
+                        typeSelect.value = allowed[0] || defaultTypes[0] || 'safety';
+                    }
+                }
+
+                orgSelect.addEventListener('change', () => refreshTypeOptions(orgSelect.value || ''));
+                refreshTypeOptions(orgSelect.value || '');
+            });
+        </script>
+    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

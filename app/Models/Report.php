@@ -36,6 +36,8 @@ class Report extends Model
         'contact_name',
         'contact_email',
         'contact_phone',
+        'type',
+        'severity',
         'urgent',
         'status',
         'violation_date',
@@ -55,6 +57,22 @@ class Report extends Model
         'first_response_at' => 'datetime',
         'violation_date' => 'date',
     ];
+
+    /**
+     * Human readable severity label.
+     */
+    public function getSeverityLabelAttribute(): string
+    {
+        return ucfirst($this->severity ?? '');
+    }
+
+    /**
+     * Human readable type label.
+     */
+    public function getTypeLabelAttribute(): string
+    {
+        return ucfirst($this->type ?? '');
+    }
 
     /**
      * Organization associated with the report.

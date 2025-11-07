@@ -27,6 +27,11 @@ class UpdateOrgRequest extends FormRequest
                 'on_call_user_id' => null,
             ]);
         }
+
+        $this->merge([
+            'enable_commendations' => $this->boolean('enable_commendations'),
+            'enable_hr_reports' => $this->boolean('enable_hr_reports'),
+        ]);
     }
 
     /**
@@ -54,6 +59,8 @@ class UpdateOrgRequest extends FormRequest
             'slug' => ['required', 'string', 'max:140', Rule::unique('orgs', 'slug')->ignore($orgId)],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'on_call_user_id' => $onCallRules,
+            'enable_commendations' => ['boolean'],
+            'enable_hr_reports' => ['boolean'],
         ];
     }
 }

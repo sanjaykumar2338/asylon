@@ -97,6 +97,8 @@ class StoreReportRequest extends FormRequest
             'org_code' => ['nullable', 'required_without:org_id', 'string', 'max:12', 'exists:orgs,org_code'],
             'category' => ['required', 'string', 'max:100', Rule::in($categoryOptions)],
             'subcategory' => ['required', 'string', 'max:100', Rule::in($subcategoryOptions)],
+            'type' => ['required', Rule::in(['safety', 'commendation', 'hr'])],
+            'severity' => ['required', Rule::in(['low', 'moderate', 'high', 'critical'])],
             'description' => [
                 'required',
                 'string',

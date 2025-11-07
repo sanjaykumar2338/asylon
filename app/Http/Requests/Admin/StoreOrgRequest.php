@@ -28,6 +28,19 @@ class StoreOrgRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'slug' => ['required', 'string', 'max:140', Rule::unique('orgs', 'slug')],
             'status' => ['required', Rule::in(['active', 'inactive'])],
+            'enable_commendations' => ['boolean'],
+            'enable_hr_reports' => ['boolean'],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'enable_commendations' => $this->boolean('enable_commendations'),
+            'enable_hr_reports' => $this->boolean('enable_hr_reports'),
+        ]);
     }
 }

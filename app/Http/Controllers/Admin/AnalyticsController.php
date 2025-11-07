@@ -35,6 +35,16 @@ class AnalyticsController extends AdminController
             ->limit(8)
             ->get();
 
+        $byType = (clone $baseQuery)
+            ->select('type', DB::raw('COUNT(*) as total'))
+            ->groupBy('type')
+            ->get();
+
+        $bySeverity = (clone $baseQuery)
+            ->select('severity', DB::raw('COUNT(*) as total'))
+            ->groupBy('severity')
+            ->get();
+
         $avgResponse = (clone $baseQuery)
             ->whereNotNull('first_response_at')
             ->avg(DB::raw('TIMESTAMPDIFF(MINUTE, created_at, first_response_at)'));
@@ -52,6 +62,8 @@ class AnalyticsController extends AdminController
             'urgentPercent' => $urgentPercent,
             'byCategory' => $byCategory,
             'bySubcategory' => $bySubcategory,
+            'byType' => $byType,
+            'bySeverity' => $bySeverity,
             'avgResponse' => $avgResponse,
             'orgLabel' => $orgLabel,
         ]);

@@ -29,6 +29,8 @@ class ExportController extends AdminController
             fputcsv($handle, [
                 'id',
                 'org',
+                'type',
+                'severity',
                 'category',
                 'subcategory',
                 'status',
@@ -50,6 +52,8 @@ class ExportController extends AdminController
                 fputcsv($handle, [
                     $report->getKey(),
                     $report->org?->name ?? '',
+                    $report->type,
+                    $report->severity,
                     $report->category,
                     $report->subcategory,
                     $report->status,
@@ -85,6 +89,8 @@ class ExportController extends AdminController
         $to = (string) $request->query('to', '');
         $violationFrom = (string) $request->query('violation_from', '');
         $violationTo = (string) $request->query('violation_to', '');
+        $type = (string) $request->query('type', '');
+        $severity = (string) $request->query('severity', '');
 
         if ($status !== '') {
             $query->where('status', $status);
@@ -100,6 +106,14 @@ class ExportController extends AdminController
 
         if ($subcategory !== '') {
             $query->where('subcategory', $subcategory);
+        }
+
+        if ($type !== '') {
+            $query->where('type', $type);
+        }
+
+        if ($severity !== '') {
+            $query->where('severity', $severity);
         }
 
         if ($from !== '' && Carbon::hasFormat($from, 'Y-m-d')) {

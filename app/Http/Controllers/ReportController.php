@@ -28,6 +28,7 @@ class ReportController extends Controller
             'categories' => $categories,
             'lockedOrg' => null,
             'types' => $this->availableTypesFor(null),
+            'orgTypeMap' => $this->mapOrgTypes($orgs),
         ]);
     }
 
@@ -43,6 +44,7 @@ class ReportController extends Controller
             'categories' => $this->loadCategories(),
             'lockedOrg' => $org,
             'types' => $this->availableTypesFor($org),
+            'orgTypeMap' => [],
         ]);
     }
 
@@ -55,9 +57,27 @@ class ReportController extends Controller
             $validated = $request->validated();
             $attachments = $validated['attachments'] ?? [];
             $voiceComment = $validated['voice_comment'] ?? null;
+            $org = null;
+
             if ($request->filled('org_code')) {
                 $orgCode = trim((string) $request->input('org_code'));
-                $validated['org_id'] = Org::where('org_code', $orgCode)->firstOrFail()->id;
+                $org = Org::where('org_code', $orgCode)->firstOrFail();
+                $validated['org_id'] = $org->id;
+            }
+
+            if (! $org) {
+                $orgId = $validated['org_id'] ?? null;
+                $org = $orgId ? Org::findOrFail($orgId) : null;
+            }
+
+            if ($org) {
+                $types = array_keys($org->enabledTypes());
+            } else {
+                $types = array_keys($this->defaultTypeOptions());
+            }
+
+            if (! in_array($validated['type'], $types, true)) {
+                abort(422, 'This report type is not enabled for the selected organization.');
             }
 
             unset($validated['attachments']);
@@ -132,7 +152,7 @@ class ReportController extends Controller
         return Org::query()
             ->where('status', 'active')
             ->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'enable_commendations', 'enable_hr_reports']);
     }
 
     /**
@@ -160,10 +180,44 @@ class ReportController extends Controller
     /**
      * Determine which report types are available for the organization.
      *
-     * @return array<int, string>
+     * @return array<string, string>
      */
     protected function availableTypesFor(?Org $org): array
     {
-        return [];
+        if ($org) {
+            $types = $org->enabledTypes();
+
+            return $types === [] ? $this->defaultTypeOptions() : $types;
+        }
+
+        return $this->defaultTypeOptions();
+    }
+
+    /**
+     * Default type options when no org constraints are available.
+     *
+     * @return array<string, string>
+     */
+    protected function defaultTypeOptions(): array
+    {
+        return [
+            'safety' => __('Safety & Threat'),
+            'commendation' => __('Commendation'),
+            'hr' => __('HR Anonymous'),
+        ];
+    }
+
+    /**
+     * Build a map of org IDs to allowed type keys for the form.
+     */
+    protected function mapOrgTypes($orgs): array
+    {
+        if (! $orgs) {
+            return [];
+        }
+
+        return $orgs->mapWithKeys(function (Org $org): array {
+            return [$org->id => array_keys($org->enabledTypes())];
+        })->all();
     }
 }

@@ -54,6 +54,14 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-1">{{ __('Type') }}</h6>
+                            <p class="mb-0 text-capitalize">{{ $report->type_label }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-1">{{ __('Severity') }}</h6>
+                            <p class="mb-0 text-capitalize">{{ $report->severity_label }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('Organization') }}</h6>
                             <p class="mb-0">{{ $report->org?->name ?? __('Unknown') }}</p>
                         </div>

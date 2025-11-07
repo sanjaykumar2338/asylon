@@ -40,7 +40,32 @@
                             @error('category')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="type">{{ __('Type') }}</label>
+                <select id="type" name="type" class="form-control @error('type') is-invalid @enderror" required>
+                    @foreach (['safety' => __('Safety & Threat'), 'commendation' => __('Commendation'), 'hr' => __('HR Anonymous')] as $value => $label)
+                        <option value="{{ $value }}" @selected(old('type', $report->type) === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('type')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="form-group col-md-6">
+                <label for="severity">{{ __('Severity') }}</label>
+                <select id="severity" name="severity" class="form-control @error('severity') is-invalid @enderror" required>
+                    @foreach (['low' => __('Low'), 'moderate' => __('Moderate'), 'high' => __('High'), 'critical' => __('Critical')] as $value => $label)
+                        <option value="{{ $value }}" @selected(old('severity', $report->severity) === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('severity')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
 
                         <div class="form-group">
                             <label for="subcategory">{{ __('Subcategory') }}</label>

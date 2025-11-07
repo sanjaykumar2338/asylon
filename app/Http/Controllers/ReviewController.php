@@ -30,6 +30,8 @@ class ReviewController extends Controller
         $subcategory = (string) $request->query('subcategory', '');
         $from = (string) $request->query('from', '');
         $to = (string) $request->query('to', '');
+        $type = (string) $request->query('type', '');
+        $severity = (string) $request->query('severity', '');
         $sort = (string) $request->query('sort', 'submitted_desc');
 
         $query = Report::query()
@@ -54,6 +56,14 @@ class ReviewController extends Controller
 
         if ($subcategory !== '') {
             $query->where('subcategory', $subcategory);
+        }
+
+        if ($type !== '') {
+            $query->where('type', $type);
+        }
+
+        if ($severity !== '') {
+            $query->where('severity', $severity);
         }
 
         if ($from !== '' && Carbon::hasFormat($from, 'Y-m-d')) {
@@ -90,6 +100,8 @@ class ReviewController extends Controller
             'urgent' => $urgent,
             'category' => $category,
             'subcategory' => $subcategory,
+            'type' => $type,
+            'severity' => $severity,
             'from' => $from,
             'to' => $to,
             'sort' => $sort,

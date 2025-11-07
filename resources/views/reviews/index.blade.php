@@ -3,6 +3,27 @@
         {{ __('Review Queue') }}
     </x-slot>
 
+    @php
+        $typeFilterOptions = [
+            '' => __('All types'),
+            'safety' => __('Safety & Threat'),
+            'commendation' => __('Commendation'),
+            'hr' => __('HR Anonymous'),
+        ];
+        $severityFilterOptions = [
+            '' => __('All severities'),
+            'low' => __('Low'),
+            'moderate' => __('Moderate'),
+            'high' => __('High'),
+            'critical' => __('Critical'),
+        ];
+        $severityBadgeClasses = [
+            'low' => 'badge-success',
+            'moderate' => 'badge-warning text-dark',
+            'high' => 'badge-danger',
+            'critical' => 'badge-dark',
+        ];
+    @endphp
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
@@ -27,6 +48,22 @@
                             <option value="">{{ __('All') }}</option>
                             <option value="1" @selected($urgent === '1')>{{ __('Yes') }}</option>
                             <option value="0" @selected($urgent === '0')>{{ __('No') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="type">{{ __('Type') }}</label>
+                        <select id="type" name="type" class="form-control">
+                            @foreach ($typeFilterOptions as $value => $label)
+                                <option value="{{ $value }}" @selected($type === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="severity">{{ __('Severity') }}</label>
+                        <select id="severity" name="severity" class="form-control">
+                            @foreach ($severityFilterOptions as $value => $label)
+                                <option value="{{ $value }}" @selected($severity === $value)>{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group col-md-3">
@@ -111,6 +148,8 @@
                             <th scope="col">{{ __('Organization') }}</th>
                         @endcan
                         <th scope="col">{{ __('Category / Subcategory') }}</th>
+                        <th scope="col">{{ __('Type') }}</th>
+                        <th scope="col">{{ __('Severity') }}</th>
                         <th scope="col">{{ __('Urgent') }}</th>
                         <th scope="col">{{ __('Status') }}</th>
                         <th scope="col">{{ __('Attachments') }}</th>
@@ -134,6 +173,15 @@
                                 @if ($report->subcategory)
                                     <div class="small text-muted">{{ $report->subcategory }}</div>
                                 @endif
+                            </td>
+                            <td>
+                                <span class="badge badge-light text-capitalize">{{ $report->type_label }}</span>
+                            </td>
+                            <td>
+                                @php
+                                    $severityClass = $severityBadgeClasses[$report->severity] ?? 'badge-secondary';
+                                @endphp
+                                <span class="badge {{ $severityClass }} text-capitalize">{{ $report->severity_label }}</span>
                             </td>
                             <td>
                                 @if ($report->urgent)
@@ -285,7 +333,7 @@
                         @endpush
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->can('view-all') ? 9 : 8 }}" class="text-center text-muted py-4">
+                            <td colspan="{{ auth()->user()->can('view-all') ? 11 : 10 }}" class="text-center text-muted py-4">
                                 {{ __('No reports match the selected filters.') }}
                             </td>
                         </tr>
