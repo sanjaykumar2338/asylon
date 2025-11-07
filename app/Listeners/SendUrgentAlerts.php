@@ -8,12 +8,26 @@ use App\Models\OrgAlertContact;
 use App\Notifications\AssignedUrgentReportNotification;
 use App\Notifications\UrgentReportEmail;
 use App\Services\Audit;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Throwable;
 
-class SendUrgentAlerts
+class SendUrgentAlerts implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    /**
+     * Maximum seconds the listener may run before failing.
+     */
+    public int $timeout = 120;
+
+    /**
+     * Number of times the listener should be retried.
+     */
+    public int $tries = 3;
+
     /**
      * Handle the event.
      */

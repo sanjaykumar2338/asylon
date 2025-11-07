@@ -5,6 +5,7 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
 use App\Providers\EventServiceProvider;
+use App\Providers\QueueLoggingServiceProvider;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         AppServiceProvider::class,
         AuthServiceProvider::class,
         EventServiceProvider::class,
+        QueueLoggingServiceProvider::class,
     ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //

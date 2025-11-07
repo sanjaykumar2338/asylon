@@ -3,7 +3,6 @@
 namespace App\Services\Sms;
 
 use App\Models\Setting;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TelnyxSmsService
@@ -37,6 +36,7 @@ class TelnyxSmsService
 
         $apiKey = $this->apiKey();
         $from = $this->pickFrom($to);
+        $messagingProfileId = $this->messagingProfileId();
 
         if (! $apiKey) {
             Log::warning('Telnyx SMS not configured. Missing API key.', [
@@ -57,43 +57,77 @@ class TelnyxSmsService
             'text' => $text,
         ];
 
-        try {
-            $response = Http::withToken($apiKey)
-                ->acceptJson()
-                ->post($this->apiBase . '/messages', $payload);
 
-            if ($response->successful()) {
-                $data = $response->json('data') ?? [];
+        Log::error('Telnyx payload', [
+            'payload' =>  $payload
+        ]);
 
-                Log::info('Telnyx SMS queued successfully.', [
-                    'to' => $to,
-                    'from' => $from,
-                    'message_id' => $data['id'] ?? null,
-                ]);
 
-                return ['ok' => true, 'data' => $data];
-            }
-
-            $body = $response->json();
-            Log::error('Telnyx SMS API error.', [
-                'to' => $to,
-                'status' => $response->status(),
-                'body' => $body,
-            ]);
-
-            return [
-                'error' => 'api_error',
-                'status' => $response->status(),
-                'body' => $body,
-            ];
-        } catch (\Throwable $exception) {
-            Log::error('Telnyx SMS exception thrown.', [
-                'to' => $to,
-                'exception' => $exception->getMessage(),
-            ]);
-
-            return ['error' => 'exception', 'message' => $exception->getMessage()];
+        if ($messagingProfileId) {
+            $payload['messaging_profile_id'] = $messagingProfileId;
         }
+
+        Log::debug('Telnyx SMS payload prepared.', [
+            'payload' => $payload,
+        ]);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $this->apiBase . '/messages',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: ' . 'Bearer '.$apiKey,
+            ],
+        ]);
+
+        $responseBody = curl_exec($curl);
+        $curlError = curl_error($curl);
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($responseBody === false) {
+            Log::error('Telnyx SMS cURL error.', [
+                'to' => $to,
+                'error' => $curlError,
+            ]);
+
+            return ['error' => 'curl_error', 'message' => $curlError];
+        }
+
+        $decoded = json_decode($responseBody, true);
+
+        if ($status >= 200 && $status < 300) {
+            $data = $decoded['data'] ?? [];
+
+            Log::info('Telnyx SMS queued successfully.', [
+                'to' => $to,
+                'from' => $from,
+                'message_id' => $data['id'] ?? null,
+            ]);
+
+            return ['ok' => true, 'data' => $data];
+        }
+
+        Log::error('Telnyx SMS API error.', [
+            'to' => $to,
+            'status' => $status,
+            'body' => $decoded,
+        ]);
+
+        return [
+            'error' => 'api_error',
+            'status' => $status,
+            'body' => $decoded,
+        ];
     }
 
     protected function apiKey(): ?string
@@ -147,6 +181,14 @@ class TelnyxSmsService
         }
 
         return $this->fromNumber();
+    }
+
+    protected function messagingProfileId(): ?string
+    {
+        $value = Setting::get('telnyx_messaging_profile_id')
+            ?: config('services.telnyx.messaging_profile_id');
+
+        return $value ? trim($value) : null;
     }
 
     protected function toBool(mixed $value): bool

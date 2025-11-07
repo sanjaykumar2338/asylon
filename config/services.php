@@ -44,6 +44,7 @@ return [
     'telnyx' => [
         'key' => env('TELNYX_API_KEY'),
         'from' => env('TELNYX_FROM_NUMBER'),
+        'messaging_profile_id' => env('TELNYX_MESSAGING_PROFILE_ID'),
         'alpha' => env('TELNYX_ALPHA_SENDER', 'ASYLON'),
         'enable_alpha' => env('TELNYX_ENABLE_ALPHA', false),
         'sms_enabled' => env('SMS_ENABLED', true),
