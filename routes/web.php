@@ -37,9 +37,15 @@ if (app()->environment('local')) {
             ], 422);
         }
 
+        $ensurePlus = static function (?string $value, string $fallback): string {
+            $number = $value ?? $fallback;
+            $number = trim($number);
+            return str_starts_with($number, '+') ? $number : '+'.$number;
+        };
+
         $payload = [
-            'from' => $request->query('from', '+12143937242'),
-            'to' => $request->query('to', '+917814976130'),
+            'from' => $ensurePlus($request->query('from'), '+12143937242'),
+            'to' => $ensurePlus($request->query('to'), '+917814976130'),
             'text' => $request->query('text', 'Hello from Telnyx!'),
         ];
 

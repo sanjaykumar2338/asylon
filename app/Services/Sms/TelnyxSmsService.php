@@ -16,7 +16,7 @@ class TelnyxSmsService
      */
     public function send(string $toE164, string $text): array
     {
-        $to = trim($toE164);
+        $to = $this->normalizeRecipient($toE164);
 
         if ($to === '' || $text === '') {
             Log::warning('Skipped Telnyx SMS due to missing to/text payload.', [
@@ -35,7 +35,7 @@ class TelnyxSmsService
         }
 
         $apiKey = $this->apiKey();
-        $from = $this->pickFrom($to);
+        $from = $this->normalizeSender($this->pickFrom($to));
         $messagingProfileId = $this->messagingProfileId();
 
         if (! $apiKey) {
@@ -57,12 +57,6 @@ class TelnyxSmsService
             'text' => $text,
         ];
 
-
-        Log::error('Telnyx payload', [
-            'payload' =>  $payload
-        ]);
-
-
         if ($messagingProfileId) {
             $payload['messaging_profile_id'] = $messagingProfileId;
         }
@@ -73,7 +67,7 @@ class TelnyxSmsService
 
         $curl = curl_init();
 
-        curl_setopt_array($curl, [
+        $curlOptions = [
             CURLOPT_URL => $this->apiBase . '/messages',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
@@ -87,7 +81,15 @@ class TelnyxSmsService
                 'Content-Type: application/json',
                 'Authorization: ' . 'Bearer '.$apiKey,
             ],
-        ]);
+        ];
+
+        if ($this->shouldSkipSslVerification()) {
+            $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
+            $curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
+            Log::warning('Telnyx SMS request is skipping SSL verification. Configure CA bundle for production.', []);
+        }
+
+        curl_setopt_array($curl, $curlOptions);
 
         $responseBody = curl_exec($curl);
         $curlError = curl_error($curl);
@@ -189,6 +191,47 @@ class TelnyxSmsService
             ?: config('services.telnyx.messaging_profile_id');
 
         return $value ? trim($value) : null;
+    }
+
+    protected function shouldSkipSslVerification(): bool
+    {
+        $value = Setting::get('telnyx_skip_ssl_verify');
+
+        if ($value === null) {
+            return (bool) config('services.telnyx.skip_ssl_verify', app()->environment('local'));
+        }
+
+        return $this->toBool($value);
+    }
+
+    protected function normalizeSender(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        if (preg_match('/[a-z]/i', $value)) {
+            return strtoupper($value);
+        }
+
+        return str_starts_with($value, '+') ? $value : '+'.$value;
+    }
+
+    protected function normalizeRecipient(string $value): string
+    {
+        $number = trim($value);
+
+        if ($number === '') {
+            return $number;
+        }
+
+        return str_starts_with($number, '+') ? $number : '+'.$number;
     }
 
     protected function toBool(mixed $value): bool

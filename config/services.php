@@ -48,6 +48,7 @@ return [
         'alpha' => env('TELNYX_ALPHA_SENDER', 'ASYLON'),
         'enable_alpha' => env('TELNYX_ENABLE_ALPHA', false),
         'sms_enabled' => env('SMS_ENABLED', true),
+        'skip_ssl_verify' => env('TELNYX_SKIP_SSL_VERIFY', env('APP_ENV') === 'local'),
     ],
 
 ];
