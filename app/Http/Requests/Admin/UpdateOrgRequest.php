@@ -31,6 +31,7 @@ class UpdateOrgRequest extends FormRequest
         $this->merge([
             'enable_commendations' => $this->boolean('enable_commendations'),
             'enable_hr_reports' => $this->boolean('enable_hr_reports'),
+            'enable_student_reports' => $this->boolean('enable_student_reports', true),
         ]);
     }
 
@@ -61,6 +62,7 @@ class UpdateOrgRequest extends FormRequest
             'on_call_user_id' => $onCallRules,
             'enable_commendations' => ['boolean'],
             'enable_hr_reports' => ['boolean'],
+            'enable_student_reports' => ['boolean'],
         ];
     }
 }

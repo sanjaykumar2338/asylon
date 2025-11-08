@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
                 'created_by' => $platformAdmin->id,
                 'enable_commendations' => true,
                 'enable_hr_reports' => true,
+                'enable_student_reports' => true,
             ],
         );
         $this->ensureOrgHasReportCode($org);
@@ -84,6 +85,7 @@ class DatabaseSeeder extends Seeder
             ['org_id' => $org->id, 'value' => 'security@asylon.edu'],
             [
                 'type' => 'email',
+                'department' => 'security',
                 'is_active' => true,
             ],
         );
@@ -92,12 +94,50 @@ class DatabaseSeeder extends Seeder
             ['org_id' => $org->id, 'value' => '+15551234567'],
             [
                 'type' => 'sms',
+                'department' => 'security',
+                'is_active' => true,
+            ],
+        );
+
+        OrgAlertContact::updateOrCreate(
+            ['org_id' => $org->id, 'value' => 'counseling@asylon.edu'],
+            [
+                'type' => 'email',
+                'department' => 'counseling',
+                'is_active' => true,
+            ],
+        );
+
+        OrgAlertContact::updateOrCreate(
+            ['org_id' => $org->id, 'value' => 'hr@asylon.edu'],
+            [
+                'type' => 'email',
+                'department' => 'hr',
+                'is_active' => true,
+            ],
+        );
+
+        OrgAlertContact::updateOrCreate(
+            ['org_id' => $org->id, 'value' => 'ethics@asylon.edu'],
+            [
+                'type' => 'email',
+                'department' => 'ethics',
+                'is_active' => true,
+            ],
+        );
+
+        OrgAlertContact::updateOrCreate(
+            ['org_id' => $org->id, 'value' => 'admin@asylon.edu'],
+            [
+                'type' => 'email',
+                'department' => 'admin',
                 'is_active' => true,
             ],
         );
 
         $categorySeedPath = config_path('report_categories.php');
         $categorySeedData = is_file($categorySeedPath) ? include $categorySeedPath : [];
+        $hrCategories = config('asylon.reports.hr_category_map', []);
 
         $categoryPosition = 1;
         foreach ($categorySeedData as $categoryName => $subcategoryNames) {
@@ -106,6 +146,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'description' => null,
                     'position' => $categoryPosition++,
+                    'type' => 'student',
                 ],
             );
 
@@ -119,6 +160,33 @@ class DatabaseSeeder extends Seeder
                     [
                         'description' => null,
                         'position' => $subcategoryPosition++,
+                        'type' => 'student',
+                    ],
+                );
+            }
+        }
+
+        foreach ($hrCategories as $categoryName => $subcategoryNames) {
+            $category = ReportCategory::updateOrCreate(
+                ['name' => $categoryName],
+                [
+                    'description' => null,
+                    'position' => $categoryPosition++,
+                    'type' => 'employee',
+                ],
+            );
+
+            $subcategoryPosition = 1;
+            foreach ($subcategoryNames as $subcategoryName) {
+                ReportSubcategory::updateOrCreate(
+                    [
+                        'report_category_id' => $category->id,
+                        'name' => $subcategoryName,
+                    ],
+                    [
+                        'description' => null,
+                        'position' => $subcategoryPosition++,
+                        'type' => 'employee',
                     ],
                 );
             }

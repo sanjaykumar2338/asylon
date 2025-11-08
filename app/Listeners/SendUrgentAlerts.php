@@ -35,16 +35,18 @@ class SendUrgentAlerts implements ShouldQueue
     {
         $report = $event->report;
 
-        if (! $report->urgent) {
-            return;
-        }
-
         $report->loadMissing(['org.onCallReviewer']);
 
-        $contacts = OrgAlertContact::query()
-            ->where('org_id', $report->org_id)
-            ->where('is_active', true)
-            ->get();
+        $contacts = $this->determineRecipients($report);
+
+        if ($contacts->isEmpty()) {
+            Log::info('No alert contacts matched for report.', [
+                'report_id' => $report->getKey(),
+                'org_id' => $report->org_id,
+                'type' => $report->type,
+            ]);
+            return;
+        }
 
         $emailCount = 0;
         $smsTargets = collect();
@@ -76,7 +78,7 @@ class SendUrgentAlerts implements ShouldQueue
             }
         }
 
-        if ($smsTargets->isNotEmpty()) {
+        if ($report->urgent && $smsTargets->isNotEmpty()) {
             SendUrgentSmsAlerts::dispatch($report);
             Log::info('Queued urgent SMS job for report.', [
                 'report_id' => $report->getKey(),
@@ -112,11 +114,39 @@ class SendUrgentAlerts implements ShouldQueue
             $report->getKey(),
             [
                 'emails' => $emailCount,
-                'sms_job_dispatched' => $smsTargets->isNotEmpty(),
+                'sms_job_dispatched' => $report->urgent && $smsTargets->isNotEmpty(),
                 'sms_recipient_count' => $smsTargets->unique()->count(),
                 'on_call_notified' => $onCallNotified,
                 'email_failures' => $emailFailures,
+                'recipients_sent' => $contacts->pluck('value'),
             ]
         );
+    }
+
+    /**
+     * Determine which alert contacts should receive the report.
+     */
+    protected function determineRecipients($report)
+    {
+        $query = OrgAlertContact::query()
+            ->where('org_id', $report->org_id)
+            ->where('is_active', true);
+
+        if (in_array($report->type, ['hr', 'commendation'], true)) {
+            $ids = collect($report->meta['recipients'] ?? [])->filter();
+
+            if ($ids->isEmpty()) {
+                return collect();
+            }
+
+            $query->whereIn('id', $ids);
+        } else {
+            $departments = config('asylon.alerts.student_departments', []);
+            if (! empty($departments)) {
+                $query->whereIn('department', $departments);
+            }
+        }
+
+        return $query->get();
     }
 }

@@ -28,6 +28,7 @@ class UpdateAlertRequest extends FormRequest
             'type' => ['required', Rule::in(['email', 'sms'])],
             'value' => ['required', 'string', 'max:160'],
             'org_id' => ['required', 'exists:orgs,id'],
+            'department' => ['required', Rule::in(array_keys(config('asylon.alerts.departments')))],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

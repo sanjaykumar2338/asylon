@@ -17,6 +17,7 @@ class ReportCategory extends Model
         'name',
         'description',
         'position',
+        'type',
     ];
 
     /**
@@ -24,6 +25,7 @@ class ReportCategory extends Model
      */
     protected $casts = [
         'position' => 'integer',
+        'type' => 'string',
     ];
 
     /**

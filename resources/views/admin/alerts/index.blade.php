@@ -48,6 +48,7 @@
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">{{ __('Type') }}</th>
+                            <th scope="col">{{ __('Department') }}</th>
                             <th scope="col">{{ __('Value') }}</th>
                             <th scope="col">{{ __('Organization') }}</th>
                             <th scope="col">{{ __('Active') }}</th>
@@ -58,6 +59,7 @@
                         @forelse ($alerts as $alert)
                             <tr>
                                 <td class="text-capitalize">{{ $alert->type }}</td>
+                                <td class="text-capitalize">{{ $alert->department ?? __('Unassigned') }}</td>
                                 <td class="font-weight-bold">{{ $alert->value }}</td>
                                 <td>{{ $alert->org?->name ?? __('Unassigned') }}</td>
                                 <td>
@@ -89,7 +91,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
+                                <td colspan="6" class="text-center text-muted py-4">
                                     {{ __('No alert contacts found.') }}
                                 </td>
                             </tr>

@@ -30,6 +30,7 @@ class StoreOrgRequest extends FormRequest
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'enable_commendations' => ['boolean'],
             'enable_hr_reports' => ['boolean'],
+            'enable_student_reports' => ['boolean'],
         ];
     }
 
@@ -41,6 +42,7 @@ class StoreOrgRequest extends FormRequest
         $this->merge([
             'enable_commendations' => $this->boolean('enable_commendations'),
             'enable_hr_reports' => $this->boolean('enable_hr_reports'),
+            'enable_student_reports' => $this->boolean('enable_student_reports', true),
         ]);
     }
 }

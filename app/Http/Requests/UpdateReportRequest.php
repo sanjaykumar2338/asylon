@@ -56,6 +56,11 @@ class UpdateReportRequest extends FormRequest
                     return [$category->name => $subcategories];
                 })
                 ->toArray();
+
+            $hrConfig = config('asylon.reports.hr_category_map', []);
+            if (is_array($hrConfig) && $hrConfig !== []) {
+                $this->categoryMap = array_merge($this->categoryMap, $hrConfig);
+            }
         }
 
         return $this->categoryMap;
@@ -109,6 +114,11 @@ class UpdateReportRequest extends FormRequest
                     $validator->errors()->add('subcategory', 'Please select a valid option for the chosen category.');
                 }
             }
+
+            $type = $this->input('type');
+            if ($type && $category && ! $this->categoryAllowedForType($type, $category)) {
+                $validator->errors()->add('category', 'Please select a category that matches the chosen report type.');
+            }
         });
     }
 
@@ -123,5 +133,17 @@ class UpdateReportRequest extends FormRequest
             'category.in' => 'Select a valid category option.',
             'subcategory.in' => 'Select a valid subcategory option.',
         ];
+    }
+
+    protected function categoryAllowedForType(string $type, string $category): bool
+    {
+        $map = config('asylon.reports.type_categories', []);
+        $allowed = $map[$type] ?? [];
+
+        if (! is_array($allowed) || $allowed === [] || in_array('all', $allowed, true)) {
+            return true;
+        }
+
+        return in_array($category, $allowed, true);
     }
 }

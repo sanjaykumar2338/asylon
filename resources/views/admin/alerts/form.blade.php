@@ -29,6 +29,21 @@
 </div>
 
 <div class="form-group">
+    <label for="department">{{ __('Department / Team') }}</label>
+    <select id="department" name="department" class="form-control" required>
+        <option value="">{{ __('Select department') }}</option>
+        @foreach ($departments as $key => $label)
+            <option value="{{ $key }}" @selected(old('department', $alert->department ?? '') === $key)>
+                {{ $label }}
+            </option>
+        @endforeach
+    </select>
+    <small class="form-text text-muted">
+        {{ __('Used to route student vs. employee reports to the right recipients.') }}
+    </small>
+</div>
+
+<div class="form-group">
     <label for="org_id">{{ __('Organization') }}</label>
     <select id="org_id" name="org_id" class="form-control" @disabled(!$isPlatform)>
         @if ($isPlatform)

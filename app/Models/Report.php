@@ -40,6 +40,8 @@ class Report extends Model
         'severity',
         'urgent',
         'status',
+        'portal_source',
+        'meta',
         'violation_date',
         'first_response_at',
         'chat_token',
@@ -56,6 +58,7 @@ class Report extends Model
         'urgent' => 'boolean',
         'first_response_at' => 'datetime',
         'violation_date' => 'date',
+        'meta' => 'array',
     ];
 
     /**

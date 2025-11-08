@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/report');
 
+Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
+Route::post('/report/student', [ReportController::class, 'storeStudent'])->name('report.student.store');
+Route::get('/report/employee', [ReportController::class, 'createEmployee'])->name('report.employee');
+Route::post('/report/employee', [ReportController::class, 'storeEmployee'])->name('report.employee.store');
+
 Route::get('/report', [ReportController::class, 'create'])->name('report.create');
 Route::get('/report/{org_code}', [ReportController::class, 'createByCode'])->name('report.by_code');
 Route::post('/report', [ReportController::class, 'store'])->middleware('throttle:report-submit')->name('report.store');

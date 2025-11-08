@@ -21,7 +21,7 @@ class OrgController extends AdminController
         $search = (string) $request->query('q', '');
 
         $query = Org::query()->orderBy('name');
-        $this->scopeByRole($query);
+        $this->scopeByRole($query, 'id');
 
         if ($status !== '') {
             $query->where('status', $status);
@@ -63,10 +63,13 @@ class OrgController extends AdminController
     {
         $this->ensurePlatformAdmin();
 
-        Org::create([
-            ...$request->validated(),
-            'created_by' => $request->user()->id,
-        ]);
+        $data = $request->validated();
+        $data['enable_student_reports'] = $request->boolean('enable_student_reports');
+        $data['enable_hr_reports'] = $request->boolean('enable_hr_reports');
+        $data['enable_commendations'] = $request->boolean('enable_commendations');
+        $data['created_by'] = $request->user()->id;
+
+        Org::create($data);
 
         return redirect()->route('admin.orgs.index')
             ->with('status', 'Organization created successfully.');
@@ -92,7 +95,12 @@ class OrgController extends AdminController
     {
         $this->authorizeOrgAccess($org);
 
-        $org->update($request->validated());
+        $data = $request->validated();
+        $data['enable_student_reports'] = $request->boolean('enable_student_reports');
+        $data['enable_hr_reports'] = $request->boolean('enable_hr_reports');
+        $data['enable_commendations'] = $request->boolean('enable_commendations');
+
+        $org->update($data);
 
         return redirect()->route('admin.orgs.index')
             ->with('status', 'Organization updated successfully.');

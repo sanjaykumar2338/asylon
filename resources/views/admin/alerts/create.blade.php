@@ -12,7 +12,7 @@
                     <form method="POST" action="{{ route('admin.alerts.store') }}">
                         @csrf
 
-                        @include('admin.alerts.form')
+                        @include('admin.alerts.form', ['departments' => $departments])
 
                         <div class="d-flex justify-content-end mt-4">
                             <a href="{{ route('admin.alerts.index') }}" class="btn btn-outline-secondary">
@@ -28,4 +28,3 @@
         </div>
     </div>
 </x-admin-layout>
-

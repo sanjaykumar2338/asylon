@@ -50,6 +50,7 @@ class AlertController extends AdminController
     {
         return view('admin.alerts.create', [
             'orgs' => $this->orgOptions(),
+            'departments' => $this->alertDepartments(),
         ]);
     }
 
@@ -76,6 +77,7 @@ class AlertController extends AdminController
         return view('admin.alerts.edit', [
             'alert' => $alert,
             'orgs' => $this->orgOptions(),
+            'departments' => $this->alertDepartments(),
         ]);
     }
 
@@ -136,6 +138,7 @@ class AlertController extends AdminController
         $user = $request->user();
 
         $data['is_active'] = $request->boolean('is_active', $data['is_active'] ?? true);
+        $data['department'] = $data['department'] ?? null;
 
         if ($user && ! $user->hasRole('platform_admin')) {
             $data['org_id'] = $user->org_id;
@@ -148,5 +151,15 @@ class AlertController extends AdminController
         }
 
         return $data;
+    }
+
+    /**
+     * Department options for alert contacts.
+     *
+     * @return array<string, string>
+     */
+    protected function alertDepartments(): array
+    {
+        return config('asylon.alerts.departments', []);
     }
 }

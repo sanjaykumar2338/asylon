@@ -18,6 +18,7 @@ class OrgAlertContact extends Model
     protected $fillable = [
         'org_id',
         'type',
+        'department',
         'value',
         'is_active',
     ];

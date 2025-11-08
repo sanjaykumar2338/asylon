@@ -18,6 +18,7 @@ class ReportSubcategory extends Model
         'name',
         'description',
         'position',
+        'type',
     ];
 
     /**
@@ -26,6 +27,7 @@ class ReportSubcategory extends Model
     protected $casts = [
         'report_category_id' => 'integer',
         'position' => 'integer',
+        'type' => 'string',
     ];
 
     /**

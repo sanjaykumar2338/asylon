@@ -26,6 +26,7 @@ class Org extends Model
         'on_call_user_id',
         'enable_commendations',
         'enable_hr_reports',
+        'enable_student_reports',
     ];
 
     /**
@@ -34,6 +35,7 @@ class Org extends Model
     protected $casts = [
         'enable_commendations' => 'boolean',
         'enable_hr_reports' => 'boolean',
+        'enable_student_reports' => 'boolean',
     ];
 
     /**
@@ -138,9 +140,11 @@ class Org extends Model
      */
     public function enabledTypes(): array
     {
-        $types = [
-            'safety' => __('Safety & Threat'),
-        ];
+        $types = [];
+
+        if ($this->enable_student_reports ?? true) {
+            $types['safety'] = __('Safety & Threat');
+        }
 
         if ($this->enable_commendations) {
             $types['commendation'] = __('Commendation');

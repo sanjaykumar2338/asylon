@@ -13,7 +13,7 @@
                         @csrf
                         @method('PUT')
 
-                        @include('admin.alerts.form', ['alert' => $alert])
+                        @include('admin.alerts.form', ['alert' => $alert, 'departments' => $departments])
 
                         <div class="d-flex justify-content-end mt-4">
                             <a href="{{ route('admin.alerts.index') }}" class="btn btn-outline-secondary">
@@ -29,4 +29,3 @@
         </div>
     </div>
 </x-admin-layout>
-
