@@ -38,6 +38,7 @@ class ReportLinkGenerator
             $value = (string) request()->root();
         }
 
+        $value = (string) request()->root();
         // We still use rtrim just in case the provided $baseUrl
         // (if not empty) has a trailing slash.
         return rtrim($value, '/');
