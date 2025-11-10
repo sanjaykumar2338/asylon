@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Report;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class UrgentReportEmail extends Notification
 {
-    public function __construct(protected Report $report)
+    public function __construct(protected Report $report, protected ?string $baseUrl = null)
     {
     }
 
@@ -29,7 +30,7 @@ class UrgentReportEmail extends Notification
     {
         $report = $this->report;
         $orgName = $report->org?->name ?? 'Unassigned organization';
-        $reportUrl = route('reports.show', $report);
+        $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;

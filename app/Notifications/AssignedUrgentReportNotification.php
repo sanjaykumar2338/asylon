@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Report;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AssignedUrgentReportNotification extends Notification
 {
-    public function __construct(protected Report $report)
+    public function __construct(protected Report $report, protected ?string $baseUrl = null)
     {
     }
 
@@ -32,7 +33,7 @@ class AssignedUrgentReportNotification extends Notification
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;
-        $reportUrl = route('reports.show', $report);
+        $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
         $submittedAt = $report->created_at
             ? $report->created_at->timezone(config('app.timezone'))->format('M d, Y H:i')
             : 'recently';

@@ -11,7 +11,16 @@ class ReportSubmitted
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(public Report $report)
+    public string $baseUrl;
+
+    public function __construct(public Report $report, ?string $baseUrl = null)
     {
+        $resolved = trim((string) ($baseUrl ?? ''));
+
+        if ($resolved === '') {
+            $resolved = (string) config('app.url', 'http://localhost');
+        }
+
+        $this->baseUrl = rtrim($resolved, '/');
     }
 }

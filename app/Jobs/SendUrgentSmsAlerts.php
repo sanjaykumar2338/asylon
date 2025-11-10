@@ -6,6 +6,7 @@ use App\Models\OrgAlertContact;
 use App\Models\Report;
 use App\Services\Audit;
 use App\Services\Sms\TelnyxSmsService;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,7 +22,7 @@ class SendUrgentSmsAlerts implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public Report $report)
+    public function __construct(public Report $report, public ?string $baseUrl = null)
     {
     }
 
@@ -98,7 +99,7 @@ class SendUrgentSmsAlerts implements ShouldQueue
             ? "{$report->category} / {$report->subcategory}"
             : $report->category;
         $statusSnippet = strtoupper($report->status ?? 'open');
-        $reportUrl = route('reports.show', $report);
+        $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
         $submittedAt = optional($report->created_at)->format('M d H:i');
 
         return sprintf(

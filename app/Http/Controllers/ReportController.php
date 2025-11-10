@@ -156,7 +156,7 @@ class ReportController extends Controller
             'portal_source' => 'general',
         ]);
 
-        event(new ReportSubmitted($report));
+        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
 
         return Redirect::route('report.thanks', $report->getKey());
@@ -172,7 +172,7 @@ class ReportController extends Controller
             'type' => 'safety',
         ]);
 
-        event(new ReportSubmitted($report));
+        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
 
         return Redirect::route('report.thanks', $report->getKey());
@@ -201,7 +201,7 @@ class ReportController extends Controller
             ],
         ]);
 
-        event(new ReportSubmitted($report));
+        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
 
         return Redirect::route('report.thanks', $report->getKey());
@@ -361,6 +361,20 @@ class ReportController extends Controller
             'portal_source' => $report->portal_source,
             'type' => $report->type,
         ]);
+    }
+
+    /**
+     * Determine the absolute dashboard base URL to use in alerts.
+     */
+    protected function dashboardBaseUrl(StoreReportRequest $request): string
+    {
+        $root = trim((string) $request->root());
+
+        if ($root === '') {
+            return rtrim((string) config('app.url', 'http://localhost'), '/');
+        }
+
+        return rtrim($root, '/');
     }
 
     /**

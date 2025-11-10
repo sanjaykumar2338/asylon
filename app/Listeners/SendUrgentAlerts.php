@@ -34,6 +34,7 @@ class SendUrgentAlerts implements ShouldQueue
     public function handle(ReportSubmitted $event): void
     {
         $report = $event->report;
+        $baseUrl = $event->baseUrl;
 
         $report->loadMissing(['org.onCallReviewer']);
 
@@ -57,7 +58,7 @@ class SendUrgentAlerts implements ShouldQueue
             if ($contact->type === 'email') {
                 try {
                     Notification::route('mail', $contact->value)
-                        ->notify(new UrgentReportEmail($report));
+                        ->notify(new UrgentReportEmail($report, $baseUrl));
                     $emailCount++;
                     Log::info('Urgent report email notification sent.', [
                         'report_id' => $report->getKey(),
@@ -79,7 +80,7 @@ class SendUrgentAlerts implements ShouldQueue
         }
 
         if ($report->urgent && $smsTargets->isNotEmpty()) {
-            SendUrgentSmsAlerts::dispatch($report);
+            SendUrgentSmsAlerts::dispatch($report, $baseUrl);
             Log::info('Queued urgent SMS job for report.', [
                 'report_id' => $report->getKey(),
                 'org_id' => $report->org_id,
@@ -90,7 +91,7 @@ class SendUrgentAlerts implements ShouldQueue
         $onCallReviewer = $report->org?->onCallReviewer;
         if ($onCallReviewer && $onCallReviewer->active) {
             try {
-                $onCallReviewer->notify(new AssignedUrgentReportNotification($report));
+                $onCallReviewer->notify(new AssignedUrgentReportNotification($report, $baseUrl));
                 $onCallNotified = true;
                 Log::info('Urgent report assignment email sent to on-call reviewer.', [
                     'report_id' => $report->getKey(),
