@@ -25,9 +25,21 @@ class ReportLinkGenerator
         $value = trim((string) ($baseUrl ?? ''));
 
         if ($value === '') {
-            $value = (string) config('app.url', 'http://localhost');
+            // MODIFICATION:
+            // Instead of getting the static config('app.url'),
+            // we dynamically get the root of the *current* request.
+            //
+            // This will return "http://example.com" or "https://sub.domain.org"
+            // based on how the user is accessing the site.
+            //
+            // In a CLI (command-line) context, this helper will
+            // automatically fall back to using your config('app.url'),
+            // so it remains safe for Artisan commands.
+            $value = (string) request()->root();
         }
 
+        // We still use rtrim just in case the provided $baseUrl
+        // (if not empty) has a trailing slash.
         return rtrim($value, '/');
     }
 
