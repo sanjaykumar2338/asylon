@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ReportSubmitted;
 use App\Http\Requests\PostChatMessageRequest;
 use App\Http\Requests\UpdateReportRequest;
 use App\Models\Report;
@@ -210,6 +211,7 @@ class ReviewController extends Controller
         }
 
         $validated = $request->validated();
+        $wasUrgent = (bool) $report->urgent;
 
         $report->category = $validated['category'];
         $report->subcategory = $validated['subcategory'];
@@ -226,6 +228,13 @@ class ReviewController extends Controller
             'status' => $report->status,
             'urgent' => $report->urgent,
         ]);
+
+        if (! $wasUrgent && $report->urgent) {
+            event(new ReportSubmitted(
+                $report->fresh(['org']),
+                config('app.url', 'http://localhost')
+            ));
+        }
 
         return redirect()
             ->route('reports.show', $report)
