@@ -25,22 +25,9 @@ class ReportLinkGenerator
         $value = trim((string) ($baseUrl ?? ''));
 
         if ($value === '') {
-            // MODIFICATION:
-            // Instead of getting the static config('app.url'),
-            // we dynamically get the root of the *current* request.
-            //
-            // This will return "http://example.com" or "https://sub.domain.org"
-            // based on how the user is accessing the site.
-            //
-            // In a CLI (command-line) context, this helper will
-            // automatically fall back to using your config('app.url'),
-            // so it remains safe for Artisan commands.
-            $value = (string) request()->root();
+            $value = static::hostFromRequest();
         }
 
-        $value = (string) request()->root();
-        // We still use rtrim just in case the provided $baseUrl
-        // (if not empty) has a trailing slash.
         return rtrim($value, '/');
     }
 
@@ -49,5 +36,36 @@ class ReportLinkGenerator
         $relative = '/'.ltrim($path, '/');
 
         return $base.$relative;
+    }
+
+    protected static function hostFromRequest(): string
+    {
+        $request = null;
+
+        try {
+            $request = request();
+        } catch (\Throwable) {
+            // No request bound (e.g., queue context); fall back to server vars.
+        }
+
+        $scheme = 'http';
+        $host = null;
+
+        if ($request) {
+            $host = $request->getHttpHost() ?: $request->getHost();
+            $scheme = $request->getScheme() ?: $scheme;
+        }
+
+        if ($host === null || $host === '') {
+            $host = $_SERVER['HTTP_HOST']
+                ?? $_SERVER['SERVER_NAME']
+                ?? 'localhost';
+
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+                $scheme = 'https';
+            }
+        }
+
+        return sprintf('%s://%s', $scheme, ltrim($host, '/'));
     }
 }
