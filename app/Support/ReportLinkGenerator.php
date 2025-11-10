@@ -25,7 +25,7 @@ class ReportLinkGenerator
         $value = trim((string) ($baseUrl ?? ''));
 
         if ($value === '') {
-            $value = static::hostFromRequest();
+            $value = (string) config('app.url', 'http://localhost');
         }
 
         return rtrim($value, '/');
@@ -38,34 +38,4 @@ class ReportLinkGenerator
         return $base.$relative;
     }
 
-    protected static function hostFromRequest(): string
-    {
-        $request = null;
-
-        try {
-            $request = request();
-        } catch (\Throwable) {
-            // No request bound (e.g., queue context); fall back to server vars.
-        }
-
-        $scheme = 'http';
-        $host = null;
-
-        if ($request) {
-            $host = $request->getHttpHost() ?: $request->getHost();
-            $scheme = $request->getScheme() ?: $scheme;
-        }
-
-        if ($host === null || $host === '') {
-            $host = $_SERVER['HTTP_HOST']
-                ?? $_SERVER['SERVER_NAME']
-                ?? 'localhost';
-
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-                $scheme = 'https';
-            }
-        }
-
-        return sprintf('%s://%s', $scheme, ltrim($host, '/'));
-    }
 }
