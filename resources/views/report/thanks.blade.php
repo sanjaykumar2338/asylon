@@ -14,15 +14,15 @@
             <p class="mt-2 text-lg font-semibold text-indigo-700">{{ $id }}</p>
         </div>
 
-        @if (!empty($chatToken))
+        @if (!empty($followupUrl))
             <div class="mt-6 rounded-md border border-gray-200 bg-white p-4 text-left shadow-sm">
-                <p class="text-sm font-medium text-gray-700">Continue conversation</p>
+                <p class="text-sm font-medium text-gray-700">{{ __('Follow your case using this link') }}</p>
                 <p class="mt-2 text-sm text-gray-600">
-                    Save this secure link to send updates or respond to reviewers.
+                    {{ __('Save this secure link to send updates or respond to reviewers anytime.') }}
                 </p>
-                <a href="{{ route('chat.thread', $chatToken) }}"
+                <a href="{{ $followupUrl }}"
                     class="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Open chat thread
+                    {{ __('Open follow-up portal') }}
                 </a>
             </div>
         @endif

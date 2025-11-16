@@ -49,6 +49,8 @@ return [
         'enable_alpha' => env('TELNYX_ENABLE_ALPHA', false),
         'sms_enabled' => env('SMS_ENABLED', true),
         'skip_ssl_verify' => env('TELNYX_SKIP_SSL_VERIFY', env('APP_ENV') === 'local'),
+        'timeout' => env('TELNYX_TIMEOUT', 8),
+        'connect_timeout' => env('TELNYX_CONNECT_TIMEOUT', 4),
     ],
 
 ];

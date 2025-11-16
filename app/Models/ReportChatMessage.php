@@ -17,8 +17,16 @@ class ReportChatMessage extends Model
      */
     protected $fillable = [
         'report_id',
-        'from',
-        'body',
+        'side',
+        'message',
+        'sent_at',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'sent_at' => 'datetime',
     ];
 
     /**

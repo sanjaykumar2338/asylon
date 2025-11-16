@@ -160,7 +160,7 @@ class ReviewController extends Controller
         $report->load([
             'org',
             'files',
-            'messages' => fn ($query) => $query->orderBy('created_at'),
+            'messages' => fn ($query) => $query->orderBy('sent_at'),
         ]);
 
         Audit::log('reviewer', 'view_report', 'report', $report->getKey());
@@ -253,8 +253,9 @@ class ReviewController extends Controller
         }
 
         $report->messages()->create([
-            'from' => 'reviewer',
-            'body' => $request->input('body'),
+            'side' => 'reviewer',
+            'message' => $request->input('message'),
+            'sent_at' => now(),
         ]);
 
         if (! $report->first_response_at) {

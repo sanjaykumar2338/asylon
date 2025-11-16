@@ -3,11 +3,16 @@
 namespace App\Services\Sms;
 
 use App\Models\Setting;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class TelnyxSmsService
 {
     protected string $apiBase = 'https://api.telnyx.com/v2';
+    protected int $defaultTimeout = 8;
+    protected int $defaultConnectTimeout = 4;
 
     /**
      * Send an SMS message via Telnyx.
@@ -65,50 +70,38 @@ class TelnyxSmsService
             'payload' => $payload,
         ]);
 
-        $curl = curl_init();
-
-        $curlOptions = [
-            CURLOPT_URL => $this->apiBase . '/messages',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($payload),
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Authorization: ' . 'Bearer '.$apiKey,
-            ],
-        ];
+        $request = Http::timeout($this->requestTimeout())
+            ->connectTimeout($this->connectTimeout())
+            ->withHeaders([
+                'Authorization' => 'Bearer '.$apiKey,
+            ])
+            ->asJson();
 
         if ($this->shouldSkipSslVerification()) {
-            $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;
-            $curlOptions[CURLOPT_SSL_VERIFYHOST] = 0;
+            $request->withoutVerifying();
             Log::warning('Telnyx SMS request is skipping SSL verification. Configure CA bundle for production.', []);
         }
 
-        curl_setopt_array($curl, $curlOptions);
-
-        $responseBody = curl_exec($curl);
-        $curlError = curl_error($curl);
-        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-
-        if ($responseBody === false) {
-            Log::error('Telnyx SMS cURL error.', [
+        try {
+            $response = $request->post($this->apiBase.'/messages', $payload);
+        } catch (ConnectionException $e) {
+            Log::error('Telnyx SMS connection error.', [
                 'to' => $to,
-                'error' => $curlError,
+                'error' => $e->getMessage(),
             ]);
 
-            return ['error' => 'curl_error', 'message' => $curlError];
+            return ['error' => 'connection_error', 'message' => $e->getMessage()];
+        } catch (Throwable $e) {
+            Log::error('Telnyx SMS unexpected error.', [
+                'to' => $to,
+                'exception' => $e,
+            ]);
+
+            return ['error' => 'unexpected_error', 'message' => $e->getMessage()];
         }
 
-        $decoded = json_decode($responseBody, true);
-
-        if ($status >= 200 && $status < 300) {
-            $data = $decoded['data'] ?? [];
+        if ($response->successful()) {
+            $data = $response->json('data', []);
 
             Log::info('Telnyx SMS queued successfully.', [
                 'to' => $to,
@@ -121,14 +114,14 @@ class TelnyxSmsService
 
         Log::error('Telnyx SMS API error.', [
             'to' => $to,
-            'status' => $status,
-            'body' => $decoded,
+            'status' => $response->status(),
+            'body' => $response->json(),
         ]);
 
         return [
             'error' => 'api_error',
-            'status' => $status,
-            'body' => $decoded,
+            'status' => $response->status(),
+            'body' => $response->json(),
         ];
     }
 
@@ -202,6 +195,24 @@ class TelnyxSmsService
         }
 
         return $this->toBool($value);
+    }
+
+    protected function requestTimeout(): int
+    {
+        $timeout = Setting::get('telnyx_timeout') ?? config('services.telnyx.timeout', $this->defaultTimeout);
+
+        $timeout = (int) $timeout;
+
+        return $timeout > 0 ? $timeout : $this->defaultTimeout;
+    }
+
+    protected function connectTimeout(): int
+    {
+        $timeout = Setting::get('telnyx_connect_timeout') ?? config('services.telnyx.connect_timeout', $this->defaultConnectTimeout);
+
+        $timeout = (int) $timeout;
+
+        return $timeout > 0 ? $timeout : $this->defaultConnectTimeout;
     }
 
     protected function normalizeSender(?string $value): ?string

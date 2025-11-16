@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryCo
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -125,11 +125,23 @@ if (app()->environment('local')) {
     })->name('dev.telnyx-test-sms');
 }
 
-Route::get('/chat/{token}', [ChatController::class, 'thread'])->name('chat.thread');
-Route::post('/chat/{token}', [ChatController::class, 'post'])->middleware('throttle:chat-post')->name('chat.post');
-Route::get('/report/{token}/attachments/{file}/preview', [ChatController::class, 'previewAttachment'])
+Route::get('/followup/{token}', [FollowUpController::class, 'show'])->name('followup.show');
+Route::post('/followup/{token}', [FollowUpController::class, 'storeMessage'])
+    ->middleware('throttle:chat-post')
+    ->name('followup.message');
+Route::get('/followup/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
+    ->name('followup.attachments.preview');
+Route::get('/followup/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
+    ->name('followup.attachments.download');
+
+// Legacy chat URLs (kept for backward compatibility)
+Route::get('/chat/{token}', [FollowUpController::class, 'show'])->name('chat.thread');
+Route::post('/chat/{token}', [FollowUpController::class, 'storeMessage'])
+    ->middleware('throttle:chat-post')
+    ->name('chat.post');
+Route::get('/report/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
     ->name('report.attachments.preview');
-Route::get('/report/{token}/attachments/{file}/download', [ChatController::class, 'downloadAttachment'])
+Route::get('/report/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
     ->name('report.attachments.download');
 
 Route::middleware(['auth', 'verified'])->group(function () {

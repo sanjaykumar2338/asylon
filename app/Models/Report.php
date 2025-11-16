@@ -98,7 +98,8 @@ class Report extends Model
      */
     public function chatMessages(): HasMany
     {
-        return $this->hasMany(ReportChatMessage::class);
+        return $this->hasMany(ReportChatMessage::class)
+            ->orderBy('sent_at');
     }
 
     /**

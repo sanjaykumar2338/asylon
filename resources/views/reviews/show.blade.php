@@ -81,7 +81,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('Reporter chat') }}</h6>
-                            <a href="{{ route('chat.thread', $report->chat_token) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <a href="{{ route('followup.show', $report->chat_token) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-comments mr-1"></i> {{ __('Open chat') }}
                             </a>
                         </div>
@@ -119,14 +119,14 @@
                             @foreach ($report->messages as $message)
                                 <div class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="mb-1 {{ $message->from === 'reviewer' ? 'text-primary' : '' }}">
-                                            {{ ucfirst($message->from) }}
+                                        <h6 class="mb-1 {{ $message->side === 'reviewer' ? 'text-primary' : '' }}">
+                                            {{ ucfirst($message->side) }}
                                         </h6>
                                         <small class="text-muted">
-                                            <i class="far fa-clock mr-1"></i>{{ $message->created_at->format('M d, Y H:i') }}
+                                            <i class="far fa-clock mr-1"></i>{{ $message->sent_at?->format('M d, Y H:i') }}
                                         </small>
                                     </div>
-                                    <p class="mb-0" style="white-space: pre-line;">{{ $message->body }}</p>
+                                    <p class="mb-0" style="white-space: pre-line;">{{ $message->message }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -135,11 +135,11 @@
                     <form method="POST" action="{{ route('reports.message', $report) }}">
                         @csrf
                         <div class="form-group">
-                            <label for="body">{{ __('Reply to reporter') }}</label>
-                            <textarea id="body" name="body" rows="4" required minlength="2" maxlength="5000"
-                                class="form-control @error('body') is-invalid @enderror"
-                                placeholder="{{ __('Write a reply to the reporter...') }}">{{ old('body') }}</textarea>
-                            @error('body')
+                            <label for="message">{{ __('Reply to reporter') }}</label>
+                            <textarea id="message" name="message" rows="4" required minlength="2" maxlength="5000"
+                                class="form-control @error('message') is-invalid @enderror"
+                                placeholder="{{ __('Write a reply to the reporter...') }}">{{ old('message') }}</textarea>
+                            @error('message')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

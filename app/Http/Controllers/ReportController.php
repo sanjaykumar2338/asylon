@@ -216,7 +216,9 @@ class ReportController extends Controller
 
         return view('report.thanks', [
             'id' => $id,
-            'chatToken' => $report->chat_token,
+            'followupUrl' => $report->chat_token
+                ? route('followup.show', $report->chat_token)
+                : null,
         ]);
     }
 

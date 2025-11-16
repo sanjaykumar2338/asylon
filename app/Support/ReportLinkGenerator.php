@@ -18,6 +18,23 @@ class ReportLinkGenerator
     }
 
     /**
+     * Build a public follow-up portal URL for the report.
+     */
+    public static function followup(Report $report, ?string $baseUrl = null): string
+    {
+        $base = static::normalizeBaseUrl($baseUrl);
+        $token = (string) $report->chat_token;
+
+        if ($token === '') {
+            return static::dashboard($report, $base);
+        }
+
+        $path = route('followup.show', ['token' => $token], absolute: false);
+
+        return static::concat($base, $path);
+    }
+
+    /**
      * Ensure we always have a usable base URL.
      */
     protected static function normalizeBaseUrl(?string $baseUrl): string

@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('report_chat_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignUlid('report_id')->constrained('reports')->cascadeOnDelete();
-            $table->string('from');
-            $table->text('body');
+            $table->string('side', 32);
+            $table->text('message');
+            $table->timestamp('sent_at')->useCurrent();
             $table->timestamps();
             $table->softDeletes();
         });

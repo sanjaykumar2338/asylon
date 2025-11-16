@@ -205,7 +205,7 @@ class DatabaseSeeder extends Seeder
                     'contact_email' => 'anon1@example.com',
                     'violation_date' => now()->subDays(1),
                     'messages' => [
-                        ['from' => 'reporter', 'body' => 'I heard alarms and saw someone running out of the side exit.'],
+                        ['side' => 'reporter', 'message' => 'I heard alarms and saw someone running out of the side exit.'],
                     ],
                 ],
                 [
@@ -219,8 +219,8 @@ class DatabaseSeeder extends Seeder
                     'contact_email' => 'teacher@example.com',
                     'violation_date' => now()->subDays(2),
                     'messages' => [
-                        ['from' => 'reporter', 'body' => 'Email subject was "Urgent Password Reset Required".'],
-                        ['from' => 'reviewer', 'body' => 'Thanks for flagging - please forward one of the emails to security.'],
+                        ['side' => 'reporter', 'message' => 'Email subject was "Urgent Password Reset Required".'],
+                        ['side' => 'reviewer', 'message' => 'Thanks for flagging - please forward one of the emails to security.'],
                     ],
                     'first_response_minutes' => 120,
                 ],
@@ -235,8 +235,8 @@ class DatabaseSeeder extends Seeder
                     'contact_phone' => '+15551230001',
                     'violation_date' => now()->subDays(3),
                     'messages' => [
-                        ['from' => 'reporter', 'body' => 'We noticed the missing cart during first period.'],
-                        ['from' => 'reviewer', 'body' => 'We are reviewing badge access logs for the wing.'],
+                        ['side' => 'reporter', 'message' => 'We noticed the missing cart during first period.'],
+                        ['side' => 'reviewer', 'message' => 'We are reviewing badge access logs for the wing.'],
                     ],
                     'first_response_minutes' => 90,
                 ],
@@ -263,8 +263,8 @@ class DatabaseSeeder extends Seeder
                     'contact_email' => 'librarian@example.com',
                     'violation_date' => now()->subDays(5),
                     'messages' => [
-                        ['from' => 'reporter', 'body' => 'Outage occurred around 10:15 AM.'],
-                        ['from' => 'reviewer', 'body' => 'Resolved - switch stack rebooted and firmware updated.'],
+                        ['side' => 'reporter', 'message' => 'Outage occurred around 10:15 AM.'],
+                        ['side' => 'reviewer', 'message' => 'Resolved - switch stack rebooted and firmware updated.'],
                     ],
                     'first_response_minutes' => 45,
                 ],
@@ -279,7 +279,7 @@ class DatabaseSeeder extends Seeder
                     'contact_phone' => '+15551230099',
                     'violation_date' => now()->subDays(1),
                     'messages' => [
-                        ['from' => 'reporter', 'body' => 'Message said "See you at 4 by the parking lot".'],
+                        ['side' => 'reporter', 'message' => 'Message said "See you at 4 by the parking lot".'],
                     ],
                 ],
             ];
@@ -304,11 +304,12 @@ class DatabaseSeeder extends Seeder
                         : null,
                 ]);
 
-                foreach ($data['messages'] as $message) {
+                foreach ($data['messages'] as $index => $message) {
                     ReportChatMessage::create([
                         'report_id' => $report->getKey(),
-                        'from' => $message['from'],
-                        'body' => $message['body'],
+                        'side' => $message['side'] ?? $message['from'] ?? 'reporter',
+                        'message' => $message['message'] ?? $message['body'] ?? '',
+                        'sent_at' => $message['sent_at'] ?? now()->subMinutes(($index + 1) * 15),
                     ]);
                 }
             }
