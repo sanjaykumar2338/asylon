@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostChatMessageRequest;
+use App\Jobs\SendReporterFollowupNotifications;
 use App\Models\Report;
 use App\Models\ReportFile;
 use App\Services\Audit;
-use App\Services\ReporterFollowupNotifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -44,8 +44,7 @@ class FollowUpController extends Controller
      */
     public function storeMessage(
         PostChatMessageRequest $request,
-        string $token,
-        ReporterFollowupNotifier $notifier
+        string $token
     ): RedirectResponse {
         $report = Report::where('chat_token', $token)->firstOrFail();
 
@@ -56,9 +55,13 @@ class FollowUpController extends Controller
         ]);
 
         try {
-            $notifier->notify($report, $message, $this->baseUrl($request));
+            SendReporterFollowupNotifications::dispatch(
+                $report,
+                $message,
+                $this->baseUrl($request)
+            );
         } catch (Throwable $e) {
-            Log::error('Reporter follow-up notification failed.', [
+            Log::error('Reporter follow-up notification dispatch failed.', [
                 'report_id' => $report->getKey(),
                 'message_id' => $message->getKey(),
                 'exception' => $e,
