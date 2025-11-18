@@ -52,15 +52,14 @@ class ReporterFollowupEmail extends Notification
                 'org' => $orgName,
                 'category' => $report->category,
             ]))
-            ->greeting(__('Hello,'))
-            ->line(__('A reporter posted a new follow-up message on case :id.', ['id' => $report->id]))
-            ->line(__('Organization: :org', ['org' => $orgName]))
-            ->line(__('Category: :category', ['category' => $categoryLabel]))
-            ->line(__('Submitted: :submitted', ['submitted' => $submitted]))
-            ->line(__('Message: ":message"', ['message' => $messageBody]))
-            ->action(__('Open report in dashboard'), $dashboardUrl)
-            ->line(__('Public follow-up portal: :url', ['url' => $followupUrl]))
-            ->line(__('Please log any responses directly in the dashboard to keep the case history complete.'))
-            ->line(config('asylon.privacy.email_footer'));
+            ->view('emails.reporter_followup', [
+                'report' => $report,
+                'submitted' => $submitted,
+                'categoryLabel' => $categoryLabel,
+                'orgName' => $orgName,
+                'dashboardUrl' => $dashboardUrl,
+                'followupUrl' => $followupUrl,
+                'messageBody' => $messageBody,
+            ]);
     }
 }

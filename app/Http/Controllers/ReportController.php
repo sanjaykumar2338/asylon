@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReportController extends Controller
 {
@@ -83,7 +84,7 @@ class ReportController extends Controller
             ->values();
 
         if ($orgs->isEmpty()) {
-            abort(403, 'Student reporting is disabled.');
+            return $this->portalDisabled('student');
         }
 
         $categories = $this->loadCategoriesByTypes(['student', 'both']);
@@ -117,7 +118,7 @@ class ReportController extends Controller
             ->values();
 
         if ($orgs->isEmpty()) {
-            abort(403, 'Employee reporting is disabled.');
+            return $this->portalDisabled('employee');
         }
 
         $categories = $this->loadCategoriesByTypes(['employee', 'both']);
@@ -220,6 +221,38 @@ class ReportController extends Controller
                 ? route('followup.show', $report->chat_token)
                 : null,
         ]);
+    }
+
+    /**
+     * Render a branded disabled-portal page instead of a generic 403.
+     */
+    protected function portalDisabled(string $portal): Response
+    {
+        $title = __('Reporting portal disabled');
+        $message = __('This reporting portal is disabled for your organization. Please contact your administrator.');
+
+        $meta = match ($portal) {
+            'student' => [
+                'heading' => __('Student Reporting Unavailable'),
+                'subheading' => __('This link is currently turned off.'),
+            ],
+            'employee' => [
+                'heading' => __('HR / Employee Reporting Unavailable'),
+                'subheading' => __('This link is currently turned off.'),
+            ],
+            default => [
+                'heading' => $title,
+                'subheading' => null,
+            ],
+        };
+
+        return response()
+            ->view('report.disabled', [
+                'title' => $title,
+                'message' => $message,
+                'heading' => $meta['heading'] ?? $title,
+                'subheading' => $meta['subheading'] ?? null,
+            ], 403);
     }
 
     /**

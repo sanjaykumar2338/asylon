@@ -69,4 +69,7 @@ return [
         'student_departments' => ['counseling', 'security', 'student_affairs'],
         'employee_departments' => ['hr', 'ethics', 'admin'],
     ],
+    'notifications' => [
+        'first_response_org_admin' => env('FIRST_RESPONSE_NOTIFY_ORG_ADMIN', true),
+    ],
 ];

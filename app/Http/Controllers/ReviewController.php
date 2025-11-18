@@ -8,12 +8,18 @@ use App\Http\Requests\UpdateReportRequest;
 use App\Models\Report;
 use App\Models\ReportCategory;
 use App\Models\ReportFile;
+use App\Models\AuditLog;
+use App\Models\User;
+use App\Notifications\FirstResponseNotification;
 use App\Services\Audit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ReviewController extends Controller
@@ -161,12 +167,15 @@ class ReviewController extends Controller
             'org',
             'files',
             'messages' => fn ($query) => $query->orderBy('sent_at'),
+            'resolver',
         ]);
 
         Audit::log('reviewer', 'view_report', 'report', $report->getKey());
 
         return view('reviews.show', [
             'report' => $report,
+            'timeline' => $this->buildTimeline($report),
+            'reviewers' => $this->reviewersForOrg($user, $report->org_id),
         ]);
     }
 
@@ -258,12 +267,22 @@ class ReviewController extends Controller
             'sent_at' => now(),
         ]);
 
+        $isFirstResponse = ! $report->first_response_at;
+
         if (! $report->first_response_at) {
             $report->first_response_at = now();
             $report->save();
         }
 
         Audit::log('reviewer', 'post_message', 'report', $report->getKey());
+
+        if ($isFirstResponse) {
+            $this->notifyFirstResponse($report, $user, $this->baseUrl($request));
+            Audit::log('reviewer', 'first_response', 'report', $report->getKey(), [
+                'responder_id' => $user->getKey(),
+                'responder_name' => $user->name,
+            ]);
+        }
 
         return back()->with('ok', 'Reply sent.');
     }
@@ -281,15 +300,46 @@ class ReviewController extends Controller
 
         $validated = $request->validate([
             'status' => ['required', 'in:open,in_review,closed'],
+            'note' => ['nullable', 'string', 'max:2000'],
+            'resolved_by' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         $fromStatus = $report->status;
         $report->status = $validated['status'];
+        $report->status_note = $validated['note'] ?? null;
+
+        $resolvedBy = null;
+        $resolvedById = $validated['resolved_by'] ?? null;
+
+        if ($report->status === 'closed') {
+            if ($resolvedById) {
+                $resolvedBy = User::query()
+                    ->when(! $user->hasRole('platform_admin'), fn ($q) => $q->where('org_id', $report->org_id))
+                    ->where('active', true)
+                    ->find($resolvedById);
+
+                if (! $resolvedBy) {
+                    return back()->withErrors(['resolved_by' => __('Reviewer not found for this organization.')]);
+                }
+
+                $report->resolved_by = $resolvedBy->getKey();
+            } elseif ($user->hasRole(['reviewer', 'security_lead', 'org_admin'])) {
+                $report->resolved_by = $user->getKey();
+                $resolvedBy = $user;
+            }
+        } else {
+            // Clear resolver if reopening.
+            $report->resolved_by = null;
+        }
+
         $report->save();
 
         Audit::log('reviewer', 'change_status', 'report', $report->getKey(), [
             'from' => $fromStatus,
             'to' => $report->status,
+            'note' => $report->status_note,
+            'resolved_by' => $resolvedBy?->getKey(),
+            'resolved_by_name' => $resolvedBy?->name,
         ]);
 
         return back()->with('ok', 'Status updated.');
@@ -383,5 +433,187 @@ class ReviewController extends Controller
         return redirect()
             ->route('reviews.index')
             ->with('ok', 'Report moved to trash.');
+    }
+
+    /**
+     * Resolve reviewers/security leads/org admins for the status form.
+     */
+    protected function reviewersForOrg($user, int $orgId)
+    {
+        return User::query()
+            ->where('active', true)
+            ->when(! $user->hasRole('platform_admin'), fn ($q) => $q->where('org_id', $orgId))
+            ->whereIn('role', ['reviewer', 'security_lead', 'org_admin'])
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    /**
+     * Base URL helper for absolute links.
+     */
+    protected function baseUrl(Request $request): string
+    {
+        $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
+
+        return $root === '' ? 'http://localhost' : rtrim($root, '/');
+    }
+
+    /**
+     * Notify org admins when the first response is sent.
+     */
+    protected function notifyFirstResponse(Report $report, $responder, string $baseUrl): void
+    {
+        if (! config('asylon.notifications.first_response_org_admin', true)) {
+            return;
+        }
+
+        $admins = User::query()
+            ->where('org_id', $report->org_id)
+            ->where('active', true)
+            ->where('role', 'org_admin')
+            ->get();
+
+        if ($admins->isEmpty()) {
+            return;
+        }
+
+        Notification::send(
+            $admins,
+            new FirstResponseNotification($report, $baseUrl, $responder?->name)
+        );
+    }
+
+    /**
+     * Build a simplified activity timeline for the report.
+     *
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
+    protected function buildTimeline(Report $report): Collection
+    {
+        return AuditLog::query()
+            ->with('user')
+            ->where('target_type', 'report')
+            ->where('target_id', $report->getKey())
+            ->orderBy('created_at')
+            ->get()
+            ->map(function (AuditLog $log): array {
+                return [
+                    'id' => $log->getKey(),
+                    'time' => $log->created_at,
+                    'title' => $this->timelineTitle($log),
+                    'description' => $this->timelineDescription($log),
+                    'icon' => $this->timelineIcon($log),
+                ];
+            });
+    }
+
+    protected function timelineTitle(AuditLog $log): string
+    {
+        return match ($log->action) {
+            'portal_submission' => __('Report submitted'),
+            'alert_dispatched' => __('Urgent alert sent'),
+            'view_report' => __('Report viewed'),
+            'update_report' => __('Report details updated'),
+            'change_status' => __('Status changed'),
+            'post_message' => __('Reviewer replied'),
+            'post_followup_message' => __('Reporter follow-up'),
+            'first_response' => __('First response sent'),
+            'reporter_followup_alert' => __('Reporter follow-up alerts sent'),
+            'download_attachment' => __('Attachment downloaded'),
+            'preview_attachment' => __('Attachment previewed'),
+            'download_followup_attachment' => __('Reporter downloaded attachment'),
+            'preview_followup_attachment' => __('Reporter previewed attachment'),
+            'trash_report' => __('Report moved to trash'),
+            'restore_report' => __('Report restored from trash'),
+            default => Str::headline(str_replace('_', ' ', $log->action)),
+        };
+    }
+
+    protected function timelineDescription(AuditLog $log): string
+    {
+        $actor = $this->timelineActor($log);
+        $meta = $log->meta ?? [];
+
+        return match ($log->action) {
+            'portal_submission' => __('Submitted via :portal (:type)', [
+                'portal' => $meta['portal_source'] ?? __('portal'),
+                'type' => $meta['type'] ?? __('unspecified'),
+            ]),
+            'alert_dispatched' => __('Urgent alert dispatched (:channel)', [
+                'channel' => $meta['channel'] ?? __('unknown channel'),
+            ]),
+            'update_report' => __('Updated by :actor', ['actor' => $actor]),
+            'change_status' => $this->buildStatusChangeDescription($actor, $meta),
+            'post_message' => __('Reply sent by :actor', ['actor' => $actor]),
+            'post_followup_message' => __('Reporter shared a follow-up message'),
+            'first_response' => __('First response sent by :actor', ['actor' => $actor]),
+            'reporter_followup_alert' => __('Alerts sent (emails: :emails, sms: :sms)', [
+                'emails' => $meta['emails_sent'] ?? 0,
+                'sms' => $meta['sms_sent'] ?? 0,
+            ]),
+            'download_attachment', 'preview_attachment' => __('Attachment access by :actor', ['actor' => $actor]),
+            'download_followup_attachment', 'preview_followup_attachment' => __('Reporter accessed attachment'),
+            'trash_report' => __('Moved to trash by :actor', ['actor' => $actor]),
+            'restore_report' => __('Restored by :actor', ['actor' => $actor]),
+            default => $actor ? __('Action by :actor', ['actor' => $actor]) : __('Activity logged'),
+        };
+    }
+
+    protected function timelineIcon(AuditLog $log): string
+    {
+        return match ($log->action) {
+            'portal_submission' => 'fas fa-flag',
+            'alert_dispatched' => 'fas fa-bell',
+            'view_report' => 'fas fa-eye',
+            'update_report' => 'fas fa-edit',
+            'change_status' => 'fas fa-random',
+            'post_message' => 'fas fa-reply',
+            'post_followup_message' => 'fas fa-comment-dots',
+            'first_response' => 'fas fa-check-circle',
+            'reporter_followup_alert' => 'fas fa-paper-plane',
+            'download_attachment', 'preview_attachment' => 'fas fa-paperclip',
+            'download_followup_attachment', 'preview_followup_attachment' => 'fas fa-paperclip',
+            'trash_report' => 'fas fa-trash',
+            'restore_report' => 'fas fa-undo',
+            default => 'fas fa-circle',
+        };
+    }
+
+    protected function buildStatusChangeDescription(?string $actor, array $meta): string
+    {
+        $base = __('Status changed from :from to :to by :actor', [
+            'from' => $meta['from'] ?? __('unknown'),
+            'to' => $meta['to'] ?? __('unknown'),
+            'actor' => $actor ?? __('System'),
+        ]);
+
+        $resolvedBy = $meta['resolved_by_name'] ?? null;
+        $note = $meta['note'] ?? null;
+
+        $parts = [$base];
+
+        if ($resolvedBy) {
+            $parts[] = __('Resolved by :name', ['name' => $resolvedBy]);
+        }
+
+        if ($note) {
+            $parts[] = __('Note: :note', ['note' => $note]);
+        }
+
+        return implode(' — ', $parts);
+    }
+
+    protected function timelineActor(AuditLog $log): ?string
+    {
+        if ($log->user?->name) {
+            return $log->user->name;
+        }
+
+        return match ($log->actor_type) {
+            'reviewer' => __('Reviewer'),
+            'reporter' => __('Reporter'),
+            'system' => __('System'),
+            default => null,
+        };
     }
 }

@@ -103,9 +103,9 @@ class SendUrgentSmsAlerts implements ShouldQueue
         $submittedAt = optional($report->created_at)->format('M d H:i');
 
         return sprintf(
-            'URGENT %s at %s (%s). Review: %s',
-            Str::limit($category, 70),
-            Str::limit($orgName, 30),
+            'URGENT %s (%s) %s. %s',
+            Str::limit($category, 64),
+            Str::limit($orgName, 28),
             $submittedAt ?? 'recent',
             $reportUrl
         );

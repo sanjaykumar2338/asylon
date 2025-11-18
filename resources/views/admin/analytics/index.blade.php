@@ -3,11 +3,46 @@
         {{ __('Analytics') }}
     </x-slot>
 
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <span class="badge badge-primary badge-pill px-3 py-2">
-                <i class="fas fa-building mr-1"></i> {{ $orgLabel }}
-            </span>
+    <div class="card card-outline card-primary mb-4">
+        <div class="card-body">
+            <form method="GET" class="form-row">
+                <div class="form-group col-md-3">
+                    <label class="small text-uppercase text-muted">{{ __('Portal') }}</label>
+                    <select name="portal" class="form-control">
+                        <option value="">{{ __('All portals') }}</option>
+                        <option value="student" @selected($filters['portal'] === 'student')>{{ __('Student only') }}</option>
+                        <option value="employee" @selected($filters['portal'] === 'employee')>{{ __('HR/Employee only') }}</option>
+                        <option value="general" @selected($filters['portal'] === 'general')>{{ __('General') }}</option>
+                    </select>
+                </div>
+                @if (isset($orgOptions) && $orgOptions->count() > 1)
+                    <div class="form-group col-md-3">
+                        <label class="small text-uppercase text-muted">{{ __('Organization') }}</label>
+                        <select name="org_id" class="form-control">
+                            <option value="">{{ __('All visible') }}</option>
+                            @foreach ($orgOptions as $org)
+                                <option value="{{ $org->id }}" @selected($filters['org_id'] == $org->id)>{{ $org->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+                <div class="form-group col-md-3">
+                    <label class="small text-uppercase text-muted">{{ __('From date') }}</label>
+                    <input type="date" name="from" value="{{ $filters['from'] }}" class="form-control">
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="small text-uppercase text-muted">{{ __('To date') }}</label>
+                    <input type="date" name="to" value="{{ $filters['to'] }}" class="form-control">
+                </div>
+                <div class="form-group col-md-12 text-right mb-0">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter mr-1"></i> {{ __('Apply filters') }}
+                    </button>
+                    <a href="{{ route('admin.analytics') }}" class="btn btn-outline-secondary">
+                        {{ __('Reset') }}
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -122,6 +157,44 @@
                                 </div>
                             @endforeach
                         </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card card-outline card-primary h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-university mr-2"></i> {{ __('Reports by organization') }}
+                    </h3>
+                    <span class="badge badge-light">{{ __('Filtered view') }}</span>
+                </div>
+                <div class="card-body">
+                    @if ($byOrg->isEmpty())
+                        <p class="text-muted mb-0">{{ __('No submissions yet.') }}</p>
+                    @else
+                        @php $orgMax = max($byOrg->max('total'), 1); @endphp
+                        <div class="list-group list-group-flush">
+                            @foreach ($byOrg as $item)
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ $item->org->name ?? __('Unknown org') }}</strong>
+                                        </div>
+                                        <span class="badge badge-light">{{ $item->total }}</span>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar"
+                                            style="width: {{ max(($item->total / $orgMax) * 100, 5) }}%;"
+                                            aria-valuenow="{{ $item->total }}" aria-valuemin="0" aria-valuemax="{{ $orgMax }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
             </div>

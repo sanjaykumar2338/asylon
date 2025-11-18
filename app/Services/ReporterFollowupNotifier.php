@@ -110,14 +110,14 @@ class ReporterFollowupNotifier
         $snippet = Str::of((string) $message->message)
             ->replaceMatches('/\s+/', ' ')
             ->trim()
-            ->limit(100, '...');
+            ->limit(90, '...');
 
         $dashboardUrl = ReportLinkGenerator::dashboard($report, $baseUrl);
 
         return sprintf(
-            'Reporter update for %s (%s): "%s" Review: %s',
-            Str::limit($orgName, 32, ''),
-            Str::limit($category, 40, ''),
+            'Reporter update (%s) %s: "%s" %s',
+            Str::limit($category, 36, ''),
+            Str::limit($orgName, 30, ''),
             $snippet,
             $dashboardUrl
         );

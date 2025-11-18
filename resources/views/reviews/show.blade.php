@@ -151,6 +151,40 @@
                     </form>
                 </div>
             </div>
+
+            <div class="card card-outline card-primary mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-stream mr-2"></i> {{ __('Activity History') }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if ($timeline->isEmpty())
+                        <p class="text-muted mb-0">{{ __('No activity logged yet.') }}</p>
+                    @else
+                        <ul class="list-group list-group-flush">
+                            @foreach ($timeline as $entry)
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex align-items-start justify-content-between">
+                                        <div class="d-flex align-items-start">
+                                            <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mr-3" style="width: 34px; height: 34px;">
+                                                <i class="{{ $entry['icon'] }}"></i>
+                                            </span>
+                                            <div>
+                                                <div class="font-weight-bold">{{ $entry['title'] }}</div>
+                                                <div class="text-muted small">{{ $entry['description'] }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right text-muted small">
+                                            {{ optional($entry['time'])->format('M d, Y H:i') }}
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-4">
@@ -169,6 +203,38 @@
                                 <option value="in_review" @selected($report->status === 'in_review')>{{ __('In review') }}</option>
                                 <option value="closed" @selected($report->status === 'closed')>{{ __('Closed') }}</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="note">{{ __('Status note') }}</label>
+                            <textarea id="note" name="note" rows="2" class="form-control @error('note') is-invalid @enderror" maxlength="2000" placeholder="{{ __('Add context for this change (optional)') }}">{{ old('note', $report->status_note) }}</textarea>
+                            @error('note')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        @if (!empty($reviewers) && $reviewers->isNotEmpty())
+                            <div class="form-group">
+                                <label for="resolved_by">{{ __('Resolved by (optional)') }}</label>
+                                <select id="resolved_by" name="resolved_by" class="form-control @error('resolved_by') is-invalid @enderror">
+                                    <option value="">{{ __('Auto-use current reviewer or leave unset') }}</option>
+                                    @foreach ($reviewers as $reviewer)
+                                        <option value="{{ $reviewer->id }}" @selected(old('resolved_by', $report->resolved_by) == $reviewer->id)>
+                                            {{ $reviewer->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">
+                                    {{ __('Only applied when marking Closed. Reopening clears the resolver.') }}
+                                </small>
+                                @error('resolved_by')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
+                        <div class="alert alert-info d-flex align-items-center py-2 px-3">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span class="small">
+                                {{ __('First reviewer reply sets the first response timestamp. Org admins can get an email when this happens.') }}
+                            </span>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">
                             <i class="fas fa-save mr-1"></i> {{ __('Save status') }}

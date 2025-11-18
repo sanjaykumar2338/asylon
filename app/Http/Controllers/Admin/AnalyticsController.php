@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Report;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -11,10 +12,13 @@ class AnalyticsController extends AdminController
     /**
      * Display key metrics for reports.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = $this->filters($request);
+
         $baseQuery = Report::query();
         $this->scopeByRole($baseQuery);
+        $this->applyFilters($baseQuery, $filters);
 
         $total = (clone $baseQuery)->count();
         $urgent = (clone $baseQuery)->where('urgent', true)->count();
@@ -45,6 +49,13 @@ class AnalyticsController extends AdminController
             ->groupBy('severity')
             ->get();
 
+        $byOrg = (clone $baseQuery)
+            ->select('org_id', DB::raw('COUNT(*) as total'))
+            ->with('org:id,name')
+            ->groupBy('org_id')
+            ->orderByDesc('total')
+            ->get();
+
         $avgResponse = (clone $baseQuery)
             ->whereNotNull('first_response_at')
             ->avg(DB::raw('TIMESTAMPDIFF(MINUTE, created_at, first_response_at)'));
@@ -64,8 +75,60 @@ class AnalyticsController extends AdminController
             'bySubcategory' => $bySubcategory,
             'byType' => $byType,
             'bySeverity' => $bySeverity,
+            'byOrg' => $byOrg,
             'avgResponse' => $avgResponse,
             'orgLabel' => $orgLabel,
+            'orgOptions' => $this->orgOptions(),
+            'filters' => $filters,
         ]);
+    }
+
+    /**
+     * Extract filter params with safe defaults.
+     *
+     * @return array<string, mixed>
+     */
+    protected function filters(Request $request): array
+    {
+        $portal = (string) $request->query('portal', '');
+        $portal = in_array($portal, ['student', 'employee', 'general'], true) ? $portal : '';
+
+        $from = (string) $request->query('from', '');
+        $to = (string) $request->query('to', '');
+
+        $orgId = $request->query('org_id');
+        $orgId = is_numeric($orgId) ? (int) $orgId : null;
+
+        return [
+            'portal' => $portal,
+            'from' => $from,
+            'to' => $to,
+            'org_id' => $orgId,
+        ];
+    }
+
+    /**
+     * Apply the allowed filters to a query.
+     */
+    protected function applyFilters($query, array $filters): void
+    {
+        if ($filters['portal']) {
+            $query->where('portal_source', $filters['portal']);
+        }
+
+        if ($filters['from']) {
+            $query->whereDate('created_at', '>=', $filters['from']);
+        }
+
+        if ($filters['to']) {
+            $query->whereDate('created_at', '<=', $filters['to']);
+        }
+
+        $user = auth()->user();
+        $orgId = $filters['org_id'];
+
+        if ($orgId && $user && $user->hasRole('platform_admin')) {
+            $query->where('org_id', $orgId);
+        }
     }
 }

@@ -27,6 +27,10 @@
         <p class="mt-2 text-sm text-gray-600">
             {{ $portalDescription }}
         </p>
+        <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <strong>{{ __('Emergency') }}:</strong>
+            {{ __('If anyone is in immediate danger, contact local emergency services first. This portal is not monitored 24/7.') }}
+        </div>
         <p class="mt-3 text-sm font-medium text-indigo-700">
             {{ config('asylon.privacy.form_header') }}
         </p>
@@ -72,9 +76,9 @@
                 <x-input-label for="org_id" value="Organization" />
                 <select id="org_id" name="org_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Select an organization</option>
-                    @foreach ($orgs as $org)
-                        <option value="{{ $org->id }}" @selected(old('org_id') == $org->id)>{{ $org->name }}</option>
-                    @endforeach
+                @foreach ($orgs as $org)
+                    <option value="{{ $org->id }}" @selected(old('org_id') == $org->id)>{{ $org->name }}</option>
+                @endforeach
                 </select>
                 <x-input-error class="mt-2" :messages="$errors->get('org_id')" />
             </div>
@@ -206,7 +210,7 @@
         <div>
             <x-input-label value="Supporting files (optional)" />
             <p class="mt-2 text-sm text-gray-500">
-                Attach photos, documents, or other files and include a short note for each attachment if needed.
+                Attach photos, documents, audio, or video. Add a short note for each attachment if needed. Max 25MB per file.
             </p>
             <div id="attachmentsList" class="mt-4 space-y-4" data-next-index="{{ $nextAttachmentIndex }}">
                 @foreach ($oldAttachments as $index => $attachment)

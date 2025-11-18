@@ -45,6 +45,8 @@ class Report extends Model
         'violation_date',
         'first_response_at',
         'chat_token',
+        'status_note',
+        'resolved_by',
     ];
 
     /**
@@ -83,6 +85,14 @@ class Report extends Model
     public function org(): BelongsTo
     {
         return $this->belongsTo(Org::class);
+    }
+
+    /**
+     * Reviewer who resolved/closed the report.
+     */
+    public function resolver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'resolved_by');
     }
 
     /**
