@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\ReportNote;
 
 class Report extends Model
 {
@@ -101,6 +102,14 @@ class Report extends Model
     public function files(): HasMany
     {
         return $this->hasMany(ReportFile::class);
+    }
+
+    /**
+     * Internal notes authored by reviewers.
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ReportNote::class);
     }
 
     /**

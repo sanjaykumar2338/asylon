@@ -20,6 +20,36 @@ class FollowUpController extends Controller
     /**
      * Display the public-facing follow-up portal for a report.
      */
+    public function entry(): View
+    {
+        return view('followup.entry');
+    }
+
+    /**
+     * Accept a case ID/token and redirect to the follow-up portal.
+     */
+    public function redirectFromEntry(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'case_id' => ['required', 'string', 'max:100'],
+        ]);
+
+        $caseId = $this->extractCaseId((string) ($validated['case_id'] ?? ''));
+
+        $report = Report::query()
+            ->where('chat_token', $caseId)
+            ->orWhere('id', $caseId)
+            ->first();
+
+        if (! $report) {
+            return Redirect::back()
+                ->withErrors(['case_id' => __('We could not find a case with that ID. Double-check and try again.')])
+                ->withInput();
+        }
+
+        return Redirect::route('followup.show', $report->chat_token);
+    }
+
     public function show(string $token): View
     {
         $report = Report::where('chat_token', $token)
@@ -90,8 +120,15 @@ class FollowUpController extends Controller
             'file_id' => $file->getKey(),
         ]);
 
-        return Storage::disk('public')->response(
-            $file->path,
+        $storage = Storage::disk('public');
+        $path = $this->preferredFilePath($file, $storage);
+
+        if (! $storage->exists($path)) {
+            abort(404);
+        }
+
+        return $storage->response(
+            $path,
             $file->original_name,
             array_filter([
                 'Content-Type' => $file->mime,
@@ -114,8 +151,15 @@ class FollowUpController extends Controller
             'file_id' => $file->getKey(),
         ]);
 
-        return Storage::disk('public')->download(
-            $file->path,
+        $storage = Storage::disk('public');
+        $path = $this->preferredFilePath($file, $storage);
+
+        if (! $storage->exists($path)) {
+            abort(404);
+        }
+
+        return $storage->download(
+            $path,
             $file->original_name,
             array_filter([
                 'Content-Type' => $file->mime,
@@ -131,5 +175,41 @@ class FollowUpController extends Controller
         $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
 
         return $root === '' ? 'http://localhost' : rtrim($root, '/');
+    }
+
+    /**
+     * Normalize pasted case IDs, even if a full follow-up URL is provided.
+     */
+    protected function extractCaseId(string $raw): string
+    {
+        $value = trim($raw);
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            $path = parse_url($value, PHP_URL_PATH) ?? '';
+            $segments = array_values(array_filter(explode('/', $path)));
+
+            if (! empty($segments)) {
+                return (string) end($segments);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Prefer anonymized audio when available.
+     */
+    protected function preferredFilePath(ReportFile $file, $storage): string
+    {
+        if ($this->isAudioMime($file->mime) && $file->anonymized_path && $storage->exists($file->anonymized_path)) {
+            return $file->anonymized_path;
+        }
+
+        return $file->path;
+    }
+
+    protected function isAudioMime(?string $mime): bool
+    {
+        return is_string($mime) && str_starts_with($mime, 'audio/');
     }
 }

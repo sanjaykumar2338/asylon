@@ -10,7 +10,9 @@ use App\Models\Org;
 use App\Models\OrgAlertContact;
 use App\Models\ReportCategory;
 use App\Models\Report;
+use App\Jobs\AnonymizeVoiceJob;
 use App\Services\Audit;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -216,9 +218,10 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
 
         return view('report.thanks', [
-            'id' => $id,
+            'id' => $report->getKey(),
+            'report' => $report,
             'followupUrl' => $report->chat_token
-                ? route('followup.show', $report->chat_token)
+                ? ReportLinkGenerator::followup($report)
                 : null,
         ]);
     }
@@ -359,13 +362,15 @@ class ReportController extends Controller
                 $comment = $comment === '' ? null : $comment;
                 $storedPath = $file->store("reports/{$report->getKey()}", 'public');
 
-                $report->files()->create([
+                $reportFile = $report->files()->create([
                     'path' => $storedPath,
                     'original_name' => $file->getClientOriginalName(),
                     'mime' => $file->getMimeType(),
                     'size' => $file->getSize(),
                     'comment' => $comment,
                 ]);
+
+                AnonymizeVoiceJob::dispatch($reportFile);
             }
 
             $voiceFile = $request->file('voice_recording');
@@ -374,13 +379,15 @@ class ReportController extends Controller
                 $normalizedVoiceComment = $normalizedVoiceComment === '' ? null : $normalizedVoiceComment;
                 $storedPath = $voiceFile->store("reports/{$report->getKey()}", 'public');
 
-                $report->files()->create([
+                $voiceReportFile = $report->files()->create([
                     'path' => $storedPath,
                     'original_name' => $voiceFile->getClientOriginalName(),
                     'mime' => $voiceFile->getMimeType(),
                     'size' => $voiceFile->getSize(),
                     'comment' => $normalizedVoiceComment,
                 ]);
+
+                AnonymizeVoiceJob::dispatch($voiceReportFile);
             }
 
             return $report;

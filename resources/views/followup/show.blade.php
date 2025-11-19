@@ -124,6 +124,12 @@
                                 @if ($file->comment)
                                     <p class="mt-1 text-xs text-gray-600 whitespace-pre-line">{{ $file->comment }}</p>
                                 @endif
+                                @if (str_starts_with($mime, 'audio/'))
+                                    <audio controls preload="metadata" class="mt-3 w-full">
+                                        <source src="{{ $previewUrl }}" type="{{ $mime }}">
+                                        {{ __('Your browser does not support the audio element.') }}
+                                    </audio>
+                                @endif
                             </div>
                             <div class="flex flex-wrap gap-2">
                                 <a href="{{ $previewUrl }}"

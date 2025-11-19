@@ -185,6 +185,54 @@
                     @endif
                 </div>
             </div>
+
+            <div class="card card-outline card-primary mb-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-sticky-note mr-2"></i> {{ __('Reviewer notes') }}
+                    </h3>
+                    <span class="badge badge-light text-muted">{{ __('Private') }}</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        {{ __('Use notes to coordinate internally. These are never shown to reporters.') }}
+                    </p>
+                    <div class="mb-4">
+                        @forelse ($notes as $note)
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="font-weight-bold">
+                                        {{ $note->user?->name ?? __('Reviewer') }}
+                                    </div>
+                                    <div class="text-muted small">
+                                        {{ $note->created_at?->format('M d, Y H:i') }}
+                                    </div>
+                                </div>
+                                <p class="mb-0" style="white-space: pre-line;">{{ $note->body }}</p>
+                            </div>
+                        @empty
+                            <p class="text-muted mb-0">{{ __('No notes added yet.') }}</p>
+                        @endforelse
+                    </div>
+                    <form method="POST" action="{{ route('reports.notes.store', $report) }}">
+                        @csrf
+                        <div class="form-group">
+                            <label for="note_body">{{ __('Add a note') }}</label>
+                            <textarea id="note_body" name="body" rows="3" maxlength="3000"
+                                class="form-control @error('body') is-invalid @enderror"
+                                placeholder="{{ __('Summarize reviewer actions or plans...') }}">{{ old('body') }}</textarea>
+                            @error('body')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus mr-1"></i> {{ __('Add note') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-4">

@@ -125,6 +125,9 @@ if (app()->environment('local')) {
     })->name('dev.telnyx-test-sms');
 }
 
+Route::get('/followup', [FollowUpController::class, 'entry'])->name('followup.entry');
+Route::post('/followup', [FollowUpController::class, 'redirectFromEntry'])->name('followup.redirect');
+
 Route::get('/followup/{token}', [FollowUpController::class, 'show'])->name('followup.show');
 Route::post('/followup/{token}', [FollowUpController::class, 'storeMessage'])
     ->middleware('throttle:chat-post')
@@ -162,6 +165,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reports/{report}/message', [ReviewController::class, 'messageReporter'])
         ->middleware('can:review-reports')
         ->name('reports.message');
+
+    Route::post('/reports/{report}/notes', [ReviewController::class, 'storeNote'])
+        ->middleware('can:review-reports')
+        ->name('reports.notes.store');
 
     Route::patch('/reports/{report}/status', [ReviewController::class, 'updateStatus'])
         ->middleware('can:review-reports')

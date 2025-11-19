@@ -27,6 +27,12 @@
         <p class="mt-2 text-sm text-gray-600">
             {{ $portalDescription }}
         </p>
+        <p class="text-sm text-gray-600 mt-2">
+            {{ __('Already have a case ID?') }}
+            <a href="{{ route('followup.entry') }}" class="text-indigo-600 underline">
+                {{ __('Follow up on your existing case') }}
+            </a>.
+        </p>
         <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             <strong>{{ __('Emergency') }}:</strong>
             {{ __('If anyone is in immediate danger, contact local emergency services first. This portal is not monitored 24/7.') }}

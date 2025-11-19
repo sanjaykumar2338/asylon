@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\ReportSubmitted;
 use App\Http\Requests\PostChatMessageRequest;
+use App\Http\Requests\PostReportNoteRequest;
 use App\Http\Requests\UpdateReportRequest;
 use App\Models\Report;
 use App\Models\ReportCategory;
@@ -167,6 +168,7 @@ class ReviewController extends Controller
             'org',
             'files',
             'messages' => fn ($query) => $query->orderBy('sent_at'),
+            'notes' => fn ($query) => $query->latest()->with('user'),
             'resolver',
         ]);
 
@@ -175,6 +177,7 @@ class ReviewController extends Controller
         return view('reviews.show', [
             'report' => $report,
             'timeline' => $this->buildTimeline($report),
+            'notes' => $report->notes,
             'reviewers' => $this->reviewersForOrg($user, $report->org_id),
         ]);
     }
@@ -288,6 +291,25 @@ class ReviewController extends Controller
     }
 
     /**
+     * Store a private reviewer note on the report.
+     */
+    public function storeNote(PostReportNoteRequest $request, Report $report): RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user->hasRole('platform_admin') && $user->org_id !== $report->org_id) {
+            abort(403);
+        }
+
+        $report->notes()->create([
+            'user_id' => $user->getKey(),
+            'body' => $request->input('body'),
+        ]);
+
+        return back()->with('ok', 'Note added.');
+    }
+
+    /**
      * Update the status of a report.
      */
     public function updateStatus(Request $request, Report $report): RedirectResponse
@@ -360,7 +382,10 @@ class ReviewController extends Controller
             abort(404);
         }
 
-        if (! Storage::disk('public')->exists($file->path)) {
+        $storage = Storage::disk('public');
+        $path = $this->preferredFilePath($file, $storage);
+
+        if (! $storage->exists($path)) {
             abort(404);
         }
 
@@ -368,8 +393,8 @@ class ReviewController extends Controller
             'file_id' => $file->getKey(),
         ]);
 
-        return Storage::disk('public')->download(
-            $file->path,
+        return $storage->download(
+            $path,
             $file->original_name,
             array_filter([
                 'Content-Type' => $file->mime,
@@ -392,7 +417,10 @@ class ReviewController extends Controller
             abort(404);
         }
 
-        if (! Storage::disk('public')->exists($file->path)) {
+        $storage = Storage::disk('public');
+        $path = $this->preferredFilePath($file, $storage);
+
+        if (! $storage->exists($path)) {
             abort(404);
         }
 
@@ -400,8 +428,8 @@ class ReviewController extends Controller
             'file_id' => $file->getKey(),
         ]);
 
-        return Storage::disk('public')->response(
-            $file->path,
+        return $storage->response(
+            $path,
             $file->original_name,
             array_filter([
                 'Content-Type' => $file->mime,
@@ -456,6 +484,23 @@ class ReviewController extends Controller
         $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
 
         return $root === '' ? 'http://localhost' : rtrim($root, '/');
+    }
+
+    /**
+     * Prefer anonymized audio when available to protect reporter identity.
+     */
+    protected function preferredFilePath(ReportFile $file, $storage): string
+    {
+        if ($this->isAudioMime($file->mime) && $file->anonymized_path && $storage->exists($file->anonymized_path)) {
+            return $file->anonymized_path;
+        }
+
+        return $file->path;
+    }
+
+    protected function isAudioMime(?string $mime): bool
+    {
+        return is_string($mime) && Str::startsWith($mime, 'audio/');
     }
 
     /**

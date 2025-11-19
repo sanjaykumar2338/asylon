@@ -18,6 +18,7 @@ class ReportFile extends Model
     protected $fillable = [
         'report_id',
         'path',
+        'anonymized_path',
         'original_name',
         'mime',
         'size',
