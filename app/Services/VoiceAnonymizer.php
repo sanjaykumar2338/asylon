@@ -69,6 +69,12 @@ class VoiceAnonymizer
             return false;
         }
 
+        Log::info('Voice anonymization succeeded.', [
+            'input' => $inputPath,
+            'output' => $outputPath,
+            'pitch_multiplier' => $pitchMultiplier,
+        ]);
+
         return $outputPath;
     }
 }

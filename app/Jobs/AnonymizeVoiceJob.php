@@ -11,7 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AnonymizeVoiceJob implements ShouldQueue
 {
@@ -72,13 +71,7 @@ class AnonymizeVoiceJob implements ShouldQueue
 
     protected function shouldAnonymize(ReportFile $file): bool
     {
-        $mime = (string) ($file->mime ?? '');
-        $extension = strtolower((string) pathinfo((string) $file->original_name, PATHINFO_EXTENSION));
-        $audioExtensions = ['mp3', 'wav', 'aac', 'm4a', 'ogg', 'opus', 'weba'];
-
-        return Str::of($mime)->startsWith('audio/')
-            || Str::of($mime)->contains('audio')
-            || in_array($extension, $audioExtensions, true);
+        return $file->isAudio();
     }
 
     protected function buildOutputPath(string $path): string

@@ -201,15 +201,10 @@ class FollowUpController extends Controller
      */
     protected function preferredFilePath(ReportFile $file, $storage): string
     {
-        if ($this->isAudioMime($file->mime) && $file->anonymized_path && $storage->exists($file->anonymized_path)) {
+        if ($file->isAudio() && $file->anonymized_path && $storage->exists($file->anonymized_path)) {
             return $file->anonymized_path;
         }
 
         return $file->path;
-    }
-
-    protected function isAudioMime(?string $mime): bool
-    {
-        return is_string($mime) && str_starts_with($mime, 'audio/');
     }
 }
