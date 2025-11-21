@@ -71,14 +71,14 @@
                             <li class="nav-item">
                                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-home"></i>
-                                    <p>{{ __('Dashboard') }}</p>
+                                    <p>{{ __('dashboard.nav') }}</p>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('reviews.index') }}" class="nav-link {{ request()->routeIs('reviews.*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-file-alt"></i>
-                                    <p>{{ __('Reports') }}</p>
+                                    <p>{{ __('reports.nav') }}</p>
                                 </a>
                             </li>
 

@@ -28,6 +28,7 @@ class StoreOrgRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'slug' => ['required', 'string', 'max:140', Rule::unique('orgs', 'slug')],
             'status' => ['required', Rule::in(['active', 'inactive'])],
+            'default_locale' => ['required', 'string', Rule::in(config('app.supported_locales', ['en']))],
             'enable_commendations' => ['boolean'],
             'enable_hr_reports' => ['boolean'],
             'enable_student_reports' => ['boolean'],

@@ -28,20 +28,23 @@ class UrgentReportEmail extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $report = $this->report;
-        $orgName = $report->org?->name ?? 'Unassigned organization';
+        $report = $this->report->loadMissing('org');
+        $locale = $report->org?->default_locale ?: config('app.locale', 'en');
+        $orgName = $report->org?->name ?? __('notifications.misc.unknown_org', [], $locale);
         $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;
 
         return (new MailMessage())
-            ->subject("URGENT: New {$report->category} report")
+            ->locale($locale)
+            ->subject(__('notifications.urgent_alert.subject', ['category' => $report->category], $locale))
             ->view('emails.urgent_report', [
                 'report' => $report,
                 'orgName' => $orgName,
                 'categoryLabel' => $categoryLabel,
                 'reportUrl' => $reportUrl,
+                'locale' => $locale,
             ]);
     }
 }

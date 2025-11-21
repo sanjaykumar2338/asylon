@@ -2,6 +2,8 @@
     /** @var \App\Models\Org|null $org */
     /** @var \Illuminate\Support\Collection<int, \App\Models\User> $eligibleUsers */
     $eligibleUsers = $eligibleUsers ?? collect();
+    $supportedLocales = config('app.supported_locales', ['en']);
+    $localeNames = config('app.locale_names', []);
 @endphp
 
 <div class="row">
@@ -35,6 +37,20 @@
         <option value="active" @selected(old('status', $org->status ?? '') === 'active')>{{ __('Active') }}</option>
         <option value="inactive" @selected(old('status', $org->status ?? '') === 'inactive')>{{ __('Inactive') }}</option>
     </select>
+</div>
+
+<div class="form-group">
+    <label for="default_locale">{{ __('general.default_language') }}</label>
+    <select id="default_locale" name="default_locale" class="form-control" required>
+        @foreach ($supportedLocales as $locale)
+            <option value="{{ $locale }}" @selected(old('default_locale', $org->default_locale ?? 'en') === $locale)>
+                {{ $localeNames[$locale] ?? strtoupper($locale) }}
+            </option>
+        @endforeach
+    </select>
+    <small class="form-text text-muted">
+        {{ __('general.default_language_hint') }}
+    </small>
 </div>
 
 <div class="form-group">

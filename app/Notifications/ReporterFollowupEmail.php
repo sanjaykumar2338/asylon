@@ -34,7 +34,8 @@ class ReporterFollowupEmail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $report = $this->report->loadMissing('org');
-        $orgName = $report->org?->name ?? __('Unknown organization');
+        $locale = $report->org?->default_locale ?: config('app.locale', 'en');
+        $orgName = $report->org?->name ?? __('notifications.misc.unknown_org', [], $locale);
         $categoryLabel = $report->subcategory
             ? "{$report->category} - {$report->subcategory}"
             : $report->category;
@@ -42,16 +43,17 @@ class ReporterFollowupEmail extends Notification
         $followupUrl = ReportLinkGenerator::followup($report, $this->baseUrl);
         $submitted = $report->created_at
             ? $report->created_at->timezone(config('app.timezone'))->format('M d, Y H:i')
-            : __('recently');
+            : __('notifications.misc.recently', [], $locale);
         $messageBody = Str::of((string) $this->message->message)
             ->trim()
             ->limit(800, '...');
 
         return (new MailMessage())
-            ->subject(__('Reporter follow-up for :org (:category)', [
+            ->locale($locale)
+            ->subject(__('notifications.reporter_followup.subject', [
                 'org' => $orgName,
                 'category' => $report->category,
-            ]))
+            ], $locale))
             ->view('emails.reporter_followup', [
                 'report' => $report,
                 'submitted' => $submitted,
@@ -60,6 +62,7 @@ class ReporterFollowupEmail extends Notification
                 'dashboardUrl' => $dashboardUrl,
                 'followupUrl' => $followupUrl,
                 'messageBody' => $messageBody,
+                'locale' => $locale,
             ]);
     }
 }

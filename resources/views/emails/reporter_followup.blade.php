@@ -1,21 +1,21 @@
 @extends('emails.layouts.brand')
 
 @section('content')
-    <span class="pill">{{ __('Reporter follow-up') }}</span>
-    <h1>{{ __('New message on case #:id', ['id' => $report->id]) }}</h1>
-    <p class="meta">{{ __('Organization') }}: {{ $orgName }}</p>
-    <p class="meta">{{ __('Category') }}: {{ $categoryLabel }}</p>
-    <p class="meta">{{ __('Submitted') }}: {{ $submitted }}</p>
+    <span class="pill">{{ __('notifications.reporter_followup.badge') }}</span>
+    <h1>{{ __('notifications.reporter_followup.new_message_subject', ['id' => $report->id]) }}</h1>
+    <p class="meta">{{ __('notifications.labels.organization') }}: {{ $orgName }}</p>
+    <p class="meta">{{ __('notifications.labels.category') }}: {{ $categoryLabel }}</p>
+    <p class="meta">{{ __('notifications.labels.submitted') }}: {{ $submitted }}</p>
 
     <div class="panel">
-        <p style="margin: 0 0 8px;">{{ __('Message from reporter:') }}</p>
+        <p style="margin: 0 0 8px;">{{ __('notifications.reporter_followup.message_intro') }}</p>
         <p style="margin: 0;">“{{ $messageBody }}”</p>
     </div>
 
-    <p>{{ __('Please log any responses directly in the dashboard to keep the case history complete.') }}</p>
+    <p>{{ __('notifications.reporter_followup.dashboard_reminder') }}</p>
 
-    <a href="{{ $dashboardUrl }}" class="btn">{{ __('Open report in dashboard') }}</a>
+    <a href="{{ $dashboardUrl }}" class="btn">{{ __('notifications.actions.open_report') }}</a>
     <p class="meta" style="margin-top: 12px;">
-        {{ __('Public follow-up portal:') }} <a href="{{ $followupUrl }}">{{ $followupUrl }}</a>
+        {{ __('notifications.labels.followup_portal') }} <a href="{{ $followupUrl }}">{{ $followupUrl }}</a>
     </p>
 @endsection

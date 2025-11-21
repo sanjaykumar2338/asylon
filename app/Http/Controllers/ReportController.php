@@ -12,6 +12,7 @@ use App\Models\ReportCategory;
 use App\Models\Report;
 use App\Jobs\AnonymizeVoiceJob;
 use App\Services\Audit;
+use App\Support\LocaleManager;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +44,8 @@ class ReportController extends Controller
             'formAction' => route('report.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('Submit a Security Concern'),
-            'portalDescription' => __('Use this form to anonymously report a security issue or concern. Only the reviewing team for your organization will be able to access the information you provide.'),
+            'portalHeading' => __('report.submit_title'),
+            'portalDescription' => __('report.submit_description'),
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -56,6 +57,7 @@ class ReportController extends Controller
     public function createByCode(string $org_code): View
     {
         $org = Org::where('org_code', $org_code)->firstOrFail();
+        LocaleManager::applyOrgLocale($org);
 
         return view('report.create', [
             'orgs' => null,
@@ -69,8 +71,8 @@ class ReportController extends Controller
             'formAction' => route('report.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('Submit a Security Concern'),
-            'portalDescription' => __('Use this form to anonymously report a security issue or concern. Only the reviewing team for your organization will be able to access the information you provide.'),
+            'portalHeading' => __('report.submit_title'),
+            'portalDescription' => __('report.submit_description'),
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -103,8 +105,8 @@ class ReportController extends Controller
             'formAction' => route('report.student.store'),
             'showTypeSelector' => false,
             'forceType' => 'safety',
-            'portalHeading' => __('Student Safety & Well-being'),
-            'portalDescription' => __('This portal is for student safety, bullying, discrimination, or wellness concerns.'),
+            'portalHeading' => __('report.student_portal_heading'),
+            'portalDescription' => __('report.student_portal_description'),
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -143,8 +145,8 @@ class ReportController extends Controller
             'formAction' => route('report.employee.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('Employee Anonymous Reporting'),
-            'portalDescription' => __('Use this portal for HR concerns, workplace issues, or commendations. Select who should be notified below.'),
+            'portalHeading' => __('report.employee_portal_heading'),
+            'portalDescription' => __('report.employee_portal_description'),
             'recipientsEnabled' => true,
             'recipientMap' => $recipientMap,
         ]);
@@ -193,7 +195,7 @@ class ReportController extends Controller
 
         if ($recipients->isEmpty()) {
             throw ValidationException::withMessages([
-                'recipients' => __('Select at least one eligible recipient.'),
+                'recipients' => __('report.errors.recipient_required'),
             ]);
         }
 
@@ -215,7 +217,8 @@ class ReportController extends Controller
      */
     public function thanks(string $id): View
     {
-        $report = Report::findOrFail($id);
+        $report = Report::with('org')->findOrFail($id);
+        LocaleManager::applyOrgLocale($report->org);
 
         return view('report.thanks', [
             'id' => $report->getKey(),
@@ -543,4 +546,5 @@ class ReportController extends Controller
             return [$org->id => array_keys($org->enabledTypes())];
         })->all();
     }
+
 }

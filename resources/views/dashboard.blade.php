@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        {{ __('Dashboard') }}
+        {{ __('dashboard.title') }}
     </x-slot>
 
     <div class="row">
@@ -50,4 +50,3 @@
         </div>
     </div>
 </x-admin-layout>
-

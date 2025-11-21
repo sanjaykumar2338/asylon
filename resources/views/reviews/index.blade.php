@@ -128,7 +128,7 @@
         <div class="card-header d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
             <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                 <h3 class="card-title mb-0">
-                    <i class="fas fa-clipboard-list mr-2"></i> {{ __('Reports') }}
+                    <i class="fas fa-clipboard-list mr-2"></i> {{ __('reports.title') }}
                 </h3>
                 <a href="{{ route('reviews.trash') }}" class="btn btn-outline-secondary btn-sm mt-3 mt-lg-0 ml-lg-3">
                     <i class="fas fa-trash-alt mr-1"></i> {{ __('View trash') }}

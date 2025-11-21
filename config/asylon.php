@@ -39,6 +39,10 @@ $hrCategories = [
 ];
 
 return [
+    'languages' => [
+        'en' => 'English',
+        'es' => 'Spanish',
+    ],
     'ffmpeg_path' => env('FFMPEG_PATH', 'ffmpeg'),
     'privacy' => [
         'general' => 'Your report is anonymous unless you choose to share your name or contact information. Asylon is a secure third-party system.',

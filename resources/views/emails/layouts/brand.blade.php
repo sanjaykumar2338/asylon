@@ -24,13 +24,13 @@
     <div class="wrapper">
         <div class="header">
             <img src="{{ asset('assets/images/logo.png') }}" alt="{{ config('app.name', 'Asylon') }}" class="logo">
-            <div class="tagline">{{ __('Speak Up. Stay Safe.') }}</div>
+            <div class="tagline">{{ __('common.email_tagline') }}</div>
         </div>
         <div class="card">
             @yield('content')
         </div>
         <div class="footer">
-            {{ config('asylon.privacy.email_footer') }}
+            {{ __('common.email_footer') }}
         </div>
     </div>
 </body>

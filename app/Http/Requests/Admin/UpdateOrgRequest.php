@@ -59,6 +59,7 @@ class UpdateOrgRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'slug' => ['required', 'string', 'max:140', Rule::unique('orgs', 'slug')->ignore($orgId)],
             'status' => ['required', Rule::in(['active', 'inactive'])],
+            'default_locale' => ['required', 'string', Rule::in(config('app.supported_locales', ['en']))],
             'on_call_user_id' => $onCallRules,
             'enable_commendations' => ['boolean'],
             'enable_hr_reports' => ['boolean'],

@@ -28,18 +28,20 @@ class FirstResponseNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $report = $this->report->loadMissing('org');
-        $orgName = $report->org?->name ?? __('Unknown organization');
+        $locale = $report->org?->default_locale ?: config('app.locale', 'en');
+        $orgName = $report->org?->name ?? __('notifications.misc.unknown_org', [], $locale);
         $dashboardUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
 
         return (new MailMessage())
-            ->subject(__('First response sent for case #:id', ['id' => $report->id]))
-            ->greeting(__('Hello :name,', ['name' => $notifiable->name ?? __('Admin')]))
-            ->line(__('A reviewer sent the first reply to the reporter.'))
-            ->line(__('Case: #:id', ['id' => $report->id]))
-            ->line(__('Organization: :org', ['org' => $orgName]))
-            ->line(__('Category: :category', ['category' => $report->category]))
-            ->line(__('Responder: :name', ['name' => $this->responder ?? __('Unknown')]))
-            ->action(__('Open in dashboard'), $dashboardUrl)
-            ->line(__('Thank you for keeping response times fast.'));
+            ->locale($locale)
+            ->subject(__('notifications.first_response.subject', ['id' => $report->id], $locale))
+            ->greeting(__('notifications.first_response.greeting', ['name' => $notifiable->name ?? __('notifications.misc.unknown_name', [], $locale)], $locale))
+            ->line(__('notifications.first_response.body', [], $locale))
+            ->line(__('notifications.labels.case_id', [], $locale).': '.$report->id)
+            ->line(__('notifications.labels.organization', [], $locale).': '.$orgName)
+            ->line(__('notifications.labels.category', [], $locale).': '.$report->category)
+            ->line(__('notifications.labels.responder', ['name' => $this->responder ?? __('notifications.misc.unknown_name', [], $locale)], $locale))
+            ->action(__('notifications.actions.open_dashboard', [], $locale), $dashboardUrl)
+            ->line(__('notifications.first_response.thanks', [], $locale));
     }
 }

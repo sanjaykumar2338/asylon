@@ -5,7 +5,7 @@
 
     @section('breadcrumb')
         <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('dashboard.breadcrumb') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('admin.report-categories.index') }}">{{ __('Report Categories') }}</a></li>
             <li class="breadcrumb-item active">{{ $category->name }}</li>
         </ol>

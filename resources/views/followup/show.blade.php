@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mx-auto w-full max-w-4xl space-y-6">
         <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-wide text-gray-500">{{ __('Case reference') }}</p>
                     <h1 class="mt-1 text-2xl font-semibold text-gray-900">{{ __('Case Follow-Up Portal') }}</h1>
@@ -9,12 +9,15 @@
                         {{ __('Track status changes, review updates, and respond securely to your assigned reviewer.') }}
                     </p>
                 </div>
-                <div class="text-right">
-                    <p class="text-xs font-medium text-gray-500">{{ __('Reference ID') }}</p>
-                    <p class="font-mono text-lg text-gray-900">{{ $report->id }}</p>
-                    <span class="mt-2 inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase text-indigo-700">
-                        {{ str_replace('_', ' ', $report->status) }}
-                    </span>
+                <div class="flex flex-col items-end gap-3 text-right">
+                    <x-language-switcher />
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">{{ __('Reference ID') }}</p>
+                        <p class="font-mono text-lg text-gray-900">{{ $report->id }}</p>
+                        <span class="mt-2 inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase text-indigo-700">
+                            {{ str_replace('_', ' ', $report->status) }}
+                        </span>
+                    </div>
                 </div>
             </div>
 

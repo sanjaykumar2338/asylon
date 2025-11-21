@@ -22,6 +22,7 @@ class Org extends Model
         'slug',
         'org_code',
         'status',
+        'default_locale',
         'created_by',
         'on_call_user_id',
         'enable_commendations',

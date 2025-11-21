@@ -1,10 +1,15 @@
 <x-guest-layout>
     <div class="mx-auto max-w-lg space-y-6">
         <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h1 class="text-xl font-semibold text-gray-900">{{ __('Follow up on an existing case') }}</h1>
-            <p class="mt-2 text-sm text-gray-600">
-                {{ __('Paste the Case ID or follow-up link you saved after submitting your report.') }}
-            </p>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">{{ __('Follow up on an existing case') }}</h1>
+                    <p class="mt-2 text-sm text-gray-600">
+                        {{ __('Paste the Case ID or follow-up link you saved after submitting your report.') }}
+                    </p>
+                </div>
+                <x-language-switcher />
+            </div>
 
             <form method="POST" action="{{ route('followup.redirect') }}" class="mt-4 space-y-4">
                 @csrf

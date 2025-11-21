@@ -7,6 +7,7 @@ use App\Jobs\SendReporterFollowupNotifications;
 use App\Models\Report;
 use App\Models\ReportFile;
 use App\Services\Audit;
+use App\Support\LocaleManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -43,7 +44,7 @@ class FollowUpController extends Controller
 
         if (! $report) {
             return Redirect::back()
-                ->withErrors(['case_id' => __('We could not find a case with that ID. Double-check and try again.')])
+                ->withErrors(['case_id' => __('followup.entry.not_found')])
                 ->withInput();
         }
 
@@ -55,11 +56,13 @@ class FollowUpController extends Controller
         $report = Report::where('chat_token', $token)
             ->with([
                 'files',
+                'org',
                 'messages' => fn ($query) => $query->orderBy('sent_at'),
             ])
             ->firstOrFail();
 
         $messages = $report->messages->values();
+        LocaleManager::applyOrgLocale($report->org);
 
         Audit::log('reporter', 'view_followup_portal', 'report', $report->getKey());
 
@@ -76,7 +79,8 @@ class FollowUpController extends Controller
         PostChatMessageRequest $request,
         string $token
     ): RedirectResponse {
-        $report = Report::where('chat_token', $token)->firstOrFail();
+        $report = Report::where('chat_token', $token)->with('org')->firstOrFail();
+        LocaleManager::applyOrgLocale($report->org);
 
         $message = $report->messages()->create([
             'side' => 'reporter',
@@ -102,7 +106,7 @@ class FollowUpController extends Controller
             'message_id' => $message->getKey(),
         ]);
 
-        return Redirect::back()->with('ok', 'Message sent.');
+        return Redirect::back()->with('ok', __('followup.show.message_sent'));
     }
 
     /**
@@ -110,7 +114,8 @@ class FollowUpController extends Controller
      */
     public function previewAttachment(string $token, ReportFile $file)
     {
-        $report = Report::where('chat_token', $token)->firstOrFail();
+        $report = Report::where('chat_token', $token)->with('org')->firstOrFail();
+        LocaleManager::applyOrgLocale($report->org);
 
         if ($file->report_id !== $report->getKey()) {
             abort(404);
@@ -141,7 +146,8 @@ class FollowUpController extends Controller
      */
     public function downloadAttachment(string $token, ReportFile $file)
     {
-        $report = Report::where('chat_token', $token)->firstOrFail();
+        $report = Report::where('chat_token', $token)->with('org')->firstOrFail();
+        LocaleManager::applyOrgLocale($report->org);
 
         if ($file->report_id !== $report->getKey()) {
             abort(404);

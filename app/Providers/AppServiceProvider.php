@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Console\Commands\TranslationsExportCommand;
+use App\Console\Commands\TranslationsImportCommand;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -29,5 +31,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('chat-post', function (Request $request): Limit {
             return Limit::perMinute(10)->by($request->ip());
         });
+
+        $this->commands([
+            TranslationsExportCommand::class,
+            TranslationsImportCommand::class,
+        ]);
     }
 }
