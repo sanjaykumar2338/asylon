@@ -71,6 +71,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', AdminUserController::class);
         Route::resource('alerts', AdminAlertController::class)
             ->parameters(['alerts' => 'alert']);
+        Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
+            ->name('report-categories.toggle-visibility')
+            ->middleware('can:manage-categories');
         Route::resource('report-categories', AdminReportCategoryController::class);
         Route::get('reports/export', [AdminExportController::class, 'reports'])
             ->name('reports.export');

@@ -86,7 +86,7 @@ class UpdateReportRequest extends FormRequest
             'subcategory' => ['required', 'string', 'max:100', Rule::in($subcategoryOptions)],
             'type' => ['required', Rule::in(['safety', 'commendation', 'hr'])],
             'severity' => ['required', Rule::in(['low', 'moderate', 'high', 'critical'])],
-            'description' => ['required', 'string', 'min:10'],
+            'description' => ['required', 'string'],
             'violation_date' => ['nullable', 'date'],
             'contact_name' => ['nullable', 'string', 'max:150'],
             'contact_email' => ['nullable', 'email'],

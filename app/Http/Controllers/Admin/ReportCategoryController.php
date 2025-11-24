@@ -7,7 +7,10 @@ use App\Http\Requests\Admin\StoreReportCategoryRequest;
 use App\Http\Requests\Admin\UpdateReportCategoryRequest;
 use App\Models\Report;
 use App\Models\ReportCategory;
+use App\Services\Audit;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReportCategoryController extends Controller
@@ -23,7 +26,10 @@ class ReportCategoryController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.report-categories.index', compact('categories'));
+        return view('admin.report-categories.index', [
+            'categories' => $categories,
+            'canManageCategories' => $this->canManageCategories(),
+        ]);
     }
 
     /**
@@ -31,6 +37,8 @@ class ReportCategoryController extends Controller
      */
     public function create(): View
     {
+        $this->ensureCategoryManager();
+
         $category = new ReportCategory([
             'position' => (ReportCategory::max('position') ?? 0) + 1,
         ]);
@@ -43,6 +51,8 @@ class ReportCategoryController extends Controller
      */
     public function store(StoreReportCategoryRequest $request): RedirectResponse
     {
+        $this->ensureCategoryManager();
+
         $data = $request->validated();
         $data['name'] = trim($data['name']);
         $data['description'] = $data['description'] ?? null;
@@ -66,6 +76,7 @@ class ReportCategoryController extends Controller
 
         return view('admin.report-categories.show', [
             'category' => $reportCategory,
+            'canManageCategories' => $this->canManageCategories(),
         ]);
     }
 
@@ -74,6 +85,8 @@ class ReportCategoryController extends Controller
      */
     public function edit(ReportCategory $reportCategory): View
     {
+        $this->ensureCategoryManager();
+
         return view('admin.report-categories.edit', [
             'category' => $reportCategory,
         ]);
@@ -84,6 +97,8 @@ class ReportCategoryController extends Controller
      */
     public function update(UpdateReportCategoryRequest $request, ReportCategory $reportCategory): RedirectResponse
     {
+        $this->ensureCategoryManager();
+
         $data = $request->validated();
         $data['name'] = trim($data['name']);
         $data['description'] = $data['description'] ?? null;
@@ -112,6 +127,8 @@ class ReportCategoryController extends Controller
      */
     public function destroy(ReportCategory $reportCategory): RedirectResponse
     {
+        $this->ensureCategoryManager();
+
         $usageCount = Report::query()
             ->where('category', $reportCategory->name)
             ->count();
@@ -127,5 +144,50 @@ class ReportCategoryController extends Controller
         return redirect()
             ->route('admin.report-categories.index')
             ->with('ok', 'Category deleted.');
+    }
+
+    /**
+     * Toggle category visibility for reporters.
+     */
+    public function toggleVisibility(Request $request, ReportCategory $reportCategory): JsonResponse|RedirectResponse
+    {
+        $this->ensureCategoryManager();
+
+        $reportCategory->is_hidden = ! $reportCategory->is_hidden;
+        $reportCategory->save();
+
+        $message = $reportCategory->is_hidden
+            ? __('Category hidden. It will no longer show up on report forms.')
+            : __('Category is visible again.');
+
+        Audit::log(
+            'admin',
+            $reportCategory->is_hidden ? 'category_hidden' : 'category_unhidden',
+            'report_category',
+            $reportCategory->getKey(),
+            ['name' => $reportCategory->name]
+        );
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+            'ok' => true,
+            'hidden' => $reportCategory->is_hidden,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.report-categories.index')
+            ->with('ok', $message);
+    }
+
+    protected function ensureCategoryManager(): void
+    {
+        abort_unless($this->canManageCategories(), 403);
+    }
+
+    protected function canManageCategories(): bool
+    {
+        return auth()->user()?->can('manage-categories') ?? false;
     }
 }

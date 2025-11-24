@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StaticPageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/report');
+Route::get('/support', [StaticPageController::class, 'support'])->name('support');
+Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
 
 Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
 Route::post('/report/student', [ReportController::class, 'storeStudent'])->name('report.student.store');

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReportCategory extends Model
 {
@@ -18,6 +19,7 @@ class ReportCategory extends Model
         'description',
         'position',
         'type',
+        'is_hidden',
     ];
 
     /**
@@ -26,6 +28,7 @@ class ReportCategory extends Model
     protected $casts = [
         'position' => 'integer',
         'type' => 'string',
+        'is_hidden' => 'boolean',
     ];
 
     /**
@@ -36,5 +39,15 @@ class ReportCategory extends Model
         return $this->hasMany(ReportSubcategory::class)
             ->orderBy('position')
             ->orderBy('name');
+    }
+
+    /**
+     * Scope visible categories.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeVisible(Builder $query): Builder
+    {
+        return $query->where('is_hidden', false);
     }
 }

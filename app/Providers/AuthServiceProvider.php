@@ -27,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-org', static fn ($user): bool => in_array($user->role, [
             'org_admin',
             'platform_admin',
+            'executive_admin',
         ], true));
 
         Gate::define('review-reports', static fn ($user): bool => in_array($user->role, [
@@ -34,6 +35,11 @@ class AuthServiceProvider extends ServiceProvider
             'security_lead',
             'org_admin',
             'platform_admin',
+        ], true));
+
+        Gate::define('manage-categories', static fn ($user): bool => in_array($user->role, [
+            'platform_admin',
+            'executive_admin',
         ], true));
     }
 }

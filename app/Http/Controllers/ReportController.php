@@ -295,6 +295,7 @@ class ReportController extends Controller
         }
 
         return ReportCategory::query()
+            ->visible()
             ->with(['subcategories' => fn ($query) => $query->orderBy('position')->orderBy('name')])
             ->whereIn('type', $types)
             ->orderBy('position')

@@ -13,7 +13,7 @@ class StoreReportSubcategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('manage-org') ?? false;
+        return $this->user()?->can('manage-categories') ?? false;
     }
 
     /**

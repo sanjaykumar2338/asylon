@@ -8,7 +8,6 @@
                         {{ __('Paste the Case ID or follow-up link you saved after submitting your report.') }}
                     </p>
                 </div>
-                <x-language-switcher />
             </div>
 
             <form method="POST" action="{{ route('followup.redirect') }}" class="mt-4 space-y-4">

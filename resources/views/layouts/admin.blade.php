@@ -163,11 +163,22 @@
                 </div>
             </div>
 
+            @php
+                $supportEmail = config('asylon.support_email', 'support@asylon.com');
+            @endphp
             <footer class="main-footer text-sm">
                 <div class="float-right d-none d-sm-inline">
                     {{ __('Admin Panel') }}
+                    @if (Route::has('support'))
+                        <span class="mx-2">|</span>
+                        <a href="{{ route('support') }}" class="text-reset">{{ __('Support') }}</a>
+                    @endif
                 </div>
-                <strong>&copy; {{ now()->year }} {{ config('app.name', 'Admin') }}.</strong> {{ __('All rights reserved.') }}
+                <div>
+                    <strong>&copy; {{ now()->year }} {{ config('app.name', 'Admin') }}.</strong> {{ __('All rights reserved.') }}
+                    <span class="ml-2">|</span>
+                    <a class="text-reset" href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
+                </div>
             </footer>
         </div>
 

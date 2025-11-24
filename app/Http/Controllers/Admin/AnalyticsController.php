@@ -67,6 +67,13 @@ class AnalyticsController extends AdminController
             ? 'All organizations'
             : ($user?->org?->name ?? 'My organization');
 
+        \Log::debug('Analytics data payload', [
+            'total' => $total,
+            'urgent' => $urgent,
+            'filters' => $filters,
+            'by_category_sample' => $byCategory->first(),
+        ]);
+
         return view('admin.analytics.index', [
             'total' => $total,
             'urgent' => $urgent,
@@ -90,14 +97,16 @@ class AnalyticsController extends AdminController
      */
     protected function filters(Request $request): array
     {
-        $portal = (string) $request->query('portal', '');
+        $cleanString = static fn ($value): string => is_string($value) ? $value : (is_numeric($value) ? (string) $value : '');
+
+        $portal = $cleanString($request->query('portal'));
         $portal = in_array($portal, ['student', 'employee', 'general'], true) ? $portal : '';
 
-        $from = (string) $request->query('from', '');
-        $to = (string) $request->query('to', '');
+        $from = $cleanString($request->query('from'));
+        $to = $cleanString($request->query('to'));
 
-        $orgId = $request->query('org_id');
-        $orgId = is_numeric($orgId) ? (int) $orgId : null;
+        $orgIdParam = $request->query('org_id');
+        $orgId = is_numeric($orgIdParam) ? (int) $orgIdParam : null;
 
         return [
             'portal' => $portal,

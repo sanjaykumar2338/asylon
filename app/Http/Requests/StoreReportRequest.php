@@ -58,6 +58,7 @@ class StoreReportRequest extends FormRequest
     {
         if ($this->categoryMap === []) {
             $this->categoryMap = ReportCategory::query()
+                ->visible()
                 ->with('subcategories')
                 ->orderBy('position')
                 ->orderBy('name')
@@ -95,8 +96,6 @@ class StoreReportRequest extends FormRequest
             ->values()
             ->all();
 
-        $minWords = $this->minimumDescriptionWords();
-
         return [
             'org_id' => ['nullable', 'required_without:org_code', 'exists:orgs,id'],
             'org_code' => ['nullable', 'required_without:org_id', 'string', 'max:12', 'exists:orgs,org_code'],
@@ -107,16 +106,6 @@ class StoreReportRequest extends FormRequest
             'description' => [
                 'required',
                 'string',
-                'min:20',
-                function (string $attribute, mixed $value, \Closure $fail) use ($minWords): void {
-                    $wordCount = str_word_count(trim((string) $value));
-                    if ($wordCount < $minWords) {
-                        $fail(__('Describe the issue must be at least :count words. You have provided :current words.', [
-                            'count' => $minWords,
-                            'current' => $wordCount,
-                        ]));
-                    }
-                },
             ],
             'violation_date' => ['nullable', 'date'],
             'contact_name' => ['nullable', 'string', 'max:150'],
@@ -200,11 +189,6 @@ class StoreReportRequest extends FormRequest
             'org_code.required_without' => 'Please select an organization or use a direct report link.',
             'org_code.exists' => 'That organization link is no longer valid. Request a new link from your administrator.',
         ];
-    }
-
-    protected function minimumDescriptionWords(): int
-    {
-        return (int) config('asylon.reports.description_min_words', 20);
     }
 
     protected function categoryAllowedForType(string $type, string $category): bool

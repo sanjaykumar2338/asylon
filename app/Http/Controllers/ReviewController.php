@@ -87,6 +87,7 @@ class ReviewController extends Controller
             ->withQueryString();
 
         $categoriesMap = ReportCategory::query()
+            ->visible()
             ->with('subcategories')
             ->orderBy('position')
             ->orderBy('name')

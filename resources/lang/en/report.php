@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'submit_title' => 'Submit a Security Concern',
+    'submit_title' => 'Submit a Concern or Share Information',
     'submit_description' => 'Use this form to anonymously report a security issue or concern. Only the reviewing team for your organization will be able to access the information you provide.',
     'student_portal_heading' => 'Student Safety & Well-being',
     'student_portal_description' => 'This portal is for student safety, bullying, discrimination, or wellness concerns.',
@@ -54,6 +54,7 @@ return [
     'voice_remove_button' => 'Remove recording',
     'voice_tip' => 'Your voice recording will be attached just like an uploaded file. This feature works best in the latest versions of Chrome, Edge, or Firefox.',
     'voice_comment_label' => 'Comment for voice recording (optional)',
+    'voice_play' => 'Play recording',
     'disclaimer' => 'By submitting this report you acknowledge that the information provided is accurate to the best of your knowledge. Do not include passwords or other secrets unless absolutely necessary.',
     'submit_button' => 'Submit report',
     'recipients_title' => 'Recipients',

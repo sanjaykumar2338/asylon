@@ -76,6 +76,20 @@ class OrgController extends AdminController
     }
 
     /**
+     * Display the specified organization.
+     */
+    public function show(Org $org): View
+    {
+        $this->authorizeOrgAccess($org);
+
+        // Reuse the edit template to present org details.
+        return view('admin.orgs.edit', [
+            'org' => $org,
+            'eligibleUsers' => $this->eligibleOnCallUsers($org),
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified organization.
      */
     public function edit(Org $org): View

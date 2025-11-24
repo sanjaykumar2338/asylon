@@ -17,6 +17,8 @@ class ReportSubcategoryController extends Controller
      */
     public function store(StoreReportSubcategoryRequest $request, ReportCategory $reportCategory): RedirectResponse
     {
+        $this->ensureCategoryManager();
+
         $data = $request->validated();
         $data['name'] = trim($data['name']);
         $data['description'] = $data['description'] ?? null;
@@ -39,6 +41,8 @@ class ReportSubcategoryController extends Controller
         ReportCategory $reportCategory,
         ReportSubcategory $reportSubcategory
     ): RedirectResponse {
+        $this->ensureCategoryManager();
+
         if ($reportSubcategory->report_category_id !== $reportCategory->id) {
             abort(404);
         }
@@ -74,6 +78,8 @@ class ReportSubcategoryController extends Controller
         ReportCategory $reportCategory,
         ReportSubcategory $reportSubcategory
     ): RedirectResponse {
+        $this->ensureCategoryManager();
+
         if ($reportSubcategory->report_category_id !== $reportCategory->id) {
             abort(404);
         }
@@ -94,5 +100,10 @@ class ReportSubcategoryController extends Controller
         return redirect()
             ->route('admin.report-categories.show', $reportCategory)
             ->with('ok', 'Subcategory deleted.');
+    }
+
+    protected function ensureCategoryManager(): void
+    {
+        abort_unless(auth()->user()?->can('manage-categories'), 403);
     }
 }

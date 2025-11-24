@@ -8,18 +8,21 @@
         $portalDescription = $portalDescription ?? __('report.submit_description');
         $recipientsEnabled = $recipientsEnabled ?? false;
         $recipientMap = $recipientMap ?? [];
+        $supportEmail = config('asylon.support_email', 'support@asylon.com');
     @endphp
+    <style>
+        @media (min-width: 640px) {
+            .sm\:max-w-md {
+                max-width: 30rem;
+            }
+        }
+    </style>
     <header class="mb-8 border-b border-gray-200 pb-4">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-widest text-indigo-500">Asylon</p>
-                <h1 class="text-xl font-semibold text-gray-900">{{ $portalHeading }}</h1>
-            </div>
-            <div class="flex flex-col gap-3 text-sm sm:flex-row sm:items-center">
-                
+        <div class="flex justify-end">
+            <div class="text-sm">
                 <a href="{{ route('login') }}"
                     class="inline-flex items-center justify-center rounded-md border border-indigo-500 px-4 py-2 font-semibold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <i class="fas fa-sign-in-alt mr-2"></i> {{ __('auth.reviewer_login') }}
+                    <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log In') }}
                 </a>
             </div>
         </div>
@@ -27,19 +30,27 @@
 
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">{{ $portalHeading }}</h1>
-        <p class="mt-2 text-sm text-gray-600">
-            {{ $portalDescription }}
-        </p>
-        <p class="text-sm text-gray-600 mt-2">
+        <div class="mt-2 space-y-3 text-sm text-gray-700">
+            <p>You stay anonymous unless YOU choose to share your information.<br>
+                Your identity is completely protected.</p>
+
+            <p>Your voice matters.<br>
+                Use this form to report a concern, share information, or speak up about something that doesn't feel right.<br>
+                You may remain anonymous if you prefer.</p>
+
+            <p>If this is an emergency, please contact 911 immediately.</p>
+        </div>
+        @if ($portalDescription && $portalDescription !== __('report.submit_description'))
+            <p class="mt-3 text-sm text-gray-600">
+                {{ $portalDescription }}
+            </p>
+        @endif
+        <p class="text-sm text-gray-600 mt-4">
             {{ __('report.already_have_case') }}
             <a href="{{ route('followup.entry') }}" class="text-indigo-600 underline">
                 {{ __('report.followup_cta') }}
             </a>.
         </p>
-        <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <strong>{{ __('common.emergency') }}:</strong>
-            {{ __('report.emergency_notice') }}
-        </div>
         <p class="mt-3 text-sm font-medium text-indigo-700">
             {{ __('report.privacy_header') }}
         </p>
@@ -57,7 +68,6 @@
     @endif
 
     @php
-        $descriptionMinWords = (int) config('asylon.reports.description_min_words', 20);
         $hasCategories = ! empty($categories);
         $selectedCategory = $hasCategories ? old('category') : null;
         $initialSubcategories = $selectedCategory && isset($categories[$selectedCategory])
@@ -158,12 +168,12 @@
 
         <div>
             <x-input-label for="description" :value="__('report.description_label')" />
-            <textarea id="description" name="description" rows="6" required data-min-words="{{ $descriptionMinWords }}"
+            <textarea id="description" name="description" rows="6" required
+                placeholder="Please describe what happened or what you've noticed.&#10;(Share as much as you feel comfortable.)"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
-            <p id="description-word-helper" data-min-words="{{ $descriptionMinWords }}"
-                class="mt-2 text-xs text-gray-500">
-                {{ __('report.description_helper', ['count' => $descriptionMinWords]) }}
-            </p>
+            <small class="mt-2 block text-xs text-gray-500">
+                Please describe what happened or what you've noticed. Share as much as you feel comfortable.
+            </small>
             <x-input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
@@ -281,9 +291,15 @@
         </template>
 
         <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-            <h3 class="text-sm font-semibold text-gray-800">{{ __('report.voice_heading') }}</h3>
-            <p class="mt-1 text-xs text-gray-600">
-                {{ __('report.voice_description') }}
+            <h3 class="text-sm font-semibold text-gray-800">Optional Voice Message (3 minutes per recording)</h3>
+            <p class="mt-1 text-sm text-gray-600">
+                You can speak instead of typing if that feels easier for you.
+            </p>
+            <p class="mt-1 text-sm text-gray-600">
+                Recordings are limited to 3 minutes each, but you can upload as many separate recordings as you need.
+            </p>
+            <p class="mt-1 text-sm text-gray-600">
+                Your voice can be automatically disguised to protect your identity.
             </p>
             <div class="mt-4 voice-recorder-control">
                 <button type="button" id="recorder" class="recorder-button" aria-pressed="false">
@@ -306,11 +322,15 @@
             </div>
             <p id="recordingStatus" class="mt-3 text-sm text-gray-500"></p>
             <audio id="voicePreview" controls class="mt-4 hidden w-full rounded-lg bg-white"></audio>
+            <div class="mt-2 flex gap-2">
+                <button type="button" id="voicePlayBtn"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled>
+                    {{ __('report.voice_play') }}
+                </button>
+            </div>
             <input type="file" id="voiceRecordingInput" name="voice_recording" class="hidden" accept="audio/webm">
             <x-input-error class="mt-3" :messages="$errors->get('voice_recording')" />
-            <p class="mt-3 text-xs text-gray-500">
-                {{ __('report.voice_tip') }}
-            </p>
             <div class="mt-4">
                 <x-input-label for="voice_comment" :value="__('report.voice_comment_label')" />
                 <textarea id="voice_comment" name="voice_comment" rows="2" maxlength="500"
@@ -543,39 +563,6 @@
                 <x-input-error class="mt-2" :messages="$errors->get('recipients')" />
             </div>
         @endif
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var textarea = document.getElementById('description');
-            var helper = document.getElementById('description-word-helper');
-
-            if (!textarea || !helper) {
-                return;
-            }
-
-            var minWords = parseInt(helper.dataset.minWords || textarea.dataset.minWords || '20', 10);
-
-            var updateHelper = function () {
-                var value = textarea.value.trim();
-                var tokens = value === '' ? [] : value.split(/\s+/).filter(function (token) {
-                    return token.length > 0;
-                });
-                var count = tokens.length;
-                helper.textContent = 'Minimum ' + minWords + ' words required. Currently ' + count + ' word' + (count === 1 ? '' : 's') + '.';
-
-                if (count < minWords) {
-                    helper.classList.remove('text-gray-500');
-                    helper.classList.add('text-red-600');
-                } else {
-                    helper.classList.remove('text-red-600');
-                    helper.classList.add('text-gray-500');
-                }
-            };
-
-            updateHelper();
-            textarea.addEventListener('input', updateHelper);
-        });
-    </script>
 
     <style>
         .voice-recorder-control {
@@ -905,8 +892,9 @@
             const previewEl = document.getElementById('voicePreview');
             const fileInput = document.getElementById('voiceRecordingInput');
             const voiceCommentInput = document.getElementById('voice_comment');
+            const playBtn = document.getElementById('voicePlayBtn');
 
-            if (!recorderBtn || !clearBtn || !statusEl || !previewEl || !fileInput) {
+            if (!recorderBtn || !clearBtn || !statusEl || !previewEl || !fileInput || !playBtn) {
                 return;
             }
 
@@ -928,6 +916,28 @@
                 if (typeof window.refreshAttachmentPreview === 'function') {
                     window.refreshAttachmentPreview();
                 }
+            };
+
+            const updatePreviewFromFile = () => {
+                const files = fileInput?.files ?? [];
+                if (!files.length) {
+                    previewEl.src = '';
+                    previewEl.classList.add('hidden');
+                    statusEl.textContent = '';
+                    revokeObject();
+                    playBtn.disabled = true;
+                    return;
+                }
+
+                revokeObject();
+                const file = files[0];
+                objectUrl = URL.createObjectURL(file);
+                previewEl.src = objectUrl;
+                previewEl.load();
+                previewEl.classList.remove('hidden');
+                previewEl.currentTime = 0;
+                statusEl.textContent = file.name || 'voice-recording.webm';
+                playBtn.disabled = false;
             };
 
             const clearFileInput = () => {
@@ -985,13 +995,22 @@
                 recordedChunks = [];
                 stopStream();
                 revokeObject();
+                if (previewEl.src?.startsWith('blob:')) {
+                    URL.revokeObjectURL(previewEl.src);
+                }
                 mediaRecorder = null;
                 previewEl.src = '';
                 previewEl.classList.add('hidden');
+                playBtn.disabled = true;
                 clearFileInput();
                 refreshAttachmentPreview();
                 setState('idle', message);
             };
+
+            fileInput.addEventListener('change', () => {
+                updatePreviewFromFile();
+                refreshAttachmentPreview();
+            });
 
             recorderBtn.addEventListener('click', async () => {
                 const currentState = recorderBtn.dataset.state || 'idle';
@@ -1050,8 +1069,10 @@
                     revokeObject();
                     objectUrl = URL.createObjectURL(blob);
                     previewEl.src = objectUrl;
+                    previewEl.load();
                     previewEl.classList.remove('hidden');
                     previewEl.currentTime = 0;
+                    playBtn.disabled = false;
 
                     refreshAttachmentPreview();
                     setState('captured', 'Recording captured. Use the player above to listen before submitting.');
@@ -1077,6 +1098,13 @@
                 clearCurrentRecording('Recording removed.');
                 if (voiceCommentInput) {
                     voiceCommentInput.value = '';
+                }
+            });
+
+            playBtn.addEventListener('click', () => {
+                if (previewEl.src) {
+                    previewEl.currentTime = 0;
+                    previewEl.play().catch(() => {});
                 }
             });
 
@@ -1153,6 +1181,9 @@
     <footer class="mt-16 border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
         <p>
             {{ __('report.footer_monitoring') }}
+        </p>
+        <p class="mt-2 text-gray-600">
+            Need help? Email <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>.
         </p>
         <p class="mt-2">&copy; {{ now()->year }} {{ __('report.footer_brand') }}</p>
     </footer>

@@ -54,6 +54,7 @@ return [
     'voice_remove_button' => 'Eliminar grabación',
     'voice_tip' => 'Tu grabación de voz se adjuntará igual que un archivo. Funciona mejor en las últimas versiones de Chrome, Edge o Firefox.',
     'voice_comment_label' => 'Comentario para la grabación de voz (opcional)',
+    'voice_play' => 'Reproducir grabación',
     'disclaimer' => 'Al enviar este reporte confirmas que la información es precisa según tu mejor conocimiento. No incluyas contraseñas ni otros secretos a menos que sea necesario.',
     'submit_button' => 'Enviar reporte',
     'recipients_title' => 'Destinatarios',
