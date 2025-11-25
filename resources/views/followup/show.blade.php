@@ -1,4 +1,4 @@
-<x-guest-layout container-class="w-full max-w-5xl mt-8 px-6 sm:px-10 py-10 bg-gray-50">
+<x-guest-layout container-class="w-full max-w-4xl mt-8 px-6 sm:px-8 py-10 bg-white shadow-md overflow-hidden sm:rounded-lg">
     <div class="mx-auto w-full max-w-4xl space-y-6">
         <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
