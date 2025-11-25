@@ -18,6 +18,10 @@
         @php
             $containerClass = $containerClass ?? 'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg';
         @endphp
+        @php
+            $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+            $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+        @endphp
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div class="flex items-center justify-center gap-3">
                 <a href="/">
@@ -28,6 +32,20 @@
 
             <div class="{{ $containerClass }}">
                 {{ $slot }}
+                <footer class="mt-8 text-center text-xs text-gray-600 space-y-1 border-t border-gray-200 pt-4">
+                    <p>
+                        Contact us:
+                        <a href="mailto:{{ $infoEmail }}" class="text-indigo-600 underline">{{ $infoEmail }}</a> |
+                        <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>
+                    </p>
+                    <p>
+                        <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
+                        &middot;
+                        <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+                        &middot;
+                        <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
+                    </p>
+                </footer>
             </div>
         </div>
         @php

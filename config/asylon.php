@@ -43,7 +43,8 @@ return [
         'en' => 'English',
         'es' => 'Spanish',
     ],
-    'support_email' => env('ASYLON_SUPPORT_EMAIL', 'support@asylon.com'),
+    'support_email' => env('ASYLON_SUPPORT_EMAIL', 'support@asylon.cc'),
+    'info_email' => env('ASYLON_INFO_EMAIL', 'info@asylon.cc'),
     'ffmpeg_path' => env('FFMPEG_PATH', 'ffmpeg'),
     'privacy' => [
         'general' => 'Your report is anonymous unless you choose to share your name or contact information. Asylon is a secure third-party system.',

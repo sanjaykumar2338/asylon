@@ -11,10 +11,12 @@ class StaticPageController extends Controller
      */
     public function support(): View
     {
-        $supportEmail = config('asylon.support_email', 'support@asylon.com');
+        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
 
         return view('static.support', [
             'supportEmail' => $supportEmail,
+            'infoEmail' => $infoEmail,
         ]);
     }
 
@@ -23,10 +25,12 @@ class StaticPageController extends Controller
      */
     public function terms(): View
     {
-        $supportEmail = config('asylon.support_email', 'support@asylon.com');
+        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
 
         return view('static.terms', [
             'supportEmail' => $supportEmail,
+            'infoEmail' => $infoEmail,
             'privacyPolicyUrl' => config('app.privacy_policy_url'),
         ]);
     }

@@ -164,7 +164,7 @@
             </div>
 
             @php
-                $supportEmail = config('asylon.support_email', 'support@asylon.com');
+                $supportEmail = config('asylon.support_email', 'support@asylon.cc');
             @endphp
             <footer class="main-footer text-sm">
                 <div class="float-right d-none d-sm-inline">

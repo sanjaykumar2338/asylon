@@ -8,7 +8,8 @@
         $portalDescription = $portalDescription ?? __('report.submit_description');
         $recipientsEnabled = $recipientsEnabled ?? false;
         $recipientMap = $recipientMap ?? [];
-        $supportEmail = config('asylon.support_email', 'support@asylon.com');
+        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
     @endphp
     <style>
         @media (min-width: 640px) {
@@ -1183,7 +1184,7 @@
             {{ __('report.footer_monitoring') }}
         </p>
         <p class="mt-2 text-gray-600">
-            Need help? Email <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>.
+            Need help? Email <a href="mailto:{{ $infoEmail }}" class="text-indigo-600 underline">{{ $infoEmail }}</a> or <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>.
         </p>
         <p class="mt-2">&copy; {{ now()->year }} {{ __('report.footer_brand') }}</p>
     </footer>
