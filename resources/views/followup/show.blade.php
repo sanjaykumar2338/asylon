@@ -10,7 +10,6 @@
                     </p>
                 </div>
                 <div class="flex flex-col items-end gap-3 text-right">
-                    <x-language-switcher />
                     <div>
                         <p class="text-xs font-medium text-gray-500">{{ __('Reference ID') }}</p>
                         <p class="font-mono text-lg text-gray-900">{{ $report->id }}</p>
