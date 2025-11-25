@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/report');
 Route::get('/support', [StaticPageController::class, 'support'])->name('support');
+Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
 
 Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');

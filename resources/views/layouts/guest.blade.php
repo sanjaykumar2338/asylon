@@ -39,11 +39,13 @@
                         <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>
                     </p>
                     <p>
-                        <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
-                        &middot;
-                        <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
-                        &middot;
-                        <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
+                    <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
+                    &middot;
+                    <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
+                    &middot;
+                    <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+                    &middot;
+                    <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
                     </p>
                 </footer>
             </div>

@@ -34,4 +34,18 @@ class StaticPageController extends Controller
             'privacyPolicyUrl' => config('app.privacy_policy_url'),
         ]);
     }
+
+    /**
+     * Display the privacy policy.
+     */
+    public function privacy(): View
+    {
+        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+
+        return view('static.privacy', [
+            'supportEmail' => $supportEmail,
+            'infoEmail' => $infoEmail,
+        ]);
+    }
 }
