@@ -24,7 +24,72 @@
                     </li>
                 </ul>
 
+                @php
+                    $navUser = Auth::user();
+                    $navUnreadCount = $navUser ? $navUser->unreadNotifications()->count() : 0;
+                    $navRecentNotifications = $navUser
+                        ? $navUser->notifications()->latest()->limit(10)->get()
+                        : collect();
+                @endphp
                 <ul class="navbar-nav ml-auto">
+                    @if ($navUser)
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+                                <i class="far fa-bell"></i>
+                                @if ($navUnreadCount > 0)
+                                    <span class="badge badge-danger navbar-badge">
+                                        {{ $navUnreadCount > 9 ? '9+' : $navUnreadCount }}
+                                    </span>
+                                @endif
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0">
+                                <div class="dropdown-header d-flex justify-content-between align-items-center px-3 py-2">
+                                    <span class="font-weight-bold">{{ __('common.notifications') }}</span>
+                                    <form method="POST" action="{{ route('notifications.markAllRead') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-link btn-sm p-0">
+                                            {{ __('common.mark_all_read') }}
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="dropdown-divider mb-0"></div>
+                                <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
+                                    @forelse ($navRecentNotifications as $notification)
+                                        @php
+                                            $data = $notification->data ?? [];
+                                            $title = $data['title'] ?? __('common.notification_single');
+                                            $message = $data['message'] ?? '';
+                                            $url = $data['url'] ?? route('notifications.index');
+                                        @endphp
+                                        <div class="list-group-item list-group-item-action {{ is_null($notification->read_at) ? 'bg-light' : '' }}">
+                                            <a href="{{ $url }}"
+                                                class="stretched-link text-dark text-decoration-none d-block">
+                                                <span class="d-block font-weight-bold">{{ $title }}</span>
+                                                @if ($message)
+                                                    <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($message, 90) }}</small>
+                                                @endif
+                                                <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                                            </a>
+                                            <form method="POST" action="{{ route('notifications.markRead', $notification->getKey()) }}"
+                                                class="mt-2">
+                                                @csrf
+                                                <button type="submit" class="btn btn-link btn-sm p-0">
+                                                    {{ $notification->read_at ? __('Viewed') : __('Mark read') }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @empty
+                                        <div class="list-group-item text-center text-muted">
+                                            {{ __('common.no_notifications') }}
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <div class="dropdown-footer text-center border-top py-2">
+                                    <a href="{{ route('notifications.index') }}">{{ __('common.view_all_notifications') }}</a>
+                                </div>
+                            </div>
+                        </li>
+                    @endif
                     <!-- User Dropdown Menu -->
                     <li class="nav-item dropdown">
                         <a class="nav-link" data-toggle="dropdown" href="#">

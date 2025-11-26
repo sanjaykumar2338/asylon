@@ -10,13 +10,16 @@ use App\Models\Org;
 use App\Models\OrgAlertContact;
 use App\Models\ReportCategory;
 use App\Models\Report;
+use App\Models\User;
 use App\Jobs\AnonymizeVoiceJob;
+use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
 use App\Support\LocaleManager;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -163,6 +166,7 @@ class ReportController extends Controller
 
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
+        $this->notifyReviewersAboutReport($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
@@ -179,6 +183,7 @@ class ReportController extends Controller
 
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
+        $this->notifyReviewersAboutReport($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
@@ -208,6 +213,7 @@ class ReportController extends Controller
 
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
+        $this->notifyReviewersAboutReport($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
@@ -548,4 +554,41 @@ class ReportController extends Controller
         })->all();
     }
 
+    /**
+     * Notify reviewers and admins through database notifications.
+     */
+    protected function notifyReviewersAboutReport(Report $report): void
+    {
+        $report->loadMissing('org');
+
+        $roles = ['reviewer', 'security_lead', 'org_admin', 'platform_admin'];
+
+        $recipients = User::query()
+            ->where('active', true)
+            ->whereIn('role', $roles)
+            ->where(function ($query) use ($report): void {
+                $query->whereNull('org_id')
+                    ->orWhere('org_id', $report->org_id);
+            })
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        $orgName = $report->org?->name ?: __('General submission');
+
+        Notification::send(
+            $recipients,
+            new ReportAlertNotification(
+                title: __('New report submitted'),
+                message: __('Report #:id (:type) for :org requires review.', [
+                    'id' => $report->getKey(),
+                    'type' => ucfirst($report->type ?? 'general'),
+                    'org' => $orgName,
+                ]),
+                url: route('reports.show', $report),
+            )
+        );
+    }
 }

@@ -14,4 +14,9 @@ return [
     'updated' => 'Updated',
     'reviewer' => 'Reviewer',
     'you' => 'You',
+    'notifications' => 'Notifications',
+    'notification_single' => 'Notification',
+    'mark_all_read' => 'Mark all as read',
+    'no_notifications' => 'No notifications yet.',
+    'view_all_notifications' => 'View all notifications',
 ];

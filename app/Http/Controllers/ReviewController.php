@@ -12,6 +12,7 @@ use App\Models\ReportFile;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\FirstResponseNotification;
+use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -288,6 +289,17 @@ class ReviewController extends Controller
             ]);
         }
 
+        $messageSnippet = Str::limit(strip_tags($request->input('message', '')), 120);
+        $this->notifyReportStakeholders(
+            $report,
+            __('Reply sent on report #:id', ['id' => $report->getKey()]),
+            __(':user replied to the reporter: :snippet', [
+                'user' => $user->name,
+                'snippet' => $messageSnippet ?: __('common.not_provided'),
+            ]),
+            $user->getKey()
+        );
+
         return back()->with('ok', 'Reply sent.');
     }
 
@@ -306,6 +318,17 @@ class ReviewController extends Controller
             'user_id' => $user->getKey(),
             'body' => $request->input('body'),
         ]);
+
+        $noteSnippet = Str::limit(strip_tags($request->input('body', '')), 120);
+        $this->notifyReportStakeholders(
+            $report,
+            __('New note on report #:id', ['id' => $report->getKey()]),
+            __(':user added a note: :snippet', [
+                'user' => $user->name,
+                'snippet' => $noteSnippet ?: __('common.not_provided'),
+            ]),
+            $user->getKey()
+        );
 
         return back()->with('ok', 'Note added.');
     }
@@ -365,7 +388,56 @@ class ReviewController extends Controller
             'resolved_by_name' => $resolvedBy?->name,
         ]);
 
+        $this->notifyReportStakeholders(
+            $report,
+            __('Status updated for report #:id', ['id' => $report->getKey()]),
+            __(':user changed the status from :from to :to.', [
+                'user' => $user->name,
+                'from' => Str::headline((string) $fromStatus),
+                'to' => Str::headline((string) $report->status),
+            ]),
+            $user->getKey()
+        );
+
         return back()->with('ok', 'Status updated.');
+    }
+
+    /**
+     * Notify internal stakeholders about report activity.
+     */
+    protected function notifyReportStakeholders(Report $report, string $title, string $message, ?int $excludeUserId = null): void
+    {
+        $report->loadMissing('org');
+
+        $recipientRoles = [
+            'reviewer',
+            'security_lead',
+            'org_admin',
+            'platform_admin',
+        ];
+
+        $recipients = User::query()
+            ->where('active', true)
+            ->whereIn('role', $recipientRoles)
+            ->when($excludeUserId, fn ($query) => $query->where('id', '!=', $excludeUserId))
+            ->where(function ($query) use ($report): void {
+                $query->whereNull('org_id')
+                    ->orWhere('org_id', $report->org_id);
+            })
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        Notification::send(
+            $recipients,
+            new ReportAlertNotification(
+                title: $title,
+                message: $message,
+                url: route('reports.show', $report),
+            )
+        );
     }
 
     /**
