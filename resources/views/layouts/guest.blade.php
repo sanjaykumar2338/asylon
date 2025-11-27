@@ -39,13 +39,19 @@
                         <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>
                     </p>
                     <p>
-                    <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
-                    &middot;
-                    <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
-                    &middot;
-                    <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
-                    &middot;
-                    <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
+                        <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
+                        &middot;
+                        <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
+                        &middot;
+                        <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+                        &middot;
+                        <a href="{{ route('privacy.anonymity') }}" class="text-indigo-600 underline">Privacy &amp; Anonymity</a>
+                        &middot;
+                        <a href="{{ route('security.overview') }}" class="text-indigo-600 underline">Security Overview</a>
+                        &middot;
+                        <a href="{{ url('/brand-info') }}" class="text-indigo-600 underline">Brand &amp; SMS Alerts Info</a>
+                        &middot;
+                        <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
                     </p>
                 </footer>
             </div>

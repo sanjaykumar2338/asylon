@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\ReportNote;
 
@@ -127,6 +128,22 @@ class Report extends Model
     public function messages(): HasMany
     {
         return $this->chatMessages();
+    }
+
+    /**
+     * Risk analysis attached to the report.
+     */
+    public function riskAnalysis(): HasOne
+    {
+        return $this->hasOne(ReportRiskAnalysis::class);
+    }
+
+    /**
+     * Escalation events triggered for this report.
+     */
+    public function escalationEvents(): HasMany
+    {
+        return $this->hasMany(EscalationEvent::class);
     }
 
     /**

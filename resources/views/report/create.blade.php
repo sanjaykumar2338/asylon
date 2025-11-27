@@ -52,6 +52,11 @@
                 {{ __('report.followup_cta') }}
             </a>.
         </p>
+        <p class="mt-3 text-sm text-indigo-700">
+            <a href="{{ route('privacy.anonymity') }}" class="underline">Learn how privacy &amp; anonymity work</a>
+            &middot;
+            <a href="{{ route('security.overview') }}" class="underline">Security overview</a>
+        </p>
         <p class="mt-3 text-sm font-medium text-indigo-700">
             {{ __('report.privacy_header') }}
         </p>

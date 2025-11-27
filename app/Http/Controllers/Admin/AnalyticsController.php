@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Report;
+use App\Models\ReportRiskAnalysis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -20,70 +21,15 @@ class AnalyticsController extends AdminController
         $this->scopeByRole($baseQuery);
         $this->applyFilters($baseQuery, $filters);
 
-        $total = (clone $baseQuery)->count();
-        $urgent = (clone $baseQuery)->where('urgent', true)->count();
-        $urgentPercent = $total > 0 ? round(($urgent / $total) * 100, 1) : 0.0;
-
-        $byCategory = (clone $baseQuery)
-            ->select('category', DB::raw('COUNT(*) as total'))
-            ->groupBy('category')
-            ->orderByDesc('total')
-            ->limit(8)
-            ->get();
-
-        $bySubcategory = (clone $baseQuery)
-            ->select('category', 'subcategory', DB::raw('COUNT(*) as total'))
-            ->whereNotNull('subcategory')
-            ->groupBy('category', 'subcategory')
-            ->orderByDesc('total')
-            ->limit(8)
-            ->get();
-
-        $byType = (clone $baseQuery)
-            ->select('type', DB::raw('COUNT(*) as total'))
-            ->groupBy('type')
-            ->get();
-
-        $bySeverity = (clone $baseQuery)
-            ->select('severity', DB::raw('COUNT(*) as total'))
-            ->groupBy('severity')
-            ->get();
-
-        $byOrg = (clone $baseQuery)
-            ->select('org_id', DB::raw('COUNT(*) as total'))
-            ->with('org:id,name')
-            ->groupBy('org_id')
-            ->orderByDesc('total')
-            ->get();
-
-        $avgResponse = (clone $baseQuery)
-            ->whereNotNull('first_response_at')
-            ->avg(DB::raw('TIMESTAMPDIFF(MINUTE, created_at, first_response_at)'));
-
-        $avgResponse = $avgResponse ? round($avgResponse, 1) : null;
+        $metrics = $this->buildMetrics($baseQuery, $filters['range']);
 
         $user = auth()->user();
         $orgLabel = $user && $user->hasRole('platform_admin')
             ? 'All organizations'
             : ($user?->org?->name ?? 'My organization');
 
-        \Log::debug('Analytics data payload', [
-            'total' => $total,
-            'urgent' => $urgent,
-            'filters' => $filters,
-            'by_category_sample' => $byCategory->first(),
-        ]);
-
         return view('admin.analytics.index', [
-            'total' => $total,
-            'urgent' => $urgent,
-            'urgentPercent' => $urgentPercent,
-            'byCategory' => $byCategory,
-            'bySubcategory' => $bySubcategory,
-            'byType' => $byType,
-            'bySeverity' => $bySeverity,
-            'byOrg' => $byOrg,
-            'avgResponse' => $avgResponse,
+            'metrics' => $metrics,
             'orgLabel' => $orgLabel,
             'orgOptions' => $this->orgOptions(),
             'filters' => $filters,
@@ -107,12 +53,18 @@ class AnalyticsController extends AdminController
 
         $orgIdParam = $request->query('org_id');
         $orgId = is_numeric($orgIdParam) ? (int) $orgIdParam : null;
+        $range = (int) $request->query('range', 30);
+        $allowedRanges = [7, 14, 30, 60, 90];
+        if (! in_array($range, $allowedRanges, true)) {
+            $range = 30;
+        }
 
         return [
             'portal' => $portal,
             'from' => $from,
             'to' => $to,
             'org_id' => $orgId,
+            'range' => $range,
         ];
     }
 
@@ -139,5 +91,108 @@ class AnalyticsController extends AdminController
         if ($orgId && $user && $user->hasRole('platform_admin')) {
             $query->where('org_id', $orgId);
         }
+    }
+
+    /**
+     * Build risk-aware metrics.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery
+     * @param  int  $rangeDays
+     * @return array<string, mixed>
+     */
+    protected function buildMetrics($baseQuery, int $rangeDays): array
+    {
+        $totalsQuery = clone $baseQuery;
+
+        $totalReports = (clone $totalsQuery)->count();
+        $highRiskReports = (clone $totalsQuery)
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['high', 'critical']))
+            ->count();
+        $lowMediumRiskReports = (clone $totalsQuery)
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['low', 'medium']))
+            ->count();
+        $noRiskScoredReports = (clone $totalsQuery)
+            ->doesntHave('riskAnalysis')
+            ->count();
+        $urgentOpenReports = (clone $totalsQuery)
+            ->where('urgent', true)
+            ->where('status', 'open')
+            ->count();
+
+        $timeseries = $this->buildTimeseries($baseQuery, $rangeDays);
+        $byCategory = $this->buildCategoryBreakdown($baseQuery);
+
+        return [
+            'totals' => [
+                'total_reports' => $totalReports,
+                'high_risk_reports' => $highRiskReports,
+                'low_medium_risk_reports' => $lowMediumRiskReports,
+                'no_risk_scored_reports' => $noRiskScoredReports,
+                'urgent_reports_open' => $urgentOpenReports,
+            ],
+            'timeseries' => $timeseries,
+            'by_category' => $byCategory,
+        ];
+    }
+
+    /**
+     * Build timeseries data.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery
+     * @param  int  $rangeDays
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildTimeseries($baseQuery, int $rangeDays): array
+    {
+        $range = max(1, min($rangeDays, 120));
+        $start = now()->subDays($range - 1)->startOfDay();
+        $end = now()->endOfDay();
+
+        $totals = (clone $baseQuery)
+            ->whereBetween('created_at', [$start, $end])
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $highs = (clone $baseQuery)
+            ->whereBetween('reports.created_at', [$start, $end])
+            ->join('report_risk_analyses as r', 'r.report_id', '=', 'reports.id')
+            ->whereIn('r.risk_level', ['high', 'critical'])
+            ->selectRaw('DATE(reports.created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $dates = collect(range(0, $range - 1))
+            ->map(fn ($i) => now()->subDays($i)->toDateString())
+            ->reverse()
+            ->values();
+
+        return $dates->map(function (string $date) use ($totals, $highs): array {
+            return [
+                'date' => $date,
+                'total_reports' => (int) ($totals[$date] ?? 0),
+                'high_risk_reports' => (int) ($highs[$date] ?? 0),
+            ];
+        })->all();
+    }
+
+    /**
+     * Build category-level breakdown including high risk counts.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery
+     * @return \Illuminate\Support\Collection
+     */
+    protected function buildCategoryBreakdown($baseQuery)
+    {
+        return (clone $baseQuery)
+            ->leftJoin('report_risk_analyses as r', 'r.report_id', '=', 'reports.id')
+            ->select([
+                'category',
+                DB::raw('COUNT(reports.id) as total_reports'),
+                DB::raw('SUM(CASE WHEN r.risk_level IN ("high", "critical") THEN 1 ELSE 0 END) as high_risk_count'),
+            ])
+            ->groupBy('category')
+            ->orderByDesc('total_reports')
+            ->get();
     }
 }

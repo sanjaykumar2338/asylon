@@ -11,16 +11,21 @@ Route::redirect('/', '/report');
 Route::get('/support', [StaticPageController::class, 'support'])->name('support');
 Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
+Route::view('/brand-info', 'static.brand_sms_info')->name('brand.sms.info');
+Route::view('/privacy-and-anonymity', 'static.privacy_anonymity')->name('privacy.anonymity');
+Route::view('/security-overview', 'static.security_overview')->name('security.overview');
 
-Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
-Route::post('/report/student', [ReportController::class, 'storeStudent'])->name('report.student.store');
-Route::get('/report/employee', [ReportController::class, 'createEmployee'])->name('report.employee');
-Route::post('/report/employee', [ReportController::class, 'storeEmployee'])->name('report.employee.store');
+Route::middleware('ultra-private')->group(function () {
+    Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
+    Route::post('/report/student', [ReportController::class, 'storeStudent'])->name('report.student.store');
+    Route::get('/report/employee', [ReportController::class, 'createEmployee'])->name('report.employee');
+    Route::post('/report/employee', [ReportController::class, 'storeEmployee'])->name('report.employee.store');
 
-Route::get('/report', [ReportController::class, 'create'])->name('report.create');
-Route::get('/report/{org_code}', [ReportController::class, 'createByCode'])->name('report.by_code');
-Route::post('/report', [ReportController::class, 'store'])->middleware('throttle:report-submit')->name('report.store');
-Route::get('/report/thanks/{id}', [ReportController::class, 'thanks'])->name('report.thanks');
+    Route::get('/report', [ReportController::class, 'create'])->name('report.create');
+    Route::get('/report/{org_code}', [ReportController::class, 'createByCode'])->name('report.by_code');
+    Route::post('/report', [ReportController::class, 'store'])->middleware('throttle:report-submit')->name('report.store');
+    Route::get('/report/thanks/{id}', [ReportController::class, 'thanks'])->name('report.thanks');
+});
 
 if (app()->environment('local')) {
     Route::get('/dev/telnyx-test-sms', function (Request $request) {
@@ -117,23 +122,25 @@ if (app()->environment('local')) {
     })->name('dev.telnyx-test-sms');
 }
 
-Route::get('/followup', [FollowUpController::class, 'entry'])->name('followup.entry');
-Route::post('/followup', [FollowUpController::class, 'redirectFromEntry'])->name('followup.redirect');
+Route::middleware('ultra-private')->group(function () {
+    Route::get('/followup', [FollowUpController::class, 'entry'])->name('followup.entry');
+    Route::post('/followup', [FollowUpController::class, 'redirectFromEntry'])->name('followup.redirect');
 
-Route::get('/followup/{token}', [FollowUpController::class, 'show'])->name('followup.show');
-Route::post('/followup/{token}', [FollowUpController::class, 'storeMessage'])
-    ->middleware('throttle:chat-post')
-    ->name('followup.message');
-Route::get('/followup/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
-    ->name('followup.attachments.preview');
-Route::get('/followup/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
-    ->name('followup.attachments.download');
+    Route::get('/followup/{token}', [FollowUpController::class, 'show'])->name('followup.show');
+    Route::post('/followup/{token}', [FollowUpController::class, 'storeMessage'])
+        ->middleware('throttle:chat-post')
+        ->name('followup.message');
+    Route::get('/followup/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
+        ->name('followup.attachments.preview');
+    Route::get('/followup/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
+        ->name('followup.attachments.download');
 
-Route::get('/chat/{token}', [FollowUpController::class, 'show'])->name('chat.thread');
-Route::post('/chat/{token}', [FollowUpController::class, 'storeMessage'])
-    ->middleware('throttle:chat-post')
-    ->name('chat.post');
-Route::get('/report/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
-    ->name('report.attachments.preview');
-Route::get('/report/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
-    ->name('report.attachments.download');
+    Route::get('/chat/{token}', [FollowUpController::class, 'show'])->name('chat.thread');
+    Route::post('/chat/{token}', [FollowUpController::class, 'storeMessage'])
+        ->middleware('throttle:chat-post')
+        ->name('chat.post');
+    Route::get('/report/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
+        ->name('report.attachments.preview');
+    Route::get('/report/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
+        ->name('report.attachments.download');
+});

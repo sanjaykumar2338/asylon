@@ -3,6 +3,7 @@
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SetLocaleFromRequest;
+use App\Http\Middleware\UltraPrivateMode;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
 use App\Providers\EventServiceProvider;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'can' => Authorize::class,
             'setLocale' => SetLocaleFromRequest::class,
+            'ultra-private' => UltraPrivateMode::class,
         ]);
 
         $middleware->append(ContentSecurityPolicy::class);

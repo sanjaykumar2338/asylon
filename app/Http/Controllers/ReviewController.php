@@ -44,7 +44,7 @@ class ReviewController extends Controller
         $sort = (string) $request->query('sort', 'submitted_desc');
 
         $query = Report::query()
-            ->with(['org', 'files'])
+            ->with(['org', 'files', 'riskAnalysis', 'escalationEvents'])
             ->withCount('files');
 
         if (! $user->can('view-all')) {
@@ -172,6 +172,8 @@ class ReviewController extends Controller
             'messages' => fn ($query) => $query->orderBy('sent_at'),
             'notes' => fn ($query) => $query->latest()->with('user'),
             'resolver',
+            'riskAnalysis',
+            'escalationEvents',
         ]);
 
         Audit::log('reviewer', 'view_report', 'report', $report->getKey());

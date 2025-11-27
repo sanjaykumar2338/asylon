@@ -155,6 +155,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('admin.escalation-rules.index') }}" class="nav-link {{ request()->routeIs('admin.escalation-rules.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-bolt"></i>
+                                        <p>{{ __('Escalation Rules') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-users"></i>
                                         <p>{{ __('Users') }}</p>

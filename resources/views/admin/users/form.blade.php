@@ -70,3 +70,7 @@
     </small>
 @endunless
 
+<div class="alert alert-info mt-3">
+    <strong>{{ __('SMS Safety Alerts') }}</strong><br>
+    {{ __('By adding this staff member, you confirm that their phone number comes from internal HR records and that they are part of your organization’s safety/incident response process. They may receive safety, security, and incident-related SMS alerts from Asylon as part of their role. Message frequency may vary. Msg & data rates may apply. They can reply STOP at any time to opt out.') }}
+</div>

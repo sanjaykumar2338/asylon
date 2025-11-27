@@ -16,12 +16,31 @@
                                 {{ $report->subcategory }}
                             </span>
                         @endif
-                        @if ($report->urgent)
-                            <span class="badge badge-danger mr-2">{{ __('Urgent') }}</span>
+                        @if ($report->urgent) 
+                            <span class="badge badge-danger mr-2">{{ __('Urgent') }}</span> 
+                        @endif 
+                        <span class="badge badge-info text-capitalize"> 
+                            {{ str_replace('_', ' ', $report->status) }} 
+                        </span> 
+                        @if ($report->escalationEvents->isNotEmpty()) 
+                            <span class="badge badge-danger ml-2">{{ __('Escalated') }}</span> 
+                        @endif 
+                        @if ($report->riskAnalysis) 
+                            @php 
+                                $riskLevel = $report->riskAnalysis->risk_level; 
+                                $riskClass = match ($riskLevel) {
+                                    'high' => 'badge-danger',
+                                    'medium' => 'badge-warning text-dark',
+                                    default => 'badge-success',
+                                };
+                            @endphp
+                            <span class="badge {{ $riskClass }} ml-2">
+                                {{ __('Risk') }}: {{ ucfirst($riskLevel) }}
+                                @if ($report->riskAnalysis->risk_score !== null)
+                                    <span class="ml-1">({{ $report->riskAnalysis->risk_score }})</span>
+                                @endif
+                            </span>
                         @endif
-                        <span class="badge badge-info text-capitalize">
-                            {{ str_replace('_', ' ', $report->status) }}
-                        </span>
                     </div>
                     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
                         <span class="text-monospace text-muted mr-3">#{{ $report->id }}</span>
@@ -85,14 +104,33 @@
                                 <i class="fas fa-comments mr-1"></i> {{ __('Open chat') }}
                             </a>
                         </div>
-                    </div>
+                    </div> 
 
-                    <div class="mt-4">
-                        <h5 class="mb-3">{{ __('Description') }}</h5>
-                        <div class="border rounded p-3 bg-light">
-                            <p class="mb-0" style="white-space: pre-line;">{{ $report->description }}</p>
-                        </div>
-                    </div>
+                    <div class="mt-4"> 
+                        @if ($report->escalationEvents->isNotEmpty())
+                            <h5 class="mb-3">{{ __('Escalation') }}</h5>
+                            <div class="list-group mb-4">
+                                @foreach ($report->escalationEvents as $event)
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ $event->rule_name ?? __('Escalation rule') }}</strong>
+                                                <div class="small text-muted">
+                                                    {{ $event->created_at?->format('M d, Y H:i') }}
+                                                </div>
+                                            </div>
+                                            <span class="badge badge-danger">{{ __('Escalated') }}</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <h5 class="mb-3">{{ __('Description') }}</h5> 
+                        <div class="border rounded p-3 bg-light"> 
+                            <p class="mb-0" style="white-space: pre-line;">{{ $report->description }}</p> 
+                        </div> 
+                    </div> 
 
                     <div class="mt-4">
                         <h5 class="mb-3">{{ __('Reporter Contact') }}</h5>

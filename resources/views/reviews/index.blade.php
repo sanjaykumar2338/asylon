@@ -150,6 +150,8 @@
                         <th scope="col">{{ __('Category / Subcategory') }}</th>
                         <th scope="col">{{ __('Type') }}</th>
                         <th scope="col">{{ __('Severity') }}</th>
+                        <th scope="col">{{ __('Risk') }}</th>
+                        <th scope="col">{{ __('Escalation') }}</th>
                         <th scope="col">{{ __('Urgent') }}</th>
                         <th scope="col">{{ __('Status') }}</th>
                         <th scope="col">{{ __('Attachments') }}</th>
@@ -182,6 +184,35 @@
                                     $severityClass = $severityBadgeClasses[$report->severity] ?? 'badge-secondary';
                                 @endphp
                                 <span class="badge {{ $severityClass }} text-capitalize">{{ $report->severity_label }}</span>
+                            </td>
+                            <td>
+                                @php
+                                    $riskLevel = $report->riskAnalysis->risk_level ?? null;
+                                    $riskScore = $report->riskAnalysis->risk_score ?? null;
+                                    $riskClass = match ($riskLevel) {
+                                        'high' => 'badge-danger',
+                                        'medium' => 'badge-warning text-dark',
+                                        'low' => 'badge-success',
+                                        default => 'badge-secondary',
+                                    };
+                                @endphp
+                                @if ($riskLevel)
+                                    <span class="badge {{ $riskClass }}">
+                                        {{ ucfirst($riskLevel) }}
+                                        @if ($riskScore !== null)
+                                            <span class="ml-1">({{ $riskScore }})</span>
+                                        @endif
+                                    </span>
+                                @else
+                                    <span class="text-muted">&mdash;</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($report->escalationEvents->isNotEmpty())
+                                    <span class="badge badge-danger">{{ __('Escalated') }}</span>
+                                @else
+                                    <span class="text-muted">&mdash;</span>
+                                @endif
                             </td>
                             <td>
                                 @if ($report->urgent)

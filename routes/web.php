@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryCo
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('report-categories.toggle-visibility')
             ->middleware('can:manage-categories');
         Route::resource('report-categories', AdminReportCategoryController::class);
+        Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
         Route::get('reports/export', [AdminExportController::class, 'reports'])
             ->name('reports.export');
         Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])

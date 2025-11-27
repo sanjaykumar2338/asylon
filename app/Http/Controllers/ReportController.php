@@ -12,6 +12,7 @@ use App\Models\ReportCategory;
 use App\Models\Report;
 use App\Models\User;
 use App\Jobs\AnonymizeVoiceJob;
+use App\Jobs\AnalyzeReportRisk;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
 use App\Support\LocaleManager;
@@ -167,6 +168,7 @@ class ReportController extends Controller
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
         $this->notifyReviewersAboutReport($report);
+        AnalyzeReportRisk::dispatch($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
@@ -184,6 +186,7 @@ class ReportController extends Controller
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
         $this->notifyReviewersAboutReport($report);
+        AnalyzeReportRisk::dispatch($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
@@ -214,6 +217,7 @@ class ReportController extends Controller
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
         $this->logPortalSubmission($report);
         $this->notifyReviewersAboutReport($report);
+        AnalyzeReportRisk::dispatch($report);
 
         return Redirect::route('report.thanks', $report->getKey());
     }
