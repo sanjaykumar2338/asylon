@@ -8,6 +8,7 @@ use App\Models\Report;
 use App\Models\ReportCategory;
 use App\Models\ReportChatMessage;
 use App\Models\ReportSubcategory;
+use App\Models\RiskKeyword;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -192,6 +193,8 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        $this->seedRiskKeywords($org);
+
         if (! Report::where('org_id', $org->id)->exists()) {
             $sampleReports = [
                 [
@@ -323,6 +326,38 @@ class DatabaseSeeder extends Seeder
     {
         if (blank($org->org_code)) {
             $org->regenerateReportCode();
+        }
+    }
+
+    protected function seedRiskKeywords(Org $org): void
+    {
+        $global = [
+            ['phrase' => 'knife', 'weight' => 40],
+            ['phrase' => 'gun', 'weight' => 50],
+            ['phrase' => 'bomb', 'weight' => 60],
+            ['phrase' => 'self harm', 'weight' => 50],
+            ['phrase' => 'kill myself', 'weight' => 70],
+            ['phrase' => 'threaten', 'weight' => 35],
+        ];
+
+        $orgSpecific = [
+            ['phrase' => 'parking lot fight', 'weight' => 30],
+            ['phrase' => 'back gate', 'weight' => 20],
+            ['phrase' => 'slang-drill', 'weight' => 25],
+        ];
+
+        foreach ($global as $kw) {
+            RiskKeyword::updateOrCreate(
+                ['phrase' => strtolower($kw['phrase']), 'org_id' => null],
+                ['weight' => $kw['weight']]
+            );
+        }
+
+        foreach ($orgSpecific as $kw) {
+            RiskKeyword::updateOrCreate(
+                ['phrase' => strtolower($kw['phrase']), 'org_id' => $org->id],
+                ['weight' => $kw['weight']]
+            );
         }
     }
 }
