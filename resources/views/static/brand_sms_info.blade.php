@@ -3,7 +3,7 @@
         <p class="text-xs uppercase tracking-[0.2em] text-indigo-500">Asylon</p>
         <h1 class="text-3xl font-semibold text-gray-900">Asylon Brand &amp; SMS Alerts Information</h1>
         <p class="text-sm text-gray-700 max-w-3xl">
-            This page is provided for carriers to verify Asylon’s SMS program, opt-in workflow, and message flow requirements.
+            This page is provided for carriers to verify Asylon's SMS program, opt-in workflow, and message flow requirements.
         </p>
         <p class="text-sm text-gray-700 max-w-3xl">
             For carrier verification, please review this page: <strong>{{ url('/brand-info') }}</strong>
@@ -28,10 +28,10 @@
         <section class="space-y-3">
             <h2 class="text-xl font-semibold text-gray-900">How phone numbers are added</h2>
             <p>
-                Staff phone numbers are added by the school or organization’s administrator from internal HR records during onboarding. Phone numbers are not collected via public web forms.
+                Staff phone numbers are added by the school or organization's administrator from internal HR records during onboarding. Phone numbers are not collected via public web forms or marketing lists.
             </p>
             <p>
-                Phone numbers are added from internal HR records by the organization’s administrator. Staff do not enter their own numbers into public forms.
+                Phone numbers come directly from the organization's internal HR systems; staff do not enter their own numbers into public web forms or self-enrollment pages.
             </p>
         </section>
 
@@ -42,6 +42,16 @@
             </p>
             <p>
                 During onboarding, staff acknowledge that they will receive safety and incident alerts via SMS as part of their internal role. This acknowledgment serves as the opt-in confirmation required by carriers.
+            </p>
+        </section>
+
+        <section class="space-y-3">
+            <h2 class="text-xl font-semibold text-gray-900">Opt-in confirmation (required for carriers)</h2>
+            <p>
+                During onboarding, staff are informed in writing (digital onboarding packet or HR enrollment documents) that their phone number will be added to the internal safety alert system. By acknowledging the onboarding documents and completing the HR enrollment, staff provide consent ("opt-in") to receive safety, security, and incident alerts from Asylon.
+            </p>
+            <p>
+                Phone numbers are <strong>not</strong> collected online or via public forms. All numbers come from internal HR systems maintained by the school or organization.
             </p>
         </section>
 
