@@ -24,6 +24,9 @@ class ReportFile extends Model
         'mime',
         'size',
         'comment',
+        'safety_scan_status',
+        'safety_scan_reasons',
+        'has_sensitive_content',
     ];
 
     /**
@@ -31,6 +34,8 @@ class ReportFile extends Model
      */
     protected $casts = [
         'size' => 'integer',
+        'has_sensitive_content' => 'boolean',
+        'safety_scan_reasons' => 'array',
     ];
 
     /**

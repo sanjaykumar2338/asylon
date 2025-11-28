@@ -3,6 +3,29 @@
         {{ __('Report Details') }}
     </x-slot>
 
+    @push('styles')
+        <style>
+            .safety-blurred {
+                filter: blur(14px);
+                pointer-events: none;
+                user-select: none;
+            }
+            .safety-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.55);
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                padding: 1rem;
+                border-radius: .35rem;
+            }
+        </style>
+    @endpush
+
     <div class="row">
         <div class="col-lg-8">
             <div class="card card-outline card-primary mb-4">
@@ -64,6 +87,27 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    @if ($isUltraPrivate ?? false)
+                        <div class="alert alert-warning d-flex align-items-start">
+                            <i class="fas fa-user-secret mr-2 mt-1"></i>
+                            <div>
+                                <strong>{{ __('Ultra-private mode enabled') }}</strong>
+                                <div class="small mb-0">
+                                    {{ __('Reporter IP, user-agent, and location headers were scrubbed on intake. Only a subpoena-safe hash was retained for lawful requests.') }}
+                                </div>
+                                @if ($subpoenaToken)
+                                    <div class="small text-monospace mt-1">
+                                        {{ __('Subpoena token') }}: {{ $subpoenaToken }}
+                                    </div>
+                                @elseif (auth()->user()?->hasRole('platform_admin'))
+                                    <div class="small text-muted mt-1">
+                                        {{ __('No subpoena token was captured for this submission.') }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <h6 class="text-muted text-uppercase small mb-1">{{ __('Category') }}</h6>
@@ -364,13 +408,17 @@
                                     $sizeMb = max(0.01, round(($file->size ?? 0) / 1024 / 1024, 2));
                                     $previewUrl = URL::temporarySignedRoute('reports.files.preview', now()->addMinutes(30), [$report, $file]);
                                     $downloadUrl = URL::temporarySignedRoute('reports.files.show', now()->addMinutes(30), [$report, $file]);
+                                    $sensitive = ($file->has_sensitive_content ?? false) || in_array($file->safety_scan_status, ['pending', 'pending_review', 'flagged'], true);
                                 @endphp
-                                <li class="list-group-item">
+                                <li class="list-group-item" data-file-id="{{ $file->id }}" data-sensitive="{{ $sensitive ? '1' : '0' }}">
                                     <div class="d-flex align-items-start justify-content-between">
                                         <div class="mr-3">
                                             <i class="{{ $icon }} mr-2"></i>
                                             <span class="font-weight-bold">{{ $file->original_name }}</span>
-                                            <small class="text-muted d-block">{{ $mime ?: __('Unknown type') }} • {{ number_format($sizeMb, 2) }} {{ __('MB') }}</small>
+                                            @if ($sensitive)
+                                                <span class="badge badge-warning text-dark ml-2">{{ __('Sensitive') }}</span>
+                                            @endif
+                                            <small class="text-muted d-block">{{ $mime ?: __('Unknown type') }} ? {{ number_format($sizeMb, 2) }} {{ __('MB') }}</small>
                                         </div>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ $downloadUrl }}" class="btn btn-outline-primary" title="{{ __('Download attachment') }}">
@@ -423,3 +471,56 @@
         </div>
     </div>
 </x-admin-layout>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function initSensitivePreviews(root) {
+                const items = root.querySelectorAll('[data-sensitive="1"]');
+                items.forEach(function (item) {
+                    const media = item.querySelector('img, video, audio, iframe');
+                    if (!media) {
+                        return;
+                    }
+                    const holder = media.parentElement;
+                    holder.classList.add('position-relative');
+                    media.classList.add('safety-blurred');
+
+                    const fileId = item.getAttribute('data-file-id') || Math.random().toString(36).slice(2);
+                    media.setAttribute('data-sensitive-content', fileId);
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'safety-overlay';
+                    overlay.setAttribute('data-sensitive-overlay', fileId);
+                    overlay.innerHTML = `
+                        <p class="font-weight-bold mb-2">{{ __('Sensitive preview') }}</p>
+                        <label class="d-block mb-2">
+                            <input type="checkbox" data-sensitive-checkbox="${fileId}"> {{ __('I understand this may contain nudity/graphic content') }}
+                        </label>
+                        <button type="button" class="btn btn-outline-light btn-sm" data-sensitive-toggle="${fileId}">
+                            {{ __('Reveal preview') }}
+                        </button>
+                    `;
+                    holder.appendChild(overlay);
+                });
+            }
+
+            initSensitivePreviews(document);
+
+            document.body.addEventListener('click', function (event) {
+                const toggle = event.target.closest('[data-sensitive-toggle]');
+                if (!toggle) return;
+                const id = toggle.getAttribute('data-sensitive-toggle');
+                const checkbox = document.querySelector(`[data-sensitive-checkbox="${id}"]`);
+                if (checkbox && !checkbox.checked) {
+                    checkbox.focus();
+                    return;
+                }
+                const content = document.querySelector(`[data-sensitive-content="${id}"]`);
+                const overlay = document.querySelector(`[data-sensitive-overlay="${id}"]`);
+                content?.classList.remove('safety-blurred');
+                overlay?.classList.add('d-none');
+            });
+        });
+    </script>
+@endpush

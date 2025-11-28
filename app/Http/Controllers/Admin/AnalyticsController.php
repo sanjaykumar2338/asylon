@@ -132,6 +132,10 @@ class AnalyticsController extends AdminController
             ],
             'timeseries' => $timeseries,
             'by_category' => $byCategory,
+            'risk_distribution' => $this->buildRiskDistribution($baseQuery),
+            'high_risk_summary' => $this->buildHighRiskSummary($baseQuery),
+            'category_heatmap' => $this->buildCategoryHeatmap($baseQuery),
+            'urgent_insights' => $this->buildUrgentInsights($baseQuery),
         ];
     }
 
@@ -162,6 +166,13 @@ class AnalyticsController extends AdminController
             ->groupBy('date')
             ->pluck('total', 'date');
 
+        $urgents = (clone $baseQuery)
+            ->whereBetween('reports.created_at', [$start, $end])
+            ->where('urgent', true)
+            ->selectRaw('DATE(reports.created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
         $dates = collect(range(0, $range - 1))
             ->map(fn ($i) => now()->subDays($i)->toDateString())
             ->reverse()
@@ -172,6 +183,7 @@ class AnalyticsController extends AdminController
                 'date' => $date,
                 'total_reports' => (int) ($totals[$date] ?? 0),
                 'high_risk_reports' => (int) ($highs[$date] ?? 0),
+                'urgent_reports' => (int) ($urgents[$date] ?? 0),
             ];
         })->all();
     }
@@ -194,5 +206,110 @@ class AnalyticsController extends AdminController
             ->groupBy('category')
             ->orderByDesc('total_reports')
             ->get();
+    }
+
+    /**
+     * Risk distribution across all submissions.
+     */
+    protected function buildRiskDistribution($baseQuery): array
+    {
+        $row = (clone $baseQuery)
+            ->leftJoin('report_risk_analyses as r', 'r.report_id', '=', 'reports.id')
+            ->select([
+                DB::raw("SUM(CASE WHEN r.risk_level = 'critical' THEN 1 ELSE 0 END) as critical"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'high' THEN 1 ELSE 0 END) as high"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'medium' THEN 1 ELSE 0 END) as medium"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'low' THEN 1 ELSE 0 END) as low"),
+                DB::raw('SUM(CASE WHEN r.risk_level IS NULL THEN 1 ELSE 0 END) as unscored'),
+            ])
+            ->first();
+
+        return [
+            'critical' => (int) ($row->critical ?? 0),
+            'high' => (int) ($row->high ?? 0),
+            'medium' => (int) ($row->medium ?? 0),
+            'low' => (int) ($row->low ?? 0),
+            'unscored' => (int) ($row->unscored ?? 0),
+        ];
+    }
+
+    /**
+     * Snapshot of high/critical reports.
+     */
+    protected function buildHighRiskSummary($baseQuery): array
+    {
+        $recentStart = now()->subDays(6)->startOfDay();
+
+        $total = (clone $baseQuery)
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['high', 'critical']))
+            ->count();
+
+        $open = (clone $baseQuery)
+            ->where('status', 'open')
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['high', 'critical']))
+            ->count();
+
+        $last7Days = (clone $baseQuery)
+            ->whereDate('reports.created_at', '>=', $recentStart)
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['high', 'critical']))
+            ->count();
+
+        return [
+            'total' => $total,
+            'open' => $open,
+            'last_7_days' => $last7Days,
+        ];
+    }
+
+    /**
+     * Category heatmap with per-level counts.
+     */
+    protected function buildCategoryHeatmap($baseQuery)
+    {
+        return (clone $baseQuery)
+            ->leftJoin('report_risk_analyses as r', 'r.report_id', '=', 'reports.id')
+            ->select([
+                'category',
+                DB::raw('COUNT(reports.id) as total_reports'),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'critical' THEN 1 ELSE 0 END) as critical"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'high' THEN 1 ELSE 0 END) as high"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'medium' THEN 1 ELSE 0 END) as medium"),
+                DB::raw("SUM(CASE WHEN r.risk_level = 'low' THEN 1 ELSE 0 END) as low"),
+                DB::raw('SUM(CASE WHEN r.risk_level IS NULL THEN 1 ELSE 0 END) as unscored'),
+            ])
+            ->groupBy('category')
+            ->orderByDesc('total_reports')
+            ->get();
+    }
+
+    /**
+     * Urgent-specific insights.
+     */
+    protected function buildUrgentInsights($baseQuery): array
+    {
+        $recentStart = now()->subDays(6)->startOfDay();
+
+        $urgentBase = (clone $baseQuery)->where('urgent', true);
+
+        $total = (clone $urgentBase)->count();
+
+        $open = (clone $urgentBase)
+            ->where('status', 'open')
+            ->count();
+
+        $highRiskUrgent = (clone $urgentBase)
+            ->whereHas('riskAnalysis', fn ($q) => $q->whereIn('risk_level', ['high', 'critical']))
+            ->count();
+
+        $last7Days = (clone $urgentBase)
+            ->whereDate('reports.created_at', '>=', $recentStart)
+            ->count();
+
+        return [
+            'total' => $total,
+            'open' => $open,
+            'high_risk' => $highRiskUrgent,
+            'last_7_days' => $last7Days,
+        ];
     }
 }

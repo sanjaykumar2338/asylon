@@ -21,6 +21,24 @@
             $string = $displayValue($translated);
             return $string !== '' ? $string : $text;
         };
+        $riskDistribution = $metrics['risk_distribution'] ?? [];
+        $highRiskSummary = $metrics['high_risk_summary'] ?? [];
+        $categoryHeatmap = collect($metrics['category_heatmap'] ?? []);
+        $urgentInsights = $metrics['urgent_insights'] ?? [];
+        $distributionTotal = array_sum($riskDistribution);
+        $heatBadge = static function (int $count): string {
+            if ($count >= 15) {
+                return 'badge-danger';
+            }
+            if ($count >= 7) {
+                return 'badge-warning text-dark';
+            }
+            if ($count >= 1) {
+                return 'badge-info';
+            }
+
+            return 'badge-light text-muted';
+        };
 @endphp
 
 <x-admin-layout>
@@ -141,28 +159,40 @@
             <div class="card card-outline card-primary h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-chart-line mr-2"></i> {{ $translate('30-day trend (Total vs High/Critical)') }}
+                        <i class="fas fa-shield-alt mr-2"></i> {{ $translate('Risk distribution') }}
                     </h3>
                 </div>
                 <div class="card-body">
-                    @if (empty($timeseries))
+                    @if ($distributionTotal === 0)
                         <p class="text-muted mb-0">{{ $translate('No submissions yet.') }}</p>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-sm table-striped mb-0">
+                            <table class="table table-sm mb-0">
                                 <thead>
                                     <tr>
-                                        <th>{{ $translate('Date') }}</th>
-                                        <th class="text-right">{{ $translate('Total') }}</th>
-                                        <th class="text-right text-danger">{{ $translate('High/Critical') }}</th>
+                                        <th>{{ $translate('Risk level') }}</th>
+                                        <th class="text-right">{{ $translate('Count') }}</th>
+                                        <th class="text-right">{{ $translate('Share') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($timeseries as $row)
+                                    @foreach ([
+                                        'critical' => $translate('Critical'),
+                                        'high' => $translate('High'),
+                                        'medium' => $translate('Medium'),
+                                        'low' => $translate('Low'),
+                                        'unscored' => $translate('Unscored'),
+                                    ] as $key => $label)
+                                        @php
+                                            $count = (int) ($riskDistribution[$key] ?? 0);
+                                            $share = $distributionTotal > 0 ? round(($count / $distributionTotal) * 100, 1) : 0;
+                                        @endphp
                                         <tr>
-                                            <td>{{ $row['date'] }}</td>
-                                            <td class="text-right">{{ $row['total_reports'] }}</td>
-                                            <td class="text-right text-danger">{{ $row['high_risk_reports'] }}</td>
+                                            <td>{{ $label }}</td>
+                                            <td class="text-right">
+                                                <span class="badge {{ $heatBadge($count) }}">{{ $count }}</span>
+                                            </td>
+                                            <td class="text-right text-muted">{{ $share }}%</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -176,11 +206,92 @@
             <div class="card card-outline card-primary h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-tags mr-2"></i> {{ $translate('Category vs High/Critical risk') }}
+                        <i class="fas fa-exclamation-triangle mr-2"></i> {{ $translate('High-risk & urgent snapshot') }}
                     </h3>
                 </div>
                 <div class="card-body">
-                    @if ($byCategory->isEmpty())
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-2">{{ $translate('High / Critical') }}</h6>
+                            <p class="mb-1">
+                                <span class="badge badge-danger mr-1">{{ number_format($highRiskSummary['total'] ?? 0) }}</span>
+                                {{ $translate('total high-risk reports') }}
+                            </p>
+                            <p class="mb-1 text-muted">{{ $translate('Open high-risk') }}:
+                                <strong>{{ number_format($highRiskSummary['open'] ?? 0) }}</strong>
+                            </p>
+                            <p class="mb-0 text-muted">{{ $translate('Last 7 days') }}:
+                                <strong>{{ number_format($highRiskSummary['last_7_days'] ?? 0) }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted text-uppercase small mb-2">{{ $translate('Urgent signals') }}</h6>
+                            <p class="mb-1">
+                                <span class="badge badge-warning text-dark mr-1">{{ number_format($urgentInsights['total'] ?? 0) }}</span>
+                                {{ $translate('urgent reports') }}
+                            </p>
+                            <p class="mb-1 text-muted">{{ $translate('Open urgent') }}:
+                                <strong>{{ number_format($urgentInsights['open'] ?? 0) }}</strong>
+                            </p>
+                            <p class="mb-0 text-muted">{{ $translate('High-risk & urgent') }}:
+                                <strong>{{ number_format($urgentInsights['high_risk'] ?? 0) }}</strong> ·
+                                {{ $translate('Last 7 days') }}:
+                                <strong>{{ number_format($urgentInsights['last_7_days'] ?? 0) }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card card-outline card-primary h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-chart-line mr-2"></i> {{ $translate('30-day trend (Total vs High/Critical vs Urgent)') }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (empty($timeseries))
+                        <p class="text-muted mb-0">{{ $translate('No submissions yet.') }}</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>{{ $translate('Date') }}</th>
+                                        <th class="text-right">{{ $translate('Total') }}</th>
+                                        <th class="text-right text-danger">{{ $translate('High/Critical') }}</th>
+                                        <th class="text-right text-warning">{{ $translate('Urgent') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($timeseries as $row)
+                                        <tr>
+                                            <td>{{ $row['date'] }}</td>
+                                            <td class="text-right">{{ $row['total_reports'] }}</td>
+                                            <td class="text-right text-danger">{{ $row['high_risk_reports'] }}</td>
+                                            <td class="text-right text-warning">{{ $row['urgent_reports'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card card-outline card-primary h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-th mr-2"></i> {{ $translate('Category heatmap (risk level counts)') }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if ($categoryHeatmap->isEmpty())
                         <p class="text-muted mb-0">{{ $translate('No submissions yet.') }}</p>
                     @else
                         <div class="table-responsive">
@@ -188,17 +299,35 @@
                                 <thead>
                                     <tr>
                                         <th>{{ $translate('Category') }}</th>
+                                        <th class="text-right text-danger">{{ $translate('Critical') }}</th>
+                                        <th class="text-right text-danger">{{ $translate('High') }}</th>
+                                        <th class="text-right text-warning">{{ $translate('Medium') }}</th>
+                                        <th class="text-right text-info">{{ $translate('Low') }}</th>
+                                        <th class="text-right text-muted">{{ $translate('Unscored') }}</th>
                                         <th class="text-right">{{ $translate('Total') }}</th>
-                                        <th class="text-right">{{ $translate('High/Critical') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($byCategory as $category)
+                                    @foreach ($categoryHeatmap as $category)
                                         <tr>
                                             <td>{{ $displayValue($category->category) ?: __('Unknown') }}</td>
-                                            <td class="text-right">{{ $category->total_reports }}</td>
                                             <td class="text-right">
-                                                <span class="badge badge-danger">{{ $category->high_risk_count }}</span>
+                                                <span class="badge badge-danger">{{ $category->critical }}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="badge badge-danger">{{ $category->high }}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="badge badge-warning text-dark">{{ $category->medium }}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="badge badge-info">{{ $category->low }}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="badge badge-light text-muted">{{ $category->unscored }}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="badge badge-primary">{{ $category->total_reports }}</span>
                                             </td>
                                         </tr>
                                     @endforeach

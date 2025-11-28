@@ -39,7 +39,8 @@ class ContentSecurityPolicy
 
             $policy = implode('; ', [
                 "default-src 'self'",
-                "img-src 'self' data:",
+                "img-src 'self' data: blob:",
+                "media-src 'self' data: blob:",
                 'script-src '.implode(' ', $scriptSources),
                 'style-src '.implode(' ', $styleSources),
                 'font-src '.implode(' ', $fontSources),

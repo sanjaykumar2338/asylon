@@ -176,6 +176,10 @@ class ReviewController extends Controller
             'escalationEvents',
         ]);
 
+        $privacyMeta = is_array($report->meta) ? ($report->meta['privacy'] ?? []) : [];
+        $isUltraPrivate = (bool) ($privacyMeta['ultra_private'] ?? $report->org?->enable_ultra_private_mode);
+        $subpoenaToken = $this->subpoenaToken($user, $privacyMeta);
+
         Audit::log('reviewer', 'view_report', 'report', $report->getKey());
 
         return view('reviews.show', [
@@ -183,6 +187,8 @@ class ReviewController extends Controller
             'timeline' => $this->buildTimeline($report),
             'notes' => $report->notes,
             'reviewers' => $this->reviewersForOrg($user, $report->org_id),
+            'isUltraPrivate' => $isUltraPrivate,
+            'subpoenaToken' => $subpoenaToken,
         ]);
     }
 
@@ -549,6 +555,20 @@ class ReviewController extends Controller
             ->whereIn('role', ['reviewer', 'security_lead', 'org_admin'])
             ->orderBy('name')
             ->get(['id', 'name']);
+    }
+
+    /**
+     * Expose subpoena-safe tokens only to platform administrators.
+     */
+    protected function subpoenaToken(User $user, array $privacyMeta): ?string
+    {
+        if (! $user->hasRole('platform_admin')) {
+            return null;
+        }
+
+        $token = $privacyMeta['subpoena_token'] ?? null;
+
+        return is_string($token) && $token !== '' ? $token : null;
     }
 
     /**

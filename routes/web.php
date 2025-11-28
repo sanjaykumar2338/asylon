@@ -73,6 +73,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', AdminUserController::class);
         Route::resource('alerts', AdminAlertController::class)
             ->parameters(['alerts' => 'alert']);
+        Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
+            ->except(['create', 'edit', 'show']);
         Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
             ->name('report-categories.toggle-visibility')
             ->middleware('can:manage-categories');

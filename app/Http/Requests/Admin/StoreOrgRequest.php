@@ -32,6 +32,7 @@ class StoreOrgRequest extends FormRequest
             'enable_commendations' => ['boolean'],
             'enable_hr_reports' => ['boolean'],
             'enable_student_reports' => ['boolean'],
+            'enable_ultra_private_mode' => ['boolean'],
         ];
     }
 
@@ -44,6 +45,7 @@ class StoreOrgRequest extends FormRequest
             'enable_commendations' => $this->boolean('enable_commendations'),
             'enable_hr_reports' => $this->boolean('enable_hr_reports'),
             'enable_student_reports' => $this->boolean('enable_student_reports', true),
+            'enable_ultra_private_mode' => $this->boolean('enable_ultra_private_mode'),
         ]);
     }
 }

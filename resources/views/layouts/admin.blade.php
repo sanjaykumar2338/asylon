@@ -184,6 +184,12 @@
                                         <p>{{ __('Analytics') }}</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.risk-keywords.index') }}" class="nav-link {{ request()->routeIs('admin.risk-keywords.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-key"></i>
+                                        <p>{{ __('Risk keywords') }}</p>
+                                    </a>
+                                </li>
                                 @if(auth()->user()?->hasRole('platform_admin'))
                                     <li class="nav-item">
                                         <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">

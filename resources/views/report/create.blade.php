@@ -132,17 +132,10 @@
                 <x-input-error class="mt-2" :messages="$errors->get('type')" />
             </div>
             <div>
-                <x-input-label for="severity" :value="__('report.severity_label')" />
-                <select id="severity" name="severity"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required>
-                    @foreach (['low' => __('report.severity.low'), 'moderate' => __('report.severity.moderate'), 'high' => __('report.severity.high'), 'critical' => __('report.severity.critical')] as $value => $label)
-                        <option value="{{ $value }}" @selected(old('severity', 'moderate') === $value)>
-                            {{ $label }}
-                        </option>
-                    @endforeach
-                </select>
-                <x-input-error class="mt-2" :messages="$errors->get('severity')" />
+                <x-input-label :value="__('report.severity_label')" />
+                <div class="mt-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                    {{ __('Automatically assigned after submission') }}
+                </div>
             </div>
         </div>
 
@@ -272,6 +265,19 @@
             <x-input-error class="mt-2" :messages="$errors->get('attachments.*.file')" />
             <x-input-error class="mt-2" :messages="$errors->get('attachments.*.comment')" />
             <div id="attachmentsPreview" class="mt-4 space-y-3" aria-live="polite"></div>
+        </div>
+
+        <div class="mt-4">
+            <label class="inline-flex items-start space-x-2">
+                <input type="checkbox"
+                    name="attachment_may_contain_sensitive_content"
+                    value="1"
+                    class="form-checkbox h-4 w-4 text-indigo-600">
+                <span class="text-sm text-gray-700">
+                    {{ __('This attachment may contain nudity or graphic content.') }}
+                </span>
+            </label>
+            <x-input-error class="mt-2" :messages="$errors->get('attachment_may_contain_sensitive_content')" />
         </div>
 
         <template id="attachment-template">

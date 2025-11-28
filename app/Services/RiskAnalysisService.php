@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Report;
 use App\Models\ReportRiskAnalysis;
+use App\Models\RiskKeyword;
+use Illuminate\Support\Collection;
 
 class RiskAnalysisService
 {
@@ -34,6 +36,7 @@ class RiskAnalysisService
         ];
 
         $score = 0;
+        $customKeywords = $this->customKeywords($report->org_id);
 
         foreach ($keywordSets as $signalKey => $words) {
             foreach ($words as $word) {
@@ -48,6 +51,18 @@ class RiskAnalysisService
                         $score += 15;
                     }
                 }
+            }
+        }
+
+        foreach ($customKeywords as $keyword) {
+            $phrase = strtolower($keyword->phrase ?? '');
+            if ($phrase === '') {
+                continue;
+            }
+
+            if (str_contains($text, $phrase)) {
+                $matchedKeywords[] = $phrase;
+                $score += (int) $keyword->weight;
             }
         }
 
@@ -70,5 +85,31 @@ class RiskAnalysisService
                 'signals' => $signals,
             ]
         );
+    }
+
+    /**
+     * Fetch custom keywords for the report/org.
+     *
+     * @return \Illuminate\Support\Collection<int, \App\Models\RiskKeyword>
+     */
+    protected function customKeywords(?int $orgId): Collection
+    {
+        static $cache = null;
+        static $cachedOrgId = null;
+
+        if ($cache !== null && $cachedOrgId === $orgId) {
+            return $cache;
+        }
+
+        $query = RiskKeyword::query()->whereNull('org_id');
+
+        if ($orgId) {
+            $query->orWhere('org_id', $orgId);
+        }
+
+        $cache = $query->get(['phrase', 'weight']);
+        $cachedOrgId = $orgId;
+
+        return $cache;
     }
 }

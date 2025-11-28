@@ -21,7 +21,21 @@ class AnalyzeReportRisk implements ShouldQueue
 
     public function handle(RiskAnalysisService $service, EscalationService $escalations): void
     {
-        $analysis = $service->analyze($this->report->fresh());
-        $escalations->evaluate($this->report->fresh(), $analysis);
+        $report = $this->report->fresh();
+        $analysis = $service->analyze($report);
+
+        // Auto-assign severity from risk level; reviewers can override later.
+        $severity = match ($analysis->risk_level) {
+            'high', 'critical' => 'high',
+            'medium' => 'moderate',
+            default => 'low',
+        };
+
+        if ($report && $report->severity !== $severity) {
+            $report->severity = $severity;
+            $report->save();
+        }
+
+        $escalations->evaluate($report->fresh(), $analysis);
     }
 }

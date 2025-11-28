@@ -67,6 +67,7 @@ class OrgController extends AdminController
         $data['enable_student_reports'] = $request->boolean('enable_student_reports');
         $data['enable_hr_reports'] = $request->boolean('enable_hr_reports');
         $data['enable_commendations'] = $request->boolean('enable_commendations');
+        $data['enable_ultra_private_mode'] = $request->boolean('enable_ultra_private_mode');
         $data['created_by'] = $request->user()->id;
 
         Org::create($data);
@@ -113,6 +114,7 @@ class OrgController extends AdminController
         $data['enable_student_reports'] = $request->boolean('enable_student_reports');
         $data['enable_hr_reports'] = $request->boolean('enable_hr_reports');
         $data['enable_commendations'] = $request->boolean('enable_commendations');
+        $data['enable_ultra_private_mode'] = $request->boolean('enable_ultra_private_mode');
 
         $org->update($data);
 

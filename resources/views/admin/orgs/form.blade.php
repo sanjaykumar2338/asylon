@@ -85,6 +85,21 @@
 </div>
 
 <div class="form-group">
+    <label class="d-block">{{ __('Privacy controls') }}</label>
+    <input type="hidden" name="enable_ultra_private_mode" value="0">
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="enable_ultra_private_mode" name="enable_ultra_private_mode" value="1"
+            @checked(old('enable_ultra_private_mode', $org->enable_ultra_private_mode ?? false))>
+        <label class="custom-control-label" for="enable_ultra_private_mode">
+            {{ __('Enable Ultra-Private Mode') }}
+        </label>
+    </div>
+    <small class="form-text text-muted">
+        {{ __('Scrubs reporter IP, user-agent, and location headers on intake and stores only a hashed subpoena token. Subpoena data is restricted to Platform Admins.') }}
+    </small>
+</div>
+
+<div class="form-group">
     <label for="on_call_user_id">{{ __('On-call reviewer') }}</label>
     @if ($eligibleUsers->isEmpty())
         <select id="on_call_user_id" class="form-control" disabled>

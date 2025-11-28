@@ -28,7 +28,6 @@ class StoreReportRequest extends FormRequest
     {
         $attachments = $this->input('attachments', []);
         if (is_array($attachments)) {
-            $attachments = array_values($attachments);
             $this->merge([
                 'attachments' => $attachments,
             ]);
@@ -36,6 +35,7 @@ class StoreReportRequest extends FormRequest
 
         $this->merge([
             'urgent' => $this->boolean('urgent'),
+            'attachment_may_contain_sensitive_content' => $this->boolean('attachment_may_contain_sensitive_content'),
         ]);
 
         if (blank($this->input('violation_date'))) {
@@ -102,7 +102,7 @@ class StoreReportRequest extends FormRequest
             'category' => ['required', 'string', 'max:100', Rule::in($categoryOptions)],
             'subcategory' => ['required', 'string', 'max:100', Rule::in($subcategoryOptions)],
             'type' => ['required', Rule::in(['safety', 'commendation', 'hr'])],
-            'severity' => ['required', Rule::in(['low', 'moderate', 'high', 'critical'])],
+            'severity' => ['nullable', Rule::in(['low', 'moderate', 'high', 'critical'])],
             'description' => [
                 'required',
                 'string',
@@ -127,6 +127,7 @@ class StoreReportRequest extends FormRequest
                 'mimetypes:audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/aac,audio/ogg,audio/webm,audio/mp4,audio/x-m4a,video/webm',
             ],
             'voice_comment' => ['nullable', 'string', 'max:500'],
+            'attachment_may_contain_sensitive_content' => ['nullable', 'boolean'],
         ];
     }
 

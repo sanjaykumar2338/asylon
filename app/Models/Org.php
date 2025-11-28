@@ -28,6 +28,7 @@ class Org extends Model
         'enable_commendations',
         'enable_hr_reports',
         'enable_student_reports',
+        'enable_ultra_private_mode',
     ];
 
     /**
@@ -37,6 +38,7 @@ class Org extends Model
         'enable_commendations' => 'boolean',
         'enable_hr_reports' => 'boolean',
         'enable_student_reports' => 'boolean',
+        'enable_ultra_private_mode' => 'boolean',
     ];
 
     /**

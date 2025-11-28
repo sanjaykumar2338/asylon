@@ -15,9 +15,11 @@ use App\Jobs\AnonymizeVoiceJob;
 use App\Jobs\AnalyzeReportRisk;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
+use App\Services\AttachmentSafetyScanner;
 use App\Support\LocaleManager;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Notification;
@@ -165,8 +167,9 @@ class ReportController extends Controller
             'portal_source' => 'general',
         ]);
 
+        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report);
+        $this->logPortalSubmission($report, $isUltraPrivate);
         $this->notifyReviewersAboutReport($report);
         AnalyzeReportRisk::dispatch($report);
 
@@ -183,8 +186,9 @@ class ReportController extends Controller
             'type' => 'safety',
         ]);
 
+        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report);
+        $this->logPortalSubmission($report, $isUltraPrivate);
         $this->notifyReviewersAboutReport($report);
         AnalyzeReportRisk::dispatch($report);
 
@@ -214,8 +218,9 @@ class ReportController extends Controller
             ],
         ]);
 
+        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
         event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report);
+        $this->logPortalSubmission($report, $isUltraPrivate);
         $this->notifyReviewersAboutReport($report);
         AnalyzeReportRisk::dispatch($report);
 
@@ -333,6 +338,8 @@ class ReportController extends Controller
             $attachments = $validated['attachments'] ?? [];
             $voiceComment = $validated['voice_comment'] ?? null;
             $org = null;
+            $safetyScanner = new AttachmentSafetyScanner();
+            $reporterFlaggedSensitive = $request->boolean('attachment_may_contain_sensitive_content');
 
             if ($request->filled('org_code')) {
                 $orgCode = trim((string) $request->input('org_code'));
@@ -357,8 +364,14 @@ class ReportController extends Controller
 
             unset($validated['attachments'], $validated['voice_comment'], $validated['org_code']);
 
+            $validated = $this->applyPrivacyMetadata($request, $validated, $org);
+
             if (isset($validated['meta']) && empty($validated['meta'])) {
                 $validated['meta'] = null;
+            }
+
+            if (empty($validated['severity'])) {
+                $validated['severity'] = 'moderate';
             }
 
             $report = Report::create($validated);
@@ -376,12 +389,17 @@ class ReportController extends Controller
                 $comment = $comment === '' ? null : $comment;
                 $storedPath = $file->store("reports/{$report->getKey()}", 'public');
 
+                $safetyMeta = $this->scanAttachment($safetyScanner, $file);
+
                 $reportFile = $report->files()->create([
                     'path' => $storedPath,
                     'original_name' => $file->getClientOriginalName(),
                     'mime' => $file->getMimeType(),
                     'size' => $file->getSize(),
                     'comment' => $comment,
+                    'safety_scan_status' => $safetyMeta['status'],
+                    'safety_scan_reasons' => $safetyMeta['reasons'],
+                    'has_sensitive_content' => $reporterFlaggedSensitive || $safetyMeta['sensitive'],
                 ]);
 
                 AnonymizeVoiceJob::dispatch($reportFile);
@@ -393,12 +411,17 @@ class ReportController extends Controller
                 $normalizedVoiceComment = $normalizedVoiceComment === '' ? null : $normalizedVoiceComment;
                 $storedPath = $voiceFile->store("reports/{$report->getKey()}", 'public');
 
+                $safetyMeta = $this->scanAttachment($safetyScanner, $voiceFile);
+
                 $voiceReportFile = $report->files()->create([
                     'path' => $storedPath,
                     'original_name' => $voiceFile->getClientOriginalName(),
                     'mime' => $voiceFile->getMimeType(),
                     'size' => $voiceFile->getSize(),
                     'comment' => $normalizedVoiceComment,
+                    'safety_scan_status' => $safetyMeta['status'],
+                    'safety_scan_reasons' => $safetyMeta['reasons'],
+                    'has_sensitive_content' => $reporterFlaggedSensitive || $safetyMeta['sensitive'],
                 ]);
 
                 AnonymizeVoiceJob::dispatch($voiceReportFile);
@@ -409,14 +432,61 @@ class ReportController extends Controller
     }
 
     /**
+     * Attach privacy metadata when ultra-private mode is enabled.
+     */
+    protected function applyPrivacyMetadata(StoreReportRequest $request, array $validated, ?Org $org): array
+    {
+        if (! $this->usesUltraPrivateMode($request, $org)) {
+            return $validated;
+        }
+
+        $existingMeta = [];
+        if (isset($validated['meta']) && is_array($validated['meta'])) {
+            $existingMeta = $validated['meta'];
+        }
+
+        $privacyMeta = array_filter([
+            'ultra_private' => true,
+            'subpoena_token' => $request->attributes->get('privacy.subpoena_hash'),
+        ], static fn ($value) => $value !== null && $value !== '');
+
+        $validated['meta'] = array_filter([
+            ...$existingMeta,
+            'privacy' => $privacyMeta,
+        ]);
+
+        return $validated;
+    }
+
+    /**
      * Persist an audit log for a portal submission.
      */
-    protected function logPortalSubmission(Report $report): void
+    protected function logPortalSubmission(Report $report, bool $ultraPrivate = false): void
     {
-        Audit::log('system', 'portal_submission', 'report', $report->getKey(), [
+        $meta = [
             'portal_source' => $report->portal_source,
             'type' => $report->type,
-        ]);
+        ];
+
+        if ($ultraPrivate) {
+            $privacyMeta = $report->meta['privacy'] ?? [];
+            $meta['privacy_mode'] = 'ultra_private';
+            $meta['privacy_token_present'] = ! empty($privacyMeta['subpoena_token']);
+        }
+
+        Audit::log('system', 'portal_submission', 'report', $report->getKey(), $meta);
+    }
+
+    /**
+     * Determine whether the incoming request should be handled in ultra-private mode.
+     */
+    protected function usesUltraPrivateMode(StoreReportRequest $request, ?Org $org): bool
+    {
+        if ($request->attributes->get('privacy.ultra_private') === true) {
+            return true;
+        }
+
+        return (bool) ($org?->enable_ultra_private_mode ?? config('asylon.ultra_private_mode', false));
     }
 
     /**
@@ -427,6 +497,20 @@ class ReportController extends Controller
         $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
 
         return $root === '' ? 'http://localhost' : rtrim($root, '/');
+    }
+
+    /**
+     * Run a lightweight safety scan and normalize the response.
+     */
+    protected function scanAttachment(AttachmentSafetyScanner $scanner, UploadedFile $file): array
+    {
+        $result = $scanner->evaluate($file);
+
+        return [
+            'status' => $result['status'] ?? 'pending_review',
+            'reasons' => $result['reasons'] ?? [],
+            'sensitive' => (bool) ($result['sensitive'] ?? false),
+        ];
     }
 
     /**
