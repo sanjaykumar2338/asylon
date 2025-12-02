@@ -27,6 +27,8 @@ class ReportFile extends Model
         'safety_scan_status',
         'safety_scan_reasons',
         'has_sensitive_content',
+        'transcription_status',
+        'transcript',
     ];
 
     /**
@@ -36,6 +38,7 @@ class ReportFile extends Model
         'size' => 'integer',
         'has_sensitive_content' => 'boolean',
         'safety_scan_reasons' => 'array',
+        'transcription_status' => 'string',
     ];
 
     /**

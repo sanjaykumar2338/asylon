@@ -6,6 +6,8 @@ use App\Models\OrgAlertContact;
 use App\Models\Report;
 use App\Services\Audit;
 use App\Services\Sms\TelnyxSmsService;
+use App\Models\NotificationTemplate;
+use App\Support\TemplateRenderer;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -98,16 +100,20 @@ class SendUrgentSmsAlerts implements ShouldQueue
         $category = $report->subcategory
             ? "{$report->category} / {$report->subcategory}"
             : $report->category;
-        $statusSnippet = strtoupper($report->status ?? 'open');
-        $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
-        $submittedAt = optional($report->created_at)->format('M d H:i');
 
-        return sprintf(
-            'URGENT %s (%s) %s. %s',
-            Str::limit($category, 64),
-            Str::limit($orgName, 28),
-            $submittedAt ?? 'recent',
-            $reportUrl
-        );
+        $reportUrl = ReportLinkGenerator::dashboard($report, $this->baseUrl);
+        $submittedAt = optional($report->created_at)?->format('M d H:i') ?? 'recent';
+
+        $templateType = $report->urgent ? NotificationTemplate::TYPE_URGENT : NotificationTemplate::TYPE_ALERT;
+        $template = NotificationTemplate::resolve($report->org_id, NotificationTemplate::CHANNEL_SMS, $templateType);
+
+        return TemplateRenderer::render($template['body'], [
+            'school_name' => Str::limit($orgName, 64, ''),
+            'category' => Str::limit($category, 64, ''),
+            'urgency' => $report->urgent ? 'Urgent' : ucfirst((string) $report->severity),
+            'date_time' => $submittedAt,
+            'report_link' => $reportUrl,
+            'report_id' => $report->id,
+        ]);
     }
 }

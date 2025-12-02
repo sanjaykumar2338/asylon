@@ -79,9 +79,9 @@ class SendUrgentAlerts implements ShouldQueue
             }
         }
 
-        if ($report->urgent && $smsTargets->isNotEmpty()) {
+        if ($smsTargets->isNotEmpty()) {
             SendUrgentSmsAlerts::dispatch($report, $baseUrl);
-            Log::info('Queued urgent SMS job for report.', [
+            Log::info('Queued SMS job for report.', [
                 'report_id' => $report->getKey(),
                 'org_id' => $report->org_id,
                 'recipients' => $smsTargets->unique()->values(),
@@ -115,7 +115,7 @@ class SendUrgentAlerts implements ShouldQueue
             $report->getKey(),
             [
                 'emails' => $emailCount,
-                'sms_job_dispatched' => $report->urgent && $smsTargets->isNotEmpty(),
+                'sms_job_dispatched' => $smsTargets->isNotEmpty(),
                 'sms_recipient_count' => $smsTargets->unique()->count(),
                 'on_call_notified' => $onCallNotified,
                 'email_failures' => $emailFailures,

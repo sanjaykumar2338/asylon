@@ -13,6 +13,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Jobs\AnonymizeVoiceJob;
 use App\Jobs\AnalyzeReportRisk;
+use App\Jobs\TranscribeAudioJob;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
 use App\Services\AttachmentSafetyScanner;
@@ -402,7 +403,10 @@ class ReportController extends Controller
                     'has_sensitive_content' => $reporterFlaggedSensitive || $safetyMeta['sensitive'],
                 ]);
 
-                AnonymizeVoiceJob::dispatch($reportFile);
+                if ($reportFile->isAudio()) {
+                    AnonymizeVoiceJob::dispatch($reportFile);
+                    TranscribeAudioJob::dispatch($reportFile);
+                }
             }
 
             $voiceFile = $request->file('voice_recording');
@@ -424,7 +428,10 @@ class ReportController extends Controller
                     'has_sensitive_content' => $reporterFlaggedSensitive || $safetyMeta['sensitive'],
                 ]);
 
-                AnonymizeVoiceJob::dispatch($voiceReportFile);
+                if ($voiceReportFile->isAudio()) {
+                    AnonymizeVoiceJob::dispatch($voiceReportFile);
+                    TranscribeAudioJob::dispatch($voiceReportFile);
+                }
             }
 
             return $report;

@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Support\TemplateRenderer;
 use Throwable;
 
 class TelnyxSmsService
@@ -55,6 +56,8 @@ class TelnyxSmsService
             // pickFrom already logged the reason.
             return ['skipped' => true, 'reason' => 'sender_unavailable'];
         }
+
+        $text = TemplateRenderer::ensureSmsCompliance($text);
 
         $payload = [
             'from' => $from,

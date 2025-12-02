@@ -461,6 +461,18 @@
                                                 {{ __('Preview not available for this file type. Use one of the buttons above to open or download the file.') }}
                                             </p>
                                         @endif
+                                        @if (method_exists($file, 'isAudio') && $file->isAudio())
+                                            @if (!empty($file->transcript))
+                                                <p class="mt-3 mb-1 text-sm text-muted">
+                                                    <strong>{{ __('Transcript') }}:</strong>
+                                                    {{ \Illuminate\Support\Str::limit($file->transcript, 220) }}
+                                                </p>
+                                            @elseif (($file->transcription_status ?? '') === 'pending')
+                                                <p class="mt-3 text-sm text-muted">{{ __('Transcription pending...') }}</p>
+                                            @elseif (($file->transcription_status ?? '') === 'failed')
+                                                <p class="mt-3 text-sm text-muted">{{ __('Transcription unavailable.') }}</p>
+                                            @endif
+                                        @endif
                                     </div>
                                 </li>
                             @endforeach

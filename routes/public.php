@@ -11,9 +11,11 @@ Route::redirect('/', '/report');
 Route::get('/support', [StaticPageController::class, 'support'])->name('support');
 Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
-Route::view('/brand-info', 'static.brand_sms_info')->name('brand.sms.info');
+Route::view('/brand-info', 'public.brand_info')->name('brand.sms.info');
 Route::view('/privacy-and-anonymity', 'static.privacy_anonymity')->name('privacy.anonymity');
 Route::view('/security-overview', 'static.security_overview')->name('security.overview');
+Route::view('/sms-opt-in', 'public.sms_opt_in')->name('sms.opt_in');
+Route::view('/sms-opt-in-example', 'public.sms_opt_in_example')->name('sms.opt_in_example');
 
 Route::middleware('ultra-private')->group(function () {
     Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');

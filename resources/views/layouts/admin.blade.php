@@ -173,6 +173,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('admin.notifications.templates.edit') }}" class="nav-link {{ request()->routeIs('admin.notifications.templates.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-envelope-open-text"></i>
+                                        <p>{{ __('Notification Templates') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('admin.report-categories.index') }}" class="nav-link {{ request()->routeIs('admin.report-categories.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-tags"></i>
                                         <p>{{ __('Report Categories') }}</p>

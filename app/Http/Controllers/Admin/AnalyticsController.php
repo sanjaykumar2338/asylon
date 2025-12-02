@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Report;
 use App\Models\ReportRiskAnalysis;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -21,7 +22,7 @@ class AnalyticsController extends AdminController
         $this->scopeByRole($baseQuery);
         $this->applyFilters($baseQuery, $filters);
 
-        $metrics = $this->buildMetrics($baseQuery, $filters['range']);
+        $metrics = $this->buildMetrics($baseQuery, $filters);
 
         $user = auth()->user();
         $orgLabel = $user && $user->hasRole('platform_admin')
@@ -54,7 +55,7 @@ class AnalyticsController extends AdminController
         $orgIdParam = $request->query('org_id');
         $orgId = is_numeric($orgIdParam) ? (int) $orgIdParam : null;
         $range = (int) $request->query('range', 30);
-        $allowedRanges = [7, 14, 30, 60, 90];
+        $allowedRanges = [7, 14, 30, 60, 90, 180];
         if (! in_array($range, $allowedRanges, true)) {
             $range = 30;
         }
@@ -97,11 +98,12 @@ class AnalyticsController extends AdminController
      * Build risk-aware metrics.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $baseQuery
-     * @param  int  $rangeDays
+     * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
-    protected function buildMetrics($baseQuery, int $rangeDays): array
+    protected function buildMetrics($baseQuery, array $filters): array
     {
+        $rangeDays = (int) ($filters['range'] ?? 30);
         $totalsQuery = clone $baseQuery;
 
         $totalReports = (clone $totalsQuery)->count();
@@ -136,6 +138,7 @@ class AnalyticsController extends AdminController
             'high_risk_summary' => $this->buildHighRiskSummary($baseQuery),
             'category_heatmap' => $this->buildCategoryHeatmap($baseQuery),
             'urgent_insights' => $this->buildUrgentInsights($baseQuery),
+            'reviewer_stats' => $this->buildReviewerStats($filters),
         ];
     }
 
@@ -178,7 +181,7 @@ class AnalyticsController extends AdminController
             ->reverse()
             ->values();
 
-        return $dates->map(function (string $date) use ($totals, $highs): array {
+        return $dates->map(function (string $date) use ($totals, $highs, $urgents): array {
             return [
                 'date' => $date,
                 'total_reports' => (int) ($totals[$date] ?? 0),
@@ -311,5 +314,58 @@ class AnalyticsController extends AdminController
             'high_risk' => $highRiskUrgent,
             'last_7_days' => $last7Days,
         ];
+    }
+
+    /**
+     * Reviewer activity basics: resolved counts and first-response averages.
+     */
+    protected function buildReviewerStats(array $filters): array
+    {
+        $user = auth()->user();
+        $visibleOrgId = $user?->org_id;
+        $orgId = $filters['org_id'];
+        $from = $filters['from'] ?: null;
+        $to = $filters['to'] ?: null;
+
+        $query = Report::query()
+            ->select([
+                'resolved_by',
+                DB::raw('COUNT(*) as resolved_count'),
+                DB::raw('AVG(TIMESTAMPDIFF(MINUTE, reports.created_at, reports.first_response_at)) as avg_first_response_min'),
+            ])
+            ->whereNotNull('resolved_by');
+
+        if ($from) {
+            $query->whereDate('reports.created_at', '>=', $from);
+        }
+        if ($to) {
+            $query->whereDate('reports.created_at', '<=', $to);
+        }
+
+        if ($orgId && $user && $user->hasRole('platform_admin')) {
+            $query->where('org_id', $orgId);
+        } elseif ($visibleOrgId) {
+            $query->where('org_id', $visibleOrgId);
+        }
+
+        $rows = $query
+            ->groupBy('resolved_by')
+            ->orderByDesc('resolved_count')
+            ->limit(10)
+            ->get();
+
+        $users = User::whereIn('id', $rows->pluck('resolved_by'))->get()->keyBy('id');
+
+        return $rows->map(function ($row) use ($users): array {
+            $user = $users[$row->resolved_by] ?? null;
+            return [
+                'user_id' => $row->resolved_by,
+                'name' => $user?->name ?? __('Unknown'),
+                'resolved_count' => (int) $row->resolved_count,
+                'avg_first_response_min' => $row->avg_first_response_min !== null
+                    ? round((float) $row->avg_first_response_min, 1)
+                    : null,
+            ];
+        })->all();
     }
 }

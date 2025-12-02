@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
+use App\Http\Controllers\Admin\NotificationTemplateController as AdminNotificationTemplateController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
@@ -90,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('report-categories.subcategories.destroy');
         Route::get('analytics', [AdminAnalyticsController::class, 'index'])
             ->name('analytics');
+        Route::get('notifications/templates', [AdminNotificationTemplateController::class, 'edit'])
+            ->name('notifications.templates.edit');
+        Route::post('notifications/templates', [AdminNotificationTemplateController::class, 'update'])
+            ->name('notifications.templates.update');
 
         Route::middleware('can:manage-platform')->group(function () {
             Route::get('settings', [AdminSettingsController::class, 'edit'])

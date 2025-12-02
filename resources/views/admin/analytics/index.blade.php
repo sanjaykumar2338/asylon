@@ -25,6 +25,7 @@
         $highRiskSummary = $metrics['high_risk_summary'] ?? [];
         $categoryHeatmap = collect($metrics['category_heatmap'] ?? []);
         $urgentInsights = $metrics['urgent_insights'] ?? [];
+        $reviewerStats = collect($metrics['reviewer_stats'] ?? []);
         $distributionTotal = array_sum($riskDistribution);
         $heatBadge = static function (int $count): string {
             if ($count >= 15) {
@@ -234,7 +235,7 @@
                                 <strong>{{ number_format($urgentInsights['open'] ?? 0) }}</strong>
                             </p>
                             <p class="mb-0 text-muted">{{ $translate('High-risk & urgent') }}:
-                                <strong>{{ number_format($urgentInsights['high_risk'] ?? 0) }}</strong> ·
+                                <strong>{{ number_format($urgentInsights['high_risk'] ?? 0) }}</strong>
                                 {{ $translate('Last 7 days') }}:
                                 <strong>{{ number_format($urgentInsights['last_7_days'] ?? 0) }}</strong>
                             </p>
@@ -328,6 +329,46 @@
                                             </td>
                                             <td class="text-right">
                                                 <span class="badge badge-primary">{{ $category->total_reports }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card card-outline card-primary h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-check mr-2"></i> {{ $translate('Reviewer activity') }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if ($reviewerStats->isEmpty())
+                        <p class="text-muted mb-0">{{ $translate('No reviewer activity yet.') }}</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>{{ $translate('Reviewer') }}</th>
+                                        <th class="text-right">{{ $translate('Resolved') }}</th>
+                                        <th class="text-right">{{ $translate('Avg first response (min)') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($reviewerStats as $row)
+                                        <tr>
+                                            <td>{{ $displayValue($row['name']) }}</td>
+                                            <td class="text-right">{{ number_format($row['resolved_count']) }}</td>
+                                            <td class="text-right">
+                                                {{ $row['avg_first_response_min'] !== null ? number_format($row['avg_first_response_min'], 1) : $translate('N/A') }}
                                             </td>
                                         </tr>
                                     @endforeach

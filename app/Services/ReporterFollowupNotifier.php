@@ -7,6 +7,8 @@ use App\Models\Report;
 use App\Models\ReportChatMessage;
 use App\Notifications\ReporterFollowupEmail;
 use App\Services\Sms\TelnyxSmsService;
+use App\Models\NotificationTemplate;
+use App\Support\TemplateRenderer;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -114,12 +116,16 @@ class ReporterFollowupNotifier
 
         $dashboardUrl = ReportLinkGenerator::dashboard($report, $baseUrl);
 
-        return sprintf(
-            'Reporter update (%s) %s: "%s" %s',
-            Str::limit($category, 36, ''),
-            Str::limit($orgName, 30, ''),
-            $snippet,
-            $dashboardUrl
-        );
+        $template = NotificationTemplate::resolve($report->org_id, NotificationTemplate::CHANNEL_SMS, NotificationTemplate::TYPE_FOLLOWUP);
+
+        return TemplateRenderer::render($template['body'], [
+            'school_name' => Str::limit($orgName, 64, ''),
+            'category' => Str::limit($category, 36, ''),
+            'urgency' => $report->urgent ? 'Urgent' : ucfirst((string) $report->severity),
+            'date_time' => optional($message->sent_at ?? $report->created_at)?->format('M d, Y H:i') ?? now()->format('M d, Y H:i'),
+            'report_link' => $dashboardUrl,
+            'report_id' => $report->id,
+            'message' => $snippet,
+        ]);
     }
 }

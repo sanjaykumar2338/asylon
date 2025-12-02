@@ -4,6 +4,8 @@ namespace App\Notifications;
 
 use App\Models\Report;
 use App\Models\ReportChatMessage;
+use App\Models\NotificationTemplate;
+use App\Support\TemplateRenderer;
 use App\Support\ReportLinkGenerator;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -48,12 +50,24 @@ class ReporterFollowupEmail extends Notification
             ->trim()
             ->limit(800, '...');
 
+        $template = NotificationTemplate::resolve($report->org_id, NotificationTemplate::CHANNEL_EMAIL, NotificationTemplate::TYPE_FOLLOWUP);
+
+        $templateData = [
+            'school_name' => $orgName,
+            'category' => $report->category,
+            'urgency' => $report->urgent ? 'Urgent' : ucfirst((string) $report->severity),
+            'date_time' => $submitted,
+            'report_link' => $dashboardUrl,
+            'report_id' => $report->id,
+            'message' => $messageBody,
+        ];
+
+        $subject = TemplateRenderer::render($template['subject'] ?? '', $templateData);
+        $body = TemplateRenderer::render($template['body'] ?? '', $templateData);
+
         return (new MailMessage())
             ->locale($locale)
-            ->subject(__('notifications.reporter_followup.subject', [
-                'org' => $orgName,
-                'category' => $report->category,
-            ], $locale))
+            ->subject($subject)
             ->view('emails.reporter_followup', [
                 'report' => $report,
                 'submitted' => $submitted,
@@ -63,6 +77,8 @@ class ReporterFollowupEmail extends Notification
                 'followupUrl' => $followupUrl,
                 'messageBody' => $messageBody,
                 'locale' => $locale,
+                'templateSubject' => $subject,
+                'templateBody' => $body,
             ]);
     }
 }
