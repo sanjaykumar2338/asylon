@@ -66,7 +66,6 @@ class ReporterFollowupEmail extends Notification
         $body = TemplateRenderer::render($template['body'] ?? '', $templateData);
 
         return (new MailMessage())
-            ->locale($locale)
             ->subject($subject)
             ->view('emails.reporter_followup', [
                 'report' => $report,
