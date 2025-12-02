@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ReportFile;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
 
 class AudioTranscriptionService
 {
@@ -20,7 +21,7 @@ class AudioTranscriptionService
             Log::warning('Audio transcription skipped; file missing.', [
                 'file_id' => $file->getKey(),
             ]);
-            return ['status' => 'failed', 'transcript' => null, 'error' => 'file_missing'];
+            return ['status' => 'failed', 'transcript' => null, 'error' => 'file_missing', 'hits' => []];
         }
 
         $python = config('asylon.audio_transcription.python_path', '/usr/bin/python3');
@@ -35,16 +36,40 @@ class AudioTranscriptionService
             'script' => $script,
         ]);
 
-        $output = @\shell_exec($command);
-        $transcript = $output !== null ? trim((string) $output) : null;
+        $process = new Process([$python, $script, $path]);
+        $process->setTimeout(180);
+
+        try {
+            $process->run();
+        } catch (\Throwable $e) {
+            Log::error('Audio transcription process failed to start.', [
+                'file_id' => $file->getKey(),
+                'exception' => $e->getMessage(),
+            ]);
+
+            return ['status' => 'failed', 'transcript' => null, 'error' => 'process_start_failed', 'hits' => []];
+        }
+
+        if (! $process->isSuccessful()) {
+            Log::warning('Audio transcription process error.', [
+                'file_id' => $file->getKey(),
+                'exit_code' => $process->getExitCode(),
+                'error_output' => $process->getErrorOutput(),
+            ]);
+
+            return ['status' => 'failed', 'transcript' => null, 'error' => 'process_failed', 'hits' => []];
+        }
+
+        $output = trim((string) $process->getOutput());
+        $transcript = $output !== '' ? $output : null;
 
         if ($transcript === null || $transcript === '') {
             Log::warning('Audio transcription returned empty output.', [
                 'file_id' => $file->getKey(),
-                'command' => $command,
+                'error_output' => $process->getErrorOutput(),
             ]);
 
-            return ['status' => 'failed', 'transcript' => null, 'error' => 'empty_output'];
+            return ['status' => 'failed', 'transcript' => null, 'error' => 'empty_output', 'hits' => []];
         }
 
         if (str_starts_with(strtolower($transcript), 'error:')) {
@@ -53,7 +78,7 @@ class AudioTranscriptionService
                 'output' => $transcript,
             ]);
 
-            return ['status' => 'failed', 'transcript' => null, 'error' => $transcript];
+            return ['status' => 'failed', 'transcript' => null, 'error' => $transcript, 'hits' => []];
         }
 
         $hits = $this->keywordHits($transcript);
