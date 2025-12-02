@@ -16,6 +16,7 @@ Route::view('/privacy-and-anonymity', 'static.privacy_anonymity')->name('privacy
 Route::view('/security-overview', 'static.security_overview')->name('security.overview');
 Route::view('/sms-opt-in', 'public.sms_opt_in')->name('sms.opt_in');
 Route::view('/sms-opt-in-example', 'public.sms_opt_in_example')->name('sms.opt_in_example');
+Route::view('/sms-onboarding-sample', 'public.onboarding_sample')->name('sms.onboarding_sample');
 
 Route::middleware('ultra-private')->group(function () {
     Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
