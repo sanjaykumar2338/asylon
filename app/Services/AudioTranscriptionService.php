@@ -35,7 +35,7 @@ class AudioTranscriptionService
             'script' => $script,
         ]);
 
-        $output = @shell_exec($command);
+        $output = @\shell_exec($command);
         $transcript = $output !== null ? trim((string) $output) : null;
 
         if ($transcript === null || $transcript === '') {
