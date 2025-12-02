@@ -57,15 +57,15 @@ class UrgentReportEmail extends Notification
         $body = TemplateRenderer::render($template['body'] ?? '', $templateData);
 
         return (new MailMessage())
-            ->subject($subject)
+            ->subject($subject ?? __('notifications.urgent_alert.subject', ['category' => $report->category], $locale))
             ->view('emails.urgent_report', [
                 'report' => $report,
                 'orgName' => $orgName,
                 'categoryLabel' => $categoryLabel,
                 'reportUrl' => $reportUrl,
                 'locale' => $locale,
-                'templateBody' => $body,
-                'templateSubject' => $subject,
+                'templateBody' => $body ?: null,
+                'templateSubject' => $subject ?: null,
             ]);
     }
 }
