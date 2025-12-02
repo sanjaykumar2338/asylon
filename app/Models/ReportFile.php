@@ -60,7 +60,11 @@ class ReportFile extends Model
             return true;
         }
 
-        if ($mime !== '' && (Str::startsWith($mime, 'audio/') || Str::contains($mime, 'audio'))) {
+        if ($mime !== '' && (
+            Str::startsWith($mime, 'audio/')
+            || Str::contains($mime, 'audio')
+            || in_array($mime, ['video/webm', 'video/ogg', 'video/mp4', 'video/quicktime', 'video/3gpp'], true)
+        )) {
             return true;
         }
 
@@ -75,7 +79,10 @@ class ReportFile extends Model
             return false;
         }
 
-        $audioExtensions = ['mp3', 'wav', 'aac', 'm4a', 'ogg', 'opus', 'weba', 'flac'];
+        $audioExtensions = [
+            'mp3', 'wav', 'aac', 'm4a', 'ogg', 'opus', 'weba', 'flac', 'webm',
+            'mp4', 'm4p', 'aiff', 'aif', 'caf', 'wma', 'amr', '3gp', '3gpp',
+        ];
 
         return in_array($extension, $audioExtensions, true);
     }
