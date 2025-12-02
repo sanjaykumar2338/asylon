@@ -17,6 +17,9 @@ class AudioTranscriptionService
         $path = $this->resolvePath($file);
 
         if (! $path) {
+            Log::warning('Audio transcription skipped; file missing.', [
+                'file_id' => $file->getKey(),
+            ]);
             return ['status' => 'failed', 'transcript' => null, 'error' => 'file_missing'];
         }
 
@@ -24,6 +27,13 @@ class AudioTranscriptionService
         $script = config('asylon.audio_transcription.script_path', '/var/www/scripts/transcribe_server.py');
 
         $command = escapeshellcmd($python).' '.escapeshellarg($script).' '.escapeshellarg($path);
+
+        Log::info('Audio transcription invoking python.', [
+            'file_id' => $file->getKey(),
+            'path' => $path,
+            'python' => $python,
+            'script' => $script,
+        ]);
 
         $output = @shell_exec($command);
         $transcript = $output !== null ? trim((string) $output) : null;
