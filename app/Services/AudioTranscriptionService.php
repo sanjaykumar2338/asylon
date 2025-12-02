@@ -10,7 +10,7 @@ class AudioTranscriptionService
     /**
      * Transcribe an audio report file using an external Python script.
      *
-     * @return array{status:string,transcript:?string,error:?string}
+     * @return array{status:string,transcript:?string,error:?string,hits:array<int,string>}
      */
     public function transcribe(ReportFile $file): array
     {
@@ -46,7 +46,15 @@ class AudioTranscriptionService
             return ['status' => 'failed', 'transcript' => null, 'error' => $transcript];
         }
 
-        return ['status' => 'completed', 'transcript' => $transcript, 'error' => null];
+        $hits = $this->keywordHits($transcript);
+
+        Log::info('Audio transcription completed.', [
+            'file_id' => $file->getKey(),
+            'hits' => $hits,
+            'transcript_preview' => mb_substr($transcript, 0, 300),
+        ]);
+
+        return ['status' => 'completed', 'transcript' => $transcript, 'error' => null, 'hits' => $hits];
     }
 
     /**
@@ -62,5 +70,31 @@ class AudioTranscriptionService
         $full = storage_path('app/public/'.$relative);
 
         return is_file($full) ? $full : null;
+    }
+
+    /**
+     * Find risky keyword hits in the transcript.
+     *
+     * @return array<int, string>
+     */
+    protected function keywordHits(string $transcript): array
+    {
+        $haystack = mb_strtolower($transcript);
+
+        $keywords = [
+            'knife', 'gun', 'weapon', 'bomb', 'shoot', 'stab',
+            'sex', 'sexual', 'nudity', 'nude', 'porn', 'explicit', 'harassment',
+            'self harm', 'suicide', 'kill myself', 'cutting', 'overdose',
+            'threat', 'violence', 'blood', 'gore',
+        ];
+
+        $hits = [];
+        foreach ($keywords as $keyword) {
+            if (str_contains($haystack, $keyword)) {
+                $hits[] = $keyword;
+            }
+        }
+
+        return array_values(array_unique($hits));
     }
 }

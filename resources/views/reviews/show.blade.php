@@ -467,6 +467,12 @@
                                                     <strong>{{ __('Transcript') }}:</strong>
                                                     {{ \Illuminate\Support\Str::limit($file->transcript, 220) }}
                                                 </p>
+                                                @if (!empty($file->safety_scan_reasons))
+                                                    <p class="mb-1 text-sm text-muted">
+                                                        <strong>{{ __('Flags') }}:</strong>
+                                                        {{ implode('; ', (array) $file->safety_scan_reasons) }}
+                                                    </p>
+                                                @endif
                                             @elseif (($file->transcription_status ?? '') === 'pending')
                                                 <p class="mt-3 text-sm text-muted">{{ __('Transcription pending...') }}</p>
                                             @elseif (($file->transcription_status ?? '') === 'failed')

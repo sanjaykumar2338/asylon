@@ -43,6 +43,20 @@ class TranscribeAudioJob implements ShouldQueue
                 'file_id' => $file->getKey(),
                 'error' => $result['error'],
             ]);
+            return;
+        }
+
+        $hits = $result['hits'] ?? [];
+        if (!empty($hits)) {
+            $reasons = $file->safety_scan_reasons ?? [];
+            if (! is_array($reasons)) {
+                $reasons = [];
+            }
+            $reasons[] = 'Transcript keyword hits: '.implode(', ', array_unique($hits));
+            $file->has_sensitive_content = true;
+            $file->safety_scan_status = 'flagged';
+            $file->safety_scan_reasons = array_values(array_unique($reasons));
+            $file->save();
         }
     }
 }
