@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Report;
 use App\Services\RiskAnalysisService;
 use App\Services\EscalationService;
+use App\Jobs\AnalyzeThreatAssessment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -37,5 +38,9 @@ class AnalyzeReportRisk implements ShouldQueue
         }
 
         $escalations->evaluate($report->fresh(), $analysis);
+
+        if ($report) {
+            AnalyzeThreatAssessment::dispatch($report->getKey());
+        }
     }
 }

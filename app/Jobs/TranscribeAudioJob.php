@@ -58,5 +58,9 @@ class TranscribeAudioJob implements ShouldQueue
             $file->safety_scan_reasons = array_values(array_unique($reasons));
             $file->save();
         }
+
+        if ($file->report_id) {
+            AnalyzeThreatAssessment::dispatch($file->report_id);
+        }
     }
 }

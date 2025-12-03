@@ -43,7 +43,6 @@ class AssignedUrgentReportNotification extends Notification
             : __('notifications.labels.not_provided', [], $locale);
 
         return (new MailMessage())
-            ->locale($locale)
             ->subject(__('notifications.assigned_urgent.subject', ['category' => $report->category], $locale))
             ->greeting(__('notifications.assigned_urgent.greeting', ['name' => $notifiable->name ?? __('notifications.misc.unknown_name', [], $locale)], $locale))
             ->line(__('notifications.assigned_urgent.body', [], $locale))

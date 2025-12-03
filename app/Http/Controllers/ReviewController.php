@@ -174,6 +174,7 @@ class ReviewController extends Controller
             'resolver',
             'riskAnalysis',
             'escalationEvents',
+            'threatAssessment',
         ]);
 
         $privacyMeta = is_array($report->meta) ? ($report->meta['privacy'] ?? []) : [];
@@ -189,6 +190,7 @@ class ReviewController extends Controller
             'reviewers' => $this->reviewersForOrg($user, $report->org_id),
             'isUltraPrivate' => $isUltraPrivate,
             'subpoenaToken' => $subpoenaToken,
+            'threatAssessment' => $report->threatAssessment,
         ]);
     }
 

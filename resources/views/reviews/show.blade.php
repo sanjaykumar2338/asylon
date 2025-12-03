@@ -319,6 +319,55 @@
 
         <div class="col-lg-4">
             <div class="card card-outline card-primary mb-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-robot mr-2"></i> {{ __('Threat Assessment (AI)') }}
+                    </h3>
+                    @php
+                        $ta = $threatAssessment;
+                        $level = $ta->level ?? 'low';
+                        $levelBadge = match ($level) {
+                            'low' => 'badge-success',
+                            'moderate' => 'badge-warning text-dark',
+                            'elevated' => 'badge-warning text-dark',
+                            'high' => 'badge-danger',
+                            'critical' => 'badge-dark',
+                            default => 'badge-secondary',
+                        };
+                        $levelLabel = ucfirst($level);
+                    @endphp
+                    @if($ta)
+                        <span class="badge {{ $levelBadge }}">{{ $levelLabel }}</span>
+                    @endif
+                </div>
+                <div class="card-body">
+                    @if (!$ta)
+                        <p class="text-muted mb-0">{{ __('Threat assessment is not available yet.') }}</p>
+                    @else
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="h4 mb-0 mr-2">{{ $ta->score }}</span>
+                            <span class="text-muted">{{ __('Score') }}</span>
+                            @if($ta->subject_of_concern)
+                                <span class="badge badge-danger ml-3"><i class="fas fa-exclamation-triangle mr-1"></i>{{ __('Subject of Concern') }}</span>
+                            @endif
+                        </div>
+                        <p class="mb-2 text-muted">
+                            <strong>{{ __('Recommendation') }}:</strong> {{ $ta->recommendation ?? __('Monitor') }}
+                        </p>
+                        @if (!empty($ta->signals))
+                            <p class="mb-2 text-muted">
+                                <strong>{{ __('Signals') }}:</strong>
+                                {{ implode(', ', (array) $ta->signals) }}
+                            </p>
+                        @endif
+                        @if (!empty($ta->summary))
+                            <p class="mb-0">{{ $ta->summary }}</p>
+                        @endif
+                    @endif
+                </div>
+            </div>
+
+            <div class="card card-outline card-primary mb-4">
                 <div class="card-header">
                     <h3 class="card-title mb-0">{{ __('Update Status') }}</h3>
                 </div>

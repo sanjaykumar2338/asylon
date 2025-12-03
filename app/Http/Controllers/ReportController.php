@@ -13,6 +13,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Jobs\AnonymizeVoiceJob;
 use App\Jobs\AnalyzeReportRisk;
+use App\Jobs\AnalyzeThreatAssessment;
 use App\Jobs\TranscribeAudioJob;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
@@ -378,6 +379,7 @@ class ReportController extends Controller
             $report = Report::create($validated);
             $report->chat_token = (string) Str::uuid();
             $report->save();
+            AnalyzeThreatAssessment::dispatch($report->getKey());
 
             foreach ($attachments as $index => $attachment) {
                 $file = $request->file("attachments.$index.file");
