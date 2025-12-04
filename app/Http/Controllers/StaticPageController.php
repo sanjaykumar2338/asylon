@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Page;
 use Illuminate\View\View;
 
 class StaticPageController extends Controller
@@ -11,13 +12,7 @@ class StaticPageController extends Controller
      */
     public function support(): View
     {
-        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
-
-        return view('static.support', [
-            'supportEmail' => $supportEmail,
-            'infoEmail' => $infoEmail,
-        ]);
+        return $this->renderPageOrFallback('support', 'static.support');
     }
 
     /**
@@ -25,14 +20,7 @@ class StaticPageController extends Controller
      */
     public function terms(): View
     {
-        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
-
-        return view('static.terms', [
-            'supportEmail' => $supportEmail,
-            'infoEmail' => $infoEmail,
-            'privacyPolicyUrl' => config('app.privacy_policy_url'),
-        ]);
+        return $this->renderPageOrFallback('terms', 'static.terms');
     }
 
     /**
@@ -40,12 +28,27 @@ class StaticPageController extends Controller
      */
     public function privacy(): View
     {
+        return $this->renderPageOrFallback('privacy', 'static.privacy');
+    }
+
+    protected function renderPageOrFallback(string $slug, string $fallbackView): View
+    {
+        $page = Page::where('slug', $slug)->where('published', true)->first();
+
+        if ($page) {
+            return view('pages.show', [
+                'page' => $page,
+                'pageTitle' => $page->meta_title ?? $page->title,
+            ]);
+        }
+
         $supportEmail = config('asylon.support_email', 'support@asylon.cc');
         $infoEmail = config('asylon.info_email', 'info@asylon.cc');
 
-        return view('static.privacy', [
+        return view($fallbackView, [
             'supportEmail' => $supportEmail,
             'infoEmail' => $infoEmail,
+            'privacyPolicyUrl' => config('app.privacy_policy_url'),
         ]);
     }
 }

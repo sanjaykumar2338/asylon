@@ -196,6 +196,18 @@
                                         <p>{{ __('Risk keywords') }}</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.pages.index') }}" class="nav-link {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-file-alt"></i>
+                                        <p>Pages</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.menus.index') }}" class="nav-link {{ request()->routeIs('admin.menus.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-ellipsis-h"></i>
+                                        <p>Menus</p>
+                                    </a>
+                                </li>
                                 @if(auth()->user()?->hasRole('platform_admin'))
                                     <li class="nav-item">
                                         <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
@@ -241,7 +253,11 @@
 
                 <div class="content">
                     <div class="container-fluid">
-                        {{ $slot }}
+                        @hasSection('content')
+                            @yield('content')
+                        @else
+                            {{ $slot ?? '' }}
+                        @endif
                     </div>
                 </div>
             </div>

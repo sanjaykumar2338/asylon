@@ -31,20 +31,29 @@
 
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">{{ $portalHeading }}</h1>
-        <div class="mt-2 space-y-3 text-sm text-gray-700">
-            <p>You stay anonymous unless YOU choose to share your information.<br>
-                Your identity is completely protected.</p>
+        @if(isset($submitPage) && $submitPage)
+            @if($portalDescription)
+                <p class="mt-2 text-sm text-gray-700">{{ $portalDescription }}</p>
+            @endif
+            <div class="mt-3 space-y-3 prose prose-indigo max-w-none text-sm text-gray-700">
+                {!! $submitPage->content !!}
+            </div>
+        @else
+            <div class="mt-2 space-y-3 text-sm text-gray-700">
+                <p>You stay anonymous unless YOU choose to share your information.<br>
+                    Your identity is completely protected.</p>
 
-            <p>Your voice matters.<br>
-                Use this form to report a concern, share information, or speak up about something that doesn't feel right.<br>
-                You may remain anonymous if you prefer.</p>
+                <p>Your voice matters.<br>
+                    Use this form to report a concern, share information, or speak up about something that doesn't feel right.<br>
+                    You may remain anonymous if you prefer.</p>
 
-            <p>If this is an emergency, please contact 911 immediately.</p>
-        </div>
-        @if ($portalDescription && $portalDescription !== __('report.submit_description'))
-            <p class="mt-3 text-sm text-gray-600">
-                {{ $portalDescription }}
-            </p>
+                <p>If this is an emergency, please contact 911 immediately.</p>
+            </div>
+            @if ($portalDescription && $portalDescription !== __('report.submit_description'))
+                <p class="mt-3 text-sm text-gray-600">
+                    {{ $portalDescription }}
+                </p>
+            @endif
         @endif
         <p class="text-sm text-gray-600 mt-4">
             {{ __('report.already_have_case') }}

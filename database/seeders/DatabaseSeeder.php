@@ -2,8 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Menu;
+use App\Models\MenuItem;
 use App\Models\Org;
 use App\Models\OrgAlertContact;
+use App\Models\Page;
+use Database\Seeders\LandingPagesSeeder;
+use Database\Seeders\StaticPagesSeeder;
 use App\Models\Report;
 use App\Models\ReportCategory;
 use App\Models\ReportChatMessage;
@@ -194,6 +199,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->seedRiskKeywords($org);
+        $this->seedCms($org);
+
+        $this->call([
+            LandingPagesSeeder::class,
+            StaticPagesSeeder::class,
+        ]);
 
         if (! Report::where('org_id', $org->id)->exists()) {
             $sampleReports = [
@@ -551,6 +562,115 @@ class DatabaseSeeder extends Seeder
             RiskKeyword::updateOrCreate(
                 ['phrase' => strtolower($kw['phrase']), 'org_id' => $org->id],
                 ['weight' => $kw['weight']]
+            );
+        }
+    }
+
+    protected function seedCms(Org $org): void
+    {
+        $pages = [
+            [
+                'title' => 'Schools',
+                'slug' => 'schools',
+                'content' => '<p>Internal safety, reporting, and alerting for schools.</p>',
+                'meta_title' => 'Asylon for Schools',
+                'meta_description' => 'Safety, reporting, and alerting for schools.',
+            ],
+            [
+                'title' => 'Churches',
+                'slug' => 'churches',
+                'content' => '<p>Safety and incident alerting tailored for faith communities.</p>',
+                'meta_title' => 'Asylon for Churches',
+                'meta_description' => 'Safety and incident alerting for churches.',
+            ],
+            [
+                'title' => 'Organizations',
+                'slug' => 'organizations',
+                'content' => '<p>Incident reporting and escalation for organizations.</p>',
+                'meta_title' => 'Asylon for Organizations',
+                'meta_description' => 'Incident reporting and escalation for organizations.',
+            ],
+        ];
+
+        $pageMap = [];
+        foreach ($pages as $pageData) {
+            $page = Page::updateOrCreate(
+                ['slug' => $pageData['slug']],
+                [
+                    'title' => $pageData['title'],
+                    'content' => $pageData['content'],
+                    'meta_title' => $pageData['meta_title'],
+                    'meta_description' => $pageData['meta_description'],
+                    'published' => true,
+                ],
+            );
+            $pageMap[$pageData['slug']] = $page;
+        }
+
+        // Bring in other statically-seeded pages if they exist (support/privacy/terms/submit-report)
+        $additionalPages = Page::whereIn('slug', ['support', 'privacy', 'terms', 'submit-report'])->get();
+        foreach ($additionalPages as $page) {
+            $pageMap[$page->slug] = $page;
+        }
+
+        $headerMenu = Menu::firstOrCreate(
+            ['location' => 'header'],
+            ['name' => 'Header']
+        );
+
+        $footerMenu = Menu::firstOrCreate(
+            ['location' => 'footer'],
+            ['name' => 'Footer']
+        );
+
+        $defaultHeaderItems = [
+            ['title' => 'Schools', 'type' => 'page', 'page' => $pageMap['schools'] ?? null, 'url' => null, 'position' => 1],
+            ['title' => 'Churches', 'type' => 'page', 'page' => $pageMap['churches'] ?? null, 'url' => null, 'position' => 2],
+            ['title' => 'Organizations', 'type' => 'page', 'page' => $pageMap['organizations'] ?? null, 'url' => null, 'position' => 3],
+            ['title' => 'Submit a Report', 'type' => 'url', 'url' => '/report', 'position' => 4],
+        ];
+
+        foreach ($defaultHeaderItems as $item) {
+            $pageId = ($item['type'] === 'page' && isset($item['page'])) ? ($item['page']?->id ?? null) : null;
+            MenuItem::updateOrCreate(
+                [
+                    'menu_id' => $headerMenu->id,
+                    'title' => $item['title'],
+                ],
+                [
+                    'type' => $item['type'],
+                    'page_id' => $pageId,
+                    'url' => $item['type'] === 'url' ? ($item['url'] ?? null) : null,
+                    'position' => $item['position'],
+                    'target' => '_self',
+                ],
+            );
+        }
+
+        $defaultFooterItems = [
+            ['title' => 'Schools', 'type' => 'page', 'page' => $pageMap['schools'] ?? null, 'url' => null, 'position' => 1],
+            ['title' => 'Churches', 'type' => 'page', 'page' => $pageMap['churches'] ?? null, 'url' => null, 'position' => 2],
+            ['title' => 'Organizations', 'type' => 'page', 'page' => $pageMap['organizations'] ?? null, 'url' => null, 'position' => 3],
+            ['title' => 'Submit a Report', 'type' => 'url', 'url' => '/report', 'position' => 4],
+            ['title' => 'Support', 'type' => 'page', 'page' => $pageMap['support'] ?? null, 'url' => '/support', 'position' => 5],
+            ['title' => 'Privacy', 'type' => 'page', 'page' => $pageMap['privacy'] ?? null, 'url' => '/privacy', 'position' => 6],
+            ['title' => 'Terms', 'type' => 'page', 'page' => $pageMap['terms'] ?? null, 'url' => '/terms', 'position' => 7],
+        ];
+
+        foreach ($defaultFooterItems as $item) {
+            $pageId = ($item['type'] === 'page' && isset($item['page'])) ? ($item['page']?->id ?? null) : null;
+            MenuItem::updateOrCreate(
+                [
+                    'menu_id' => $footerMenu->id,
+                    'title' => $item['title'],
+                ],
+                [
+                    'type' => $item['type'] ?? 'url',
+                    'page_id' => $pageId,
+                    'url' => $item['type'] === 'url' ? ($item['url'] ?? null) : null,
+                    'position' => $item['position'],
+                    'target' => '_self',
+                ],
             );
         }
     }

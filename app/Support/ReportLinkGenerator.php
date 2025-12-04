@@ -42,7 +42,7 @@ class ReportLinkGenerator
         $value = trim((string) ($baseUrl ?? ''));
 
         if ($value === '') {
-            $value = (string) config('app.url', 'http://localhost');
+            $value = rtrim((string) url()->to('/'), '/');
         }
 
         return rtrim($value, '/');

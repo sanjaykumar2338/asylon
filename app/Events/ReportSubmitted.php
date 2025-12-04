@@ -18,7 +18,7 @@ class ReportSubmitted
         $resolved = trim((string) ($baseUrl ?? ''));
 
         if ($resolved === '') {
-            $resolved = (string) config('app.url', 'http://localhost');
+            $resolved = rtrim((string) url()->to('/'), '/');
         }
 
         $this->baseUrl = rtrim($resolved, '/');

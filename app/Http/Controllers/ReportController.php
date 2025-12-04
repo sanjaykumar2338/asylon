@@ -11,6 +11,7 @@ use App\Models\OrgAlertContact;
 use App\Models\ReportCategory;
 use App\Models\Report;
 use App\Models\User;
+use App\Models\Page;
 use App\Jobs\AnonymizeVoiceJob;
 use App\Jobs\AnalyzeReportRisk;
 use App\Jobs\AnalyzeThreatAssessment;
@@ -39,6 +40,7 @@ class ReportController extends Controller
     {
         $orgs = $this->loadActiveOrgs();
         $categories = $this->loadCategories();
+        [$portalHeading, $portalDescription, $submitPage] = $this->submitPageContent(__('report.submit_title'), __('report.submit_description'));
 
         return view('report.create', [
             'orgs' => $orgs,
@@ -52,8 +54,9 @@ class ReportController extends Controller
             'formAction' => route('report.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('report.submit_title'),
-            'portalDescription' => __('report.submit_description'),
+            'portalHeading' => $portalHeading,
+            'portalDescription' => $portalDescription,
+            'submitPage' => $submitPage,
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -66,6 +69,7 @@ class ReportController extends Controller
     {
         $org = Org::where('org_code', $org_code)->firstOrFail();
         LocaleManager::applyOrgLocale($org);
+        [$portalHeading, $portalDescription, $submitPage] = $this->submitPageContent(__('report.submit_title'), __('report.submit_description'));
 
         return view('report.create', [
             'orgs' => null,
@@ -79,8 +83,9 @@ class ReportController extends Controller
             'formAction' => route('report.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('report.submit_title'),
-            'portalDescription' => __('report.submit_description'),
+            'portalHeading' => $portalHeading,
+            'portalDescription' => $portalDescription,
+            'submitPage' => $submitPage,
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -100,6 +105,7 @@ class ReportController extends Controller
         }
 
         $categories = $this->loadCategoriesByTypes(['student', 'both']);
+        [$portalHeading, $portalDescription, $submitPage] = $this->submitPageContent(__('report.student_portal_heading'), __('report.student_portal_description'));
 
         return view('report.create', [
             'orgs' => $orgs,
@@ -113,8 +119,9 @@ class ReportController extends Controller
             'formAction' => route('report.student.store'),
             'showTypeSelector' => false,
             'forceType' => 'safety',
-            'portalHeading' => __('report.student_portal_heading'),
-            'portalDescription' => __('report.student_portal_description'),
+            'portalHeading' => $portalHeading,
+            'portalDescription' => $portalDescription,
+            'submitPage' => $submitPage,
             'recipientsEnabled' => false,
             'recipientMap' => [],
         ]);
@@ -137,6 +144,7 @@ class ReportController extends Controller
         $recipientMap = $this->recipientMap(
             config('asylon.alerts.employee_departments', ['hr', 'ethics', 'admin'])
         );
+        [$portalHeading, $portalDescription, $submitPage] = $this->submitPageContent(__('report.employee_portal_heading'), __('report.employee_portal_description'));
 
         return view('report.create', [
             'orgs' => $orgs,
@@ -153,8 +161,9 @@ class ReportController extends Controller
             'formAction' => route('report.employee.store'),
             'showTypeSelector' => true,
             'forceType' => null,
-            'portalHeading' => __('report.employee_portal_heading'),
-            'portalDescription' => __('report.employee_portal_description'),
+            'portalHeading' => $portalHeading,
+            'portalDescription' => $portalDescription,
+            'submitPage' => $submitPage,
             'recipientsEnabled' => true,
             'recipientMap' => $recipientMap,
         ]);
@@ -503,9 +512,26 @@ class ReportController extends Controller
      */
     protected function dashboardBaseUrl(StoreReportRequest $request): string
     {
-        $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
+        $root = trim((string) ($request->root() ?: url()->to('/')));
 
-        return $root === '' ? 'http://localhost' : rtrim($root, '/');
+        return $root === '' ? url()->to('/') : rtrim($root, '/');
+    }
+
+    /**
+     * Load optional page-managed content for the submit portal.
+     */
+    protected function submitPageContent(string $fallbackHeading, string $fallbackDescription): array
+    {
+        $page = Page::where('slug', 'submit-report')->where('published', true)->first();
+
+        if (! $page) {
+            return [$fallbackHeading, $fallbackDescription, null];
+        }
+
+        $heading = $page->title ?: $fallbackHeading;
+        $description = $page->excerpt ?: $fallbackDescription;
+
+        return [$heading, $description, $page];
     }
 
     /**

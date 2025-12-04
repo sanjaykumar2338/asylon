@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
 use App\Http\Controllers\Admin\NotificationTemplateController as AdminNotificationTemplateController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\MenuController as AdminMenuController;
+use App\Http\Controllers\Admin\MenuItemController as AdminMenuItemController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
@@ -15,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TrashReportController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['setLocale'])->group(function () {
@@ -95,6 +99,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('notifications.templates.edit');
         Route::post('notifications/templates', [AdminNotificationTemplateController::class, 'update'])
             ->name('notifications.templates.update');
+        Route::resource('pages', AdminPageController::class)->except(['show']);
+        Route::resource('menus', AdminMenuController::class)->except(['show']);
+        Route::post('menus/{menu}/items/reorder', [AdminMenuItemController::class, 'reorder'])
+            ->name('menus.items.reorder');
+        Route::post('menus/{menu}/items', [AdminMenuItemController::class, 'store'])
+            ->name('menus.items.store');
+        Route::put('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'update'])
+            ->name('menus.items.update');
+        Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
+            ->name('menus.items.destroy');
 
         Route::middleware('can:manage-platform')->group(function () {
             Route::get('settings', [AdminSettingsController::class, 'edit'])
@@ -117,4 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Catch-all for published pages by slug (placed after defined routes to avoid conflicts).
+Route::get('/{slug}', [PageController::class, 'resolve'])
+    ->where('slug', '[A-Za-z0-9\\-]+')
+    ->name('pages.resolve');
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Http\Request;
@@ -17,6 +18,9 @@ Route::view('/security-overview', 'static.security_overview')->name('security.ov
 Route::view('/sms-opt-in', 'public.sms_opt_in')->name('sms.opt_in');
 Route::view('/sms-opt-in-example', 'public.sms_opt_in_example')->name('sms.opt_in_example');
 Route::view('/sms-onboarding-sample', 'public.onboarding_sample')->name('sms.onboarding_sample');
+Route::get('/pages/{slug}', [PageController::class, 'show'])->name('pages.show');
+Route::get('/pages/submit-report', fn () => redirect()->route('report.create'))->name('pages.submit-report');
+Route::get('/submit-report', fn () => redirect()->route('report.create'));
 
 Route::middleware('ultra-private')->group(function () {
     Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');
@@ -144,6 +148,6 @@ Route::middleware('ultra-private')->group(function () {
         ->name('chat.post');
     Route::get('/report/{token}/attachments/{file}/preview', [FollowUpController::class, 'previewAttachment'])
         ->name('report.attachments.preview');
-    Route::get('/report/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
-        ->name('report.attachments.download');
+Route::get('/report/{token}/attachments/{file}/download', [FollowUpController::class, 'downloadAttachment'])
+    ->name('report.attachments.download');
 });

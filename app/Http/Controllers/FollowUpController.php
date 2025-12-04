@@ -178,9 +178,9 @@ class FollowUpController extends Controller
      */
     protected function baseUrl(Request $request): string
     {
-        $root = trim((string) ($request->root() ?: config('app.url', 'http://localhost')));
+        $root = trim((string) ($request->root() ?: url()->to('/')));
 
-        return $root === '' ? 'http://localhost' : rtrim($root, '/');
+        return $root === '' ? url()->to('/') : rtrim($root, '/');
     }
 
     /**
