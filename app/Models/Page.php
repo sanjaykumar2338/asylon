@@ -17,6 +17,7 @@ class Page extends Model
         'template',
         'meta_title',
         'meta_description',
+        'meta_keywords',
         'content',
         'published',
     ];

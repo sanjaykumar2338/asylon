@@ -7,6 +7,8 @@ use App\Models\MenuItem;
 use App\Models\Org;
 use App\Models\OrgAlertContact;
 use App\Models\Page;
+use App\Models\SeoPage;
+use Database\Seeders\BlogSeeder;
 use Database\Seeders\LandingPagesSeeder;
 use Database\Seeders\StaticPagesSeeder;
 use App\Models\Report;
@@ -204,7 +206,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LandingPagesSeeder::class,
             StaticPagesSeeder::class,
+            BlogSeeder::class,
         ]);
+
+        $this->seedSeoPages();
 
         if (! Report::where('org_id', $org->id)->exists()) {
             $sampleReports = [
@@ -627,7 +632,8 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Schools', 'type' => 'page', 'page' => $pageMap['schools'] ?? null, 'url' => null, 'position' => 1],
             ['title' => 'Churches', 'type' => 'page', 'page' => $pageMap['churches'] ?? null, 'url' => null, 'position' => 2],
             ['title' => 'Organizations', 'type' => 'page', 'page' => $pageMap['organizations'] ?? null, 'url' => null, 'position' => 3],
-            ['title' => 'Submit a Report', 'type' => 'url', 'url' => '/report', 'position' => 4],
+            ['title' => 'Blog', 'type' => 'url', 'url' => '/blog', 'position' => 4],
+            ['title' => 'Submit a Report', 'type' => 'url', 'url' => '/report', 'position' => 5],
         ];
 
         foreach ($defaultHeaderItems as $item) {
@@ -652,9 +658,10 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Churches', 'type' => 'page', 'page' => $pageMap['churches'] ?? null, 'url' => null, 'position' => 2],
             ['title' => 'Organizations', 'type' => 'page', 'page' => $pageMap['organizations'] ?? null, 'url' => null, 'position' => 3],
             ['title' => 'Submit a Report', 'type' => 'url', 'url' => '/report', 'position' => 4],
-            ['title' => 'Support', 'type' => 'page', 'page' => $pageMap['support'] ?? null, 'url' => '/support', 'position' => 5],
-            ['title' => 'Privacy', 'type' => 'page', 'page' => $pageMap['privacy'] ?? null, 'url' => '/privacy', 'position' => 6],
-            ['title' => 'Terms', 'type' => 'page', 'page' => $pageMap['terms'] ?? null, 'url' => '/terms', 'position' => 7],
+            ['title' => 'Blog', 'type' => 'url', 'url' => '/blog', 'position' => 5],
+            ['title' => 'Support', 'type' => 'page', 'page' => $pageMap['support'] ?? null, 'url' => '/support', 'position' => 6],
+            ['title' => 'Privacy', 'type' => 'page', 'page' => $pageMap['privacy'] ?? null, 'url' => '/privacy', 'position' => 7],
+            ['title' => 'Terms', 'type' => 'page', 'page' => $pageMap['terms'] ?? null, 'url' => '/terms', 'position' => 8],
         ];
 
         foreach ($defaultFooterItems as $item) {
@@ -672,6 +679,30 @@ class DatabaseSeeder extends Seeder
                     'target' => '_self',
                 ],
             );
+        }
+    }
+
+    protected function seedSeoPages(): void
+    {
+        $slugs = [
+            'home',
+            'how-it-works',
+            'solutions-schools',
+            'solutions-churches',
+            'solutions-organizations',
+            'features',
+            'resources',
+            'about',
+            'book-a-demo',
+            'contact',
+            'blog',
+        ];
+
+        foreach ($slugs as $slug) {
+            SeoPage::firstOrCreate(['slug' => $slug], [
+                'meta_title' => ucwords(str_replace('-', ' ', $slug)).' | '.config('app.name', 'Asylon'),
+                'meta_description' => 'SEO settings placeholder for '.$slug,
+            ]);
         }
     }
 }

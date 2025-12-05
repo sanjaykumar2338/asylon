@@ -4,6 +4,7 @@ use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\BlogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ Route::view('/sms-onboarding-sample', 'public.onboarding_sample')->name('sms.onb
 Route::get('/pages/{slug}', [PageController::class, 'show'])->name('pages.show');
 Route::get('/pages/submit-report', fn () => redirect()->route('report.create'))->name('pages.submit-report');
 Route::get('/submit-report', fn () => redirect()->route('report.create'));
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 Route::middleware('ultra-private')->group(function () {
     Route::get('/report/student', [ReportController::class, 'createStudent'])->name('report.student');

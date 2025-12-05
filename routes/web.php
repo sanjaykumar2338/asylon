@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\NotificationTemplateController as AdminNotificati
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\MenuItemController as AdminMenuItemController;
+use App\Http\Controllers\Admin\BlogCategoryController as AdminBlogCategoryController;
+use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
@@ -109,6 +111,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('menus.items.update');
         Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
             ->name('menus.items.destroy');
+        Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
+        Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
 
         Route::middleware('can:manage-platform')->group(function () {
             Route::get('settings', [AdminSettingsController::class, 'edit'])

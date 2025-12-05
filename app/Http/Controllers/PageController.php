@@ -10,8 +10,9 @@ class PageController extends Controller
     public function show(string $slug): View
     {
         $page = Page::where('slug', $slug)->where('published', true)->firstOrFail();
+        $seo = \App\Models\SeoPage::where('slug', $slug)->first();
 
-        return view('pages.show', compact('page'));
+        return view('pages.show', compact('page', 'seo'));
     }
 
     /**
@@ -22,7 +23,8 @@ class PageController extends Controller
         $page = Page::where('slug', $slug)->where('published', true)->first();
 
         if ($page) {
-            return view('pages.show', compact('page'));
+            $seo = \App\Models\SeoPage::where('slug', $slug)->first();
+            return view('pages.show', compact('page', 'seo'));
         }
 
         $fallbackViews = [

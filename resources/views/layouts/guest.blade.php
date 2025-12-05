@@ -14,6 +14,10 @@
         @if(isset($page) && $page->meta_description)
             <meta name="description" content="{{ $page->meta_description }}">
         @endif
+        @if(isset($page) && $page->meta_keywords)
+            <meta name="keywords" content="{{ $page->meta_keywords }}">
+        @endif
+        @stack('meta')
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,7 +27,7 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         @php
-            $containerClass = $containerClass ?? 'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg';
+            $containerClass = $containerClass ?? 'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg min-h-[60vh]';
         @endphp
         @php
             $supportEmail = config('asylon.support_email', 'support@asylon.cc');
@@ -47,6 +51,13 @@
                                     {{ $item->title }}
                                 </a>
                             @endforeach
+                        </nav>
+                    @else
+                        <nav class="hidden sm:flex items-center gap-4 text-sm font-medium text-gray-700">
+                            <a href="{{ url('/pages/schools') }}" class="hover:text-indigo-600">Schools</a>
+                            <a href="{{ url('/pages/churches') }}" class="hover:text-indigo-600">Churches</a>
+                            <a href="{{ url('/pages/organizations') }}" class="hover:text-indigo-600">Organizations</a>
+                            <a href="{{ route('blog.index') }}" class="hover:text-indigo-600">Blog</a>
                         </nav>
                     @endif
                 </div>
@@ -78,6 +89,8 @@
                             <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
                             &middot;
                             <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+                            &middot;
+                            <a href="{{ route('blog.index') }}" class="text-indigo-600 underline">Blog</a>
                             &middot;
                             <a href="{{ route('privacy.anonymity') }}" class="text-indigo-600 underline">Privacy &amp; Anonymity</a>
                             &middot;

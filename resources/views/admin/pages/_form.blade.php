@@ -41,6 +41,12 @@
 </div>
 
 <div class="form-group">
+    <label for="meta_keywords">Meta Keywords (comma separated)</label>
+    <textarea name="meta_keywords" id="meta_keywords" rows="2" class="form-control">{{ old('meta_keywords', $page->meta_keywords) }}</textarea>
+    <small class="text-muted">Optional keywords for SEO.</small>
+</div>
+
+<div class="form-group">
     <label for="content">Content</label>
     <input id="content" type="hidden" name="content" value="{{ old('content', $page->content) }}">
     <trix-editor input="content"></trix-editor>
