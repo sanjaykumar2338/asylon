@@ -346,6 +346,7 @@ class ReportExporter
         return implode(' - ', $parts);
     }
 
+    
     protected function auditTitle(AuditLog $log): string
     {
         return match ($log->action) {

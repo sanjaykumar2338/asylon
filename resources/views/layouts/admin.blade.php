@@ -145,6 +145,7 @@
                                     <i class="nav-icon fas fa-file-alt"></i>
                                     <p>{{ __('reports.nav') }}</p>
                                 </a>
+                                
                             </li>
 
                             @if(auth()->user()?->hasRole(['org_admin', 'platform_admin', 'executive_admin']))

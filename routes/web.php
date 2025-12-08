@@ -28,6 +28,7 @@ Route::middleware(['setLocale'])->group(function () {
     require base_path('routes/public.php');
 });
 
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('role:reviewer,security_lead,org_admin,platform_admin')

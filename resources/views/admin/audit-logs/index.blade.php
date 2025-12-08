@@ -4,6 +4,7 @@
     $ultraPrivate = config('asylon.ultra_private_mode', false);
 @endphp
 
+
 <x-admin-layout :title="$pageTitle">
     <x-slot name="header">
         {{ $pageTitle }}

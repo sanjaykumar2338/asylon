@@ -13,6 +13,7 @@ class Audit
      */
     public static function log(string $actorType, string $action, string $targetType, mixed $targetId, array $meta = []): void
     {
+        
         $user = auth()->user();
         $request = request();
         $ip = $request ? $request->ip() : null;

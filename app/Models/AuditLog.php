@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AuditLog extends Model
 {
+    
     use HasFactory;
     use SoftDeletes;
 
@@ -52,6 +53,7 @@ class AuditLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 
     /**
      * Case/report relationship for the log entry.

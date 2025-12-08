@@ -32,6 +32,7 @@ class ReviewController extends Controller
      */
     public function index(Request $request): View
     {
+        
         $user = $request->user();
 
         $status = (string) $request->query('status', '');
