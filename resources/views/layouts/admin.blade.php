@@ -147,7 +147,7 @@
                                 </a>
                             </li>
 
-                            @if(auth()->user()?->hasRole(['org_admin', 'platform_admin']))
+                            @if(auth()->user()?->hasRole(['org_admin', 'platform_admin', 'executive_admin']))
                                 <li class="nav-item">
                                     <a href="{{ route('admin.orgs.index') }}" class="nav-link {{ request()->routeIs('admin.orgs.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
@@ -190,6 +190,14 @@
                                         <p>{{ __('Analytics') }}</p>
                                     </a>
                                 </li>
+                                @if(auth()->user()?->hasRole(['platform_admin', 'executive_admin']))
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-clipboard-list"></i>
+                                            <p>{{ __('Audit Logs') }}</p>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="nav-item">
                                     <a href="{{ route('admin.risk-keywords.index') }}" class="nav-link {{ request()->routeIs('admin.risk-keywords.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-key"></i>

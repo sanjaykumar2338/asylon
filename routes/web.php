@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AlertController as AdminAlertController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
@@ -54,6 +55,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('can:review-reports')
         ->name('reports.status');
 
+    Route::get('/reports/export', [AdminExportController::class, 'reports'])
+        ->middleware('can:review-reports')
+        ->name('reports.export.list');
+
+    Route::get('/reports/export/pdf', [AdminExportController::class, 'reportsPdf'])
+        ->middleware('can:review-reports')
+        ->name('reports.export.list.pdf');
+
+    Route::get('/reports/{report}/export/csv', [AdminExportController::class, 'reportCsv'])
+        ->middleware('can:review-reports')
+        ->name('reports.export.csv');
+
+    Route::get('/reports/{report}/export/pdf', [AdminExportController::class, 'reportPdf'])
+        ->middleware('can:review-reports')
+        ->name('reports.export.pdf');
+
+    Route::get('/reports/{report}/export/audit', [AdminExportController::class, 'auditPacket'])
+        ->middleware('can:review-reports')
+        ->name('reports.export.audit');
+
     Route::get('/reports/{report}', [ReviewController::class, 'show'])
         ->middleware('can:review-reports')
         ->name('reports.show');
@@ -89,6 +110,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
         Route::get('reports/export', [AdminExportController::class, 'reports'])
             ->name('reports.export');
+        Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
+            ->middleware('role:platform_admin,executive_admin')
+            ->name('audit-logs.index');
         Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
             ->name('report-categories.subcategories.store');
         Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])

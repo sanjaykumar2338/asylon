@@ -12,10 +12,7 @@ class AuditLog extends Model
     use HasFactory;
     use SoftDeletes;
 
-    /**
-     * @var string
-     */
-    protected $table = 'audit_log';
+    protected $table = 'audit_logs';
 
     /**
      * @var array<int, string>
@@ -23,10 +20,13 @@ class AuditLog extends Model
     protected $fillable = [
         'org_id',
         'user_id',
-        'actor_type',
+        'case_id',
         'action',
+        'actor_type',
         'target_type',
         'target_id',
+        'ip_address',
+        'user_agent',
         'meta',
     ];
 
@@ -51,5 +51,21 @@ class AuditLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Case/report relationship for the log entry.
+     */
+    public function case(): BelongsTo
+    {
+        return $this->belongsTo(Report::class, 'case_id');
+    }
+
+    /**
+     * Scope logs for a specific organization.
+     */
+    public function scopeForOrg($query, ?int $orgId)
+    {
+        return $query->where('org_id', $orgId);
     }
 }

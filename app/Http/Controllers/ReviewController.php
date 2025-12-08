@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Notifications\FirstResponseNotification;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
+use App\Support\AuditLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class ReviewController extends Controller
         $to = (string) $request->query('to', '');
         $type = (string) $request->query('type', '');
         $severity = (string) $request->query('severity', '');
+        $riskLevel = (string) $request->query('risk_level', '');
         $sort = (string) $request->query('sort', 'submitted_desc');
 
         $query = Report::query()
@@ -73,6 +75,14 @@ class ReviewController extends Controller
 
         if ($severity !== '') {
             $query->where('severity', $severity);
+        }
+
+        if ($riskLevel !== '') {
+            if ($riskLevel === 'unscored') {
+                $query->whereDoesntHave('riskAnalysis');
+            } else {
+                $query->whereHas('riskAnalysis', fn ($q) => $q->where('risk_level', $riskLevel));
+            }
         }
 
         if ($from !== '' && Carbon::hasFormat($from, 'Y-m-d')) {
@@ -112,6 +122,7 @@ class ReviewController extends Controller
             'subcategory' => $subcategory,
             'type' => $type,
             'severity' => $severity,
+            'riskLevel' => $riskLevel,
             'from' => $from,
             'to' => $to,
             'sort' => $sort,
@@ -181,7 +192,7 @@ class ReviewController extends Controller
         $isUltraPrivate = (bool) ($privacyMeta['ultra_private'] ?? $report->org?->enable_ultra_private_mode);
         $subpoenaToken = $this->subpoenaToken($user, $privacyMeta);
 
-        Audit::log('reviewer', 'view_report', 'report', $report->getKey());
+        AuditLogger::caseAction($user, $report, 'case_view');
 
         return view('reviews.show', [
             'report' => $report,
@@ -253,6 +264,12 @@ class ReviewController extends Controller
             'urgent' => $report->urgent,
         ]);
 
+        AuditLogger::caseAction($user, $report, 'case_update', [
+            'updated_fields' => array_keys($validated),
+            'status' => $report->status,
+            'urgent' => $report->urgent,
+        ]);
+
         if (! $wasUrgent && $report->urgent) {
             event(new ReportSubmitted(
                 $report->fresh(['org']),
@@ -290,6 +307,9 @@ class ReviewController extends Controller
         }
 
         Audit::log('reviewer', 'post_message', 'report', $report->getKey());
+        AuditLogger::caseAction($user, $report, 'case_update', [
+            'message_sent' => true,
+        ]);
 
         if ($isFirstResponse) {
             $this->notifyFirstResponse($report, $user, $this->baseUrl($request));
@@ -327,6 +347,10 @@ class ReviewController extends Controller
         $report->notes()->create([
             'user_id' => $user->getKey(),
             'body' => $request->input('body'),
+        ]);
+
+        AuditLogger::caseAction($user, $report, 'case_update', [
+            'note_added' => true,
         ]);
 
         $noteSnippet = Str::limit(strip_tags($request->input('body', '')), 120);
@@ -396,6 +420,11 @@ class ReviewController extends Controller
             'note' => $report->status_note,
             'resolved_by' => $resolvedBy?->getKey(),
             'resolved_by_name' => $resolvedBy?->name,
+        ]);
+
+        AuditLogger::caseAction($user, $report, 'case_update', [
+            'from_status' => $fromStatus,
+            'to_status' => $report->status,
         ]);
 
         $this->notifyReportStakeholders(
@@ -629,8 +658,13 @@ class ReviewController extends Controller
     {
         return AuditLog::query()
             ->with('user')
-            ->where('target_type', 'report')
-            ->where('target_id', $report->getKey())
+            ->where(function ($query) use ($report): void {
+                $query->where('case_id', $report->getKey())
+                    ->orWhere(function ($sub) use ($report): void {
+                        $sub->where('target_type', 'report')
+                            ->where('target_id', $report->getKey());
+                    });
+            })
             ->orderBy('created_at')
             ->get()
             ->map(function (AuditLog $log): array {
@@ -647,6 +681,12 @@ class ReviewController extends Controller
     protected function timelineTitle(AuditLog $log): string
     {
         return match ($log->action) {
+            'case_view' => __('Case viewed'),
+            'case_update' => __('Case updated'),
+            'case_export_csv' => __('Case exported (CSV)'),
+            'case_export_pdf' => __('Case exported (PDF)'),
+            'case_export_audit_packet' => __('Audit packet exported'),
+            'case_list_export_csv', 'case_list_export_pdf' => __('Filtered list exported'),
             'portal_submission' => __('Report submitted'),
             'alert_dispatched' => __('Urgent alert sent'),
             'view_report' => __('Report viewed'),
@@ -672,6 +712,20 @@ class ReviewController extends Controller
         $meta = $log->meta ?? [];
 
         return match ($log->action) {
+            'case_view' => $actor ? __('Viewed by :actor', ['actor' => $actor]) : __('Viewed'),
+            'case_update' => ($meta['from_status'] ?? null) || ($meta['to_status'] ?? null)
+                ? $this->buildStatusChangeDescription($actor, [
+                    'from' => $meta['from_status'] ?? ($meta['from'] ?? null),
+                    'to' => $meta['to_status'] ?? ($meta['to'] ?? null),
+                    'resolved_by_name' => $meta['resolved_by_name'] ?? null,
+                    'note' => $meta['note'] ?? null,
+                ])
+                : __('Updated by :actor', ['actor' => $actor ?? __('System')]),
+            'case_export_csv' => __('Case CSV exported by :actor', ['actor' => $actor ?? __('System')]),
+            'case_export_pdf' => __('Case PDF exported by :actor', ['actor' => $actor ?? __('System')]),
+            'case_export_audit_packet' => __('Audit packet exported by :actor', ['actor' => $actor ?? __('System')]),
+            'case_list_export_csv' => __('List CSV exported by :actor', ['actor' => $actor ?? __('System')]),
+            'case_list_export_pdf' => __('List PDF exported by :actor', ['actor' => $actor ?? __('System')]),
             'portal_submission' => __('Submitted via :portal (:type)', [
                 'portal' => $meta['portal_source'] ?? __('portal'),
                 'type' => $meta['type'] ?? __('unspecified'),
@@ -699,6 +753,11 @@ class ReviewController extends Controller
     protected function timelineIcon(AuditLog $log): string
     {
         return match ($log->action) {
+            'case_view' => 'fas fa-eye',
+            'case_update' => 'fas fa-edit',
+            'case_export_csv', 'case_list_export_csv' => 'fas fa-file-csv',
+            'case_export_pdf', 'case_list_export_pdf' => 'fas fa-file-pdf',
+            'case_export_audit_packet' => 'fas fa-clipboard-list',
             'portal_submission' => 'fas fa-flag',
             'alert_dispatched' => 'fas fa-bell',
             'view_report' => 'fas fa-eye',
@@ -743,7 +802,9 @@ class ReviewController extends Controller
     protected function timelineActor(AuditLog $log): ?string
     {
         if ($log->user?->name) {
-            return $log->user->name;
+            $role = $log->user->role ? ' ('.$log->user->role.')' : '';
+
+            return $log->user->name.$role;
         }
 
         return match ($log->actor_type) {

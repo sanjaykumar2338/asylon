@@ -67,6 +67,17 @@
                         </select>
                     </div>
                     <div class="form-group col-md-3">
+                        <label for="risk_level">{{ __('Risk level') }}</label>
+                        <select id="risk_level" name="risk_level" class="form-control">
+                            <option value="">{{ __('All risk levels') }}</option>
+                            <option value="high" @selected($riskLevel === 'high')>{{ __('High') }}</option>
+                            <option value="medium" @selected($riskLevel === 'medium')>{{ __('Medium') }}</option>
+                            <option value="low" @selected($riskLevel === 'low')>{{ __('Low') }}</option>
+                            <option value="critical" @selected($riskLevel === 'critical')>{{ __('Critical') }}</option>
+                            <option value="unscored" @selected($riskLevel === 'unscored')>{{ __('Unscored') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="category">{{ __('Category') }}</label>
                         <select id="category" name="category" class="form-control">
                             <option value="">{{ __('Any category') }}</option>
@@ -134,9 +145,19 @@
                     <i class="fas fa-trash-alt mr-1"></i> {{ __('View trash') }}
                 </a>
             </div>
-            <span class="badge badge-info badge-pill px-3 py-2 mt-3 mt-lg-0">
-                {{ __('Results') }}: {{ number_format($reports->total()) }}
-            </span>
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center mt-3 mt-lg-0">
+                <div class="btn-group mr-lg-3 mb-2 mb-lg-0" role="group" aria-label="Export reports">
+                    <a href="{{ route('reports.export.list', request()->query()) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-file-csv mr-1"></i> {{ __('Export CSV') }}
+                    </a>
+                    <a href="{{ route('reports.export.list.pdf', request()->query()) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-file-pdf mr-1"></i> {{ __('Export PDF') }}
+                    </a>
+                </div>
+                <span class="badge badge-info badge-pill px-3 py-2 ml-lg-2">
+                    {{ __('Results') }}: {{ number_format($reports->total()) }}
+                </span>
+            </div>
         </div>
 
         <div class="table-responsive">
