@@ -28,6 +28,17 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
+            <label for="phone">{{ __('Phone (E.164 preferred)') }}</label>
+            <input type="text" name="phone" id="phone" maxlength="30"
+                value="{{ old('phone', $user->phone ?? '') }}"
+                class="form-control">
+            <small class="form-text text-muted">
+                {{ __('Required for SMS two-factor codes and alerts.') }}
+            </small>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
             <label for="role">{{ __('Role') }}</label>
             <select id="role" name="role" class="form-control" required>
                 @foreach (['platform_admin' => 'Platform Admin', 'org_admin' => 'Org Admin', 'security_lead' => 'Security Lead', 'reviewer' => 'Reviewer'] as $value => $label)

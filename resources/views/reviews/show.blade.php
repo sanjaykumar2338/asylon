@@ -68,6 +68,14 @@
                     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
                         <span class="text-monospace text-muted mr-3">#{{ $report->id }}</span>
                         <div class="btn-group btn-group-sm" role="group">
+                            @can('manage-data-requests')
+                                <form method="POST" action="{{ route('admin.data_requests.from_case', $report) }}" class="mr-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eraser mr-1"></i> {{ __('Create Data Deletion Request') }}
+                                    </button>
+                                </form>
+                            @endcan
                             <a href="{{ route('reports.edit', $report) }}" class="btn btn-outline-primary">
                                 <i class="fas fa-edit mr-1"></i> {{ __('Edit') }}
                             </a>

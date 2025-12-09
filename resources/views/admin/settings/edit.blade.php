@@ -20,6 +20,40 @@
                             </label>
                         </div>
 
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ __('Admin Two-Factor Authentication') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="hidden" name="admin_2fa_enabled" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="admin_2fa_enabled" name="admin_2fa_enabled" value="1" {{ old('admin_2fa_enabled', $admin_2fa_enabled ? '1' : '0') == '1' ? 'checked' : '' }}>
+                                    <label class="custom-control-label font-weight-bold" for="admin_2fa_enabled">
+                                        {{ __('Require 2FA for admin roles') }}
+                                    </label>
+                                </div>
+
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="hidden" name="admin_2fa_email" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="admin_2fa_email" name="admin_2fa_email" value="1" {{ old('admin_2fa_email', $admin_2fa_email ? '1' : '0') == '1' ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="admin_2fa_email">
+                                        {{ __('Send codes via email') }}
+                                    </label>
+                                </div>
+
+                                <div class="custom-control custom-switch">
+                                    <input type="hidden" name="admin_2fa_sms" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="admin_2fa_sms" name="admin_2fa_sms" value="1" {{ old('admin_2fa_sms', $admin_2fa_sms ? '1' : '0') == '1' ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="admin_2fa_sms">
+                                        {{ __('Send codes via SMS') }}
+                                    </label>
+                                    <small class="form-text text-muted">
+                                        {{ __('Requires a valid phone number on the user profile and Telnyx SMS settings.') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="telnyx_api_key">{{ __('Telnyx API Key') }}</label>
                             <input type="password"

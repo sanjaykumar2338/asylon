@@ -193,6 +193,14 @@
                                 </li>
                                 @if(auth()->user()?->hasRole(['platform_admin', 'executive_admin']))
                                     <li class="nav-item">
+                                        <a href="{{ route('admin.data_requests.index') }}" class="nav-link {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-eraser"></i>
+                                            <p>{{ __('Data Requests') }}</p>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if(auth()->user()?->hasRole(['platform_admin', 'executive_admin']))
+                                    <li class="nav-item">
                                         <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
                                             <i class="nav-icon fas fa-clipboard-list"></i>
                                             <p>{{ __('Audit Logs') }}</p>

@@ -41,5 +41,10 @@ class AuthServiceProvider extends ServiceProvider
             'platform_admin',
             'executive_admin',
         ], true));
+
+        Gate::define('manage-data-requests', static fn ($user): bool => in_array($user->role, [
+            'platform_admin',
+            'executive_admin',
+        ], true));
     }
 }

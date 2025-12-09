@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AlertController as AdminAlertController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
+use App\Http\Controllers\Admin\DataDeletionAdminController as AdminDataDeletionAdminController;
 use App\Http\Controllers\Admin\OrgController as AdminOrgController;
 use App\Http\Controllers\Admin\ReportCategoryController as AdminReportCategoryController;
 use App\Http\Controllers\Admin\ReportSubcategoryController as AdminReportSubcategoryController;
@@ -114,6 +115,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
             ->middleware('role:platform_admin,executive_admin')
             ->name('audit-logs.index');
+        Route::middleware('can:manage-data-requests')->group(function () {
+            Route::get('data-requests', [AdminDataDeletionAdminController::class, 'index'])->name('data_requests.index');
+            Route::get('data-requests/{dataRequest}', [AdminDataDeletionAdminController::class, 'show'])->name('data_requests.show');
+            Route::post('data-requests/{dataRequest}/status', [AdminDataDeletionAdminController::class, 'updateStatus'])->name('data_requests.update_status');
+            Route::post('data-requests/from-case/{report}', [AdminDataDeletionAdminController::class, 'storeFromCase'])->name('data_requests.from_case');
+        });
         Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
             ->name('report-categories.subcategories.store');
         Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
@@ -165,4 +172,3 @@ require __DIR__.'/auth.php';
 Route::get('/{slug}', [PageController::class, 'resolve'])
     ->where('slug', '[A-Za-z0-9\\-]+')
     ->name('pages.resolve');
-
