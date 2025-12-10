@@ -67,31 +67,6 @@
                     </div>
                     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
                         <span class="text-monospace text-muted mr-3">#{{ $report->id }}</span>
-                        <div class="btn-group btn-group-sm" role="group">
-                            @can('manage-data-requests')
-                                <form method="POST" action="{{ route('admin.data_requests.from_case', $report) }}" class="mr-2">
-                                    @csrf
-                                    <button type="submit" class="btn btn-outline-secondary">
-                                        <i class="fas fa-eraser mr-1"></i> {{ __('Create Data Deletion Request') }}
-                                    </button>
-                                </form>
-                            @endcan
-                            <a href="{{ route('reports.edit', $report) }}" class="btn btn-outline-primary">
-                                <i class="fas fa-edit mr-1"></i> {{ __('Edit') }}
-                            </a>
-                            <form method="POST" action="{{ route('reports.destroy', $report) }}"
-                                data-swal-confirm
-                                data-swal-title="{{ __('Delete report') }}"
-                                data-swal-message="{{ __('Are you sure you want to delete this report? This action cannot be undone.') }}"
-                                data-swal-confirm-button="{{ __('Yes, delete') }}"
-                                data-swal-icon="warning">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger">
-                                    <i class="fas fa-trash mr-1"></i> {{ __('Delete') }}
-                                </button>
-                            </form>
-                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -191,6 +166,33 @@
                             <li><strong>{{ __('Email') }}:</strong> {{ $report->contact_email ?? __('Not provided') }}</li>
                             <li><strong>{{ __('Phone') }}:</strong> {{ $report->contact_phone ?? __('Not provided') }}</li>
                         </ul>
+                    </div>
+
+                    <div class="mt-3 d-flex flex-wrap justify-content-end">
+                        @can('manage-data-requests')
+                            <form method="POST" action="{{ route('admin.data_requests.from_case', $report) }}" class="mb-2 ml-2">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-eraser mr-1"></i> {{ __('Create Data Deletion Request') }}
+                                </button>
+                            </form>
+                        @endcan
+                        <a href="{{ route('reports.edit', $report) }}" class="btn btn-primary btn-sm mb-2 ml-2">
+                            <i class="fas fa-edit mr-1"></i> {{ __('Edit') }}
+                        </a>
+                        <form method="POST" action="{{ route('reports.destroy', $report) }}"
+                            class="mb-2 ml-2"
+                            data-swal-confirm
+                            data-swal-title="{{ __('Delete report') }}"
+                            data-swal-message="{{ __('Are you sure you want to delete this report? This action cannot be undone.') }}"
+                            data-swal-confirm-button="{{ __('Yes, delete') }}"
+                            data-swal-icon="warning">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash mr-1"></i> {{ __('Delete') }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
