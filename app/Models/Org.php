@@ -19,16 +19,30 @@ class Org extends Model
      */
     protected $fillable = [
         'name',
+        'short_name',
+        'org_type',
         'slug',
         'org_code',
         'status',
         'default_locale',
+        'contact_email',
+        'contact_phone',
+        'primary_color',
+        'logo_path',
         'created_by',
         'on_call_user_id',
         'enable_commendations',
         'enable_hr_reports',
         'enable_student_reports',
         'enable_ultra_private_mode',
+        'plan_id',
+        'billing_status',
+        'trial_ends_at',
+        'is_self_service',
+        'reports_this_month',
+        'reports_month_reset_at',
+        'total_reports',
+        'seats_used',
     ];
 
     /**
@@ -39,6 +53,9 @@ class Org extends Model
         'enable_hr_reports' => 'boolean',
         'enable_student_reports' => 'boolean',
         'enable_ultra_private_mode' => 'boolean',
+        'trial_ends_at' => 'datetime',
+        'is_self_service' => 'boolean',
+        'reports_month_reset_at' => 'datetime',
     ];
 
     /**
@@ -87,6 +104,42 @@ class Org extends Model
     public function onCallReviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'on_call_user_id');
+    }
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
+    public function getReportsThisMonthLabelAttribute(): string
+    {
+        $limit = $this->plan?->max_reports_per_month;
+
+        if ($limit) {
+            return $this->reports_this_month.' / '.$limit;
+        }
+
+        return $this->reports_this_month.' (no limit)';
+    }
+
+    public function getSeatsUsedLabelAttribute(): string
+    {
+        $limit = $this->plan?->max_users;
+
+        if ($limit) {
+            return $this->seats_used.' / '.$limit;
+        }
+
+        return $this->seats_used.' (no limit)';
+    }
+
+    public function getTrialDaysLeftAttribute(): ?int
+    {
+        if (! $this->trial_ends_at) {
+            return null;
+        }
+
+        return now()->diffInDays($this->trial_ends_at, false);
     }
 
     /**

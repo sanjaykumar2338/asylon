@@ -65,6 +65,33 @@
         </div>
     </div>
 
+    @if ($user->hasRole('platform_admin') && ($orgs ?? collect())->isNotEmpty())
+        <div class="card card-outline card-primary mb-4">
+            <div class="card-header">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-filter mr-2"></i> {{ __('Filter by organization') }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ route('admin.risk-keywords.index') }}" class="form-inline">
+                    <label for="org_id" class="sr-only">{{ __('Organization') }}</label>
+                    <select name="org_id" id="org_id" class="form-control mr-2">
+                        <option value="0">{{ __('All organizations & global') }}</option>
+                        @foreach ($orgs as $org)
+                            <option value="{{ $org->id }}" @selected((string)$orgFilter === (string)$org->id)>{{ $org->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-search mr-1"></i> {{ __('Apply') }}
+                    </button>
+                    <a href="{{ route('admin.risk-keywords.index') }}" class="btn btn-link btn-sm ml-2">
+                        {{ __('Clear') }}
+                    </a>
+                </form>
+            </div>
+        </div>
+    @endif
+
     <div class="card card-outline card-primary">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title mb-0">

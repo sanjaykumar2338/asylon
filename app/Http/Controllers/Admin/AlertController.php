@@ -19,12 +19,17 @@ class AlertController extends AdminController
     {
         $type = (string) $request->query('type', '');
         $search = (string) $request->query('q', '');
+        $orgId = $request->user()?->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
 
         $query = OrgAlertContact::query()
             ->with('org')
             ->orderByDesc('created_at');
 
         $this->scopeByRole($query);
+
+        if ($orgId > 0 && $request->user()?->hasRole('platform_admin')) {
+            $query->where('org_id', $orgId);
+        }
 
         if ($type !== '') {
             $query->where('type', $type);
@@ -40,6 +45,8 @@ class AlertController extends AdminController
             'alerts' => $alerts,
             'type' => $type,
             'search' => $search,
+            'orgId' => $orgId,
+            'orgOptions' => $this->orgOptions(),
         ]);
     }
 

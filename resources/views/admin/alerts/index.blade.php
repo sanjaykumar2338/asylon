@@ -9,8 +9,8 @@
         <div class="card-header">
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
                 <form method="GET" action="{{ route('admin.alerts.index') }}" class="w-100 mb-3 mb-lg-0">
-                    <div class="form-row">
-                        <div class="col-md-5 mb-2 mb-md-0">
+                    <div class="form-row align-items-center">
+                        <div class="col-md-4 mb-2 mb-md-0">
                             <label class="sr-only" for="search-alerts">{{ __('Search contacts') }}</label>
                             <input type="search" name="q" id="search-alerts" value="{{ $search }}" class="form-control"
                                 placeholder="{{ __('Search contact value') }}">
@@ -23,12 +23,23 @@
                                 <option value="sms" @selected($type === 'sms')>{{ __('SMS') }}</option>
                             </select>
                         </div>
-                        <div class="col-md-4 text-md-right">
-                            <button type="submit" class="btn btn-outline-primary">
+                        @if(auth()->user()?->hasRole('platform_admin'))
+                            <div class="col-md-3 mb-2 mb-md-0">
+                                <label class="sr-only" for="org_id">{{ __('Organization') }}</label>
+                                <select name="org_id" id="org_id" class="form-control">
+                                    <option value="0">{{ __('All organizations') }}</option>
+                                    @foreach(($orgOptions ?? collect()) as $org)
+                                        <option value="{{ $org->id }}" @selected((string)($orgId ?? '') === (string)$org->id)>{{ $org->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+                        <div class="col-md-2 text-md-right">
+                            <button type="submit" class="btn btn-outline-primary btn-block">
                                 <i class="fas fa-filter mr-1"></i> {{ __('Filter') }}
                             </button>
-                            @if ($type !== '' || $search !== '')
-                                <a href="{{ route('admin.alerts.index') }}" class="btn btn-link">
+                            @if ($type !== '' || $search !== '' || ($orgId ?? 0))
+                                <a href="{{ route('admin.alerts.index') }}" class="btn btn-link btn-sm">
                                     {{ __('Clear') }}
                                 </a>
                             @endif

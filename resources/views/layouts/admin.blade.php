@@ -148,7 +148,15 @@
                                 
                             </li>
 
-                            @if(auth()->user()?->hasRole(['org_admin', 'platform_admin', 'executive_admin']))
+                            @php
+                                $navUser = auth()->user();
+                                $isPlatform = $navUser?->hasRole('platform_admin');
+                                $isExec = $navUser?->hasRole('executive_admin');
+                                $isOrgAdmin = $navUser?->hasRole('org_admin');
+                                $isReviewer = $navUser?->hasRole('reviewer');
+                            @endphp
+
+                            @if($isPlatform)
                                 <li class="nav-item">
                                     <a href="{{ route('admin.orgs.index') }}" class="nav-link {{ request()->routeIs('admin.orgs.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
@@ -186,31 +194,39 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('admin.risk-keywords.index') }}" class="nav-link {{ request()->routeIs('admin.risk-keywords.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-key"></i>
+                                        <p>{{ __('Risk keywords') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-chart-line"></i>
                                         <p>{{ __('Analytics') }}</p>
                                     </a>
                                 </li>
-                                @if(auth()->user()?->hasRole(['platform_admin', 'executive_admin']))
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.data_requests.index') }}" class="nav-link {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">
-                                            <i class="nav-icon fas fa-eraser"></i>
-                                            <p>{{ __('Data Requests') }}</p>
-                                        </a>
-                                    </li>
-                                @endif
-                                @if(auth()->user()?->hasRole(['platform_admin', 'executive_admin']))
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
-                                            <i class="nav-icon fas fa-clipboard-list"></i>
-                                            <p>{{ __('Audit Logs') }}</p>
-                                        </a>
-                                    </li>
-                                @endif
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.risk-keywords.index') }}" class="nav-link {{ request()->routeIs('admin.risk-keywords.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-key"></i>
-                                        <p>{{ __('Risk keywords') }}</p>
+                                    <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-building"></i>
+                                        <p>{{ __('Org Settings') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('platform.organizations.index') }}" class="nav-link {{ request()->routeIs('platform.organizations.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-layer-group"></i>
+                                        <p>{{ __('Platform Orgs') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.data_requests.index') }}" class="nav-link {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-eraser"></i>
+                                        <p>{{ __('Data Requests') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-clipboard-list"></i>
+                                        <p>{{ __('Audit Logs') }}</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -245,14 +261,50 @@
                                         </li>
                                     </ul>
                                 </li>
-                                @if(auth()->user()?->hasRole('platform_admin'))
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                                            <i class="nav-icon fas fa-tools"></i>
-                                            <p>{{ __('Settings') }}</p>
-                                        </a>
-                                    </li>
-                                @endif
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-tools"></i>
+                                        <p>{{ __('Settings') }}</p>
+                                    </a>
+                                </li>
+                            @elseif($isExec || $isOrgAdmin)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-users"></i>
+                                        <p>{{ __('Users') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.alerts.index') }}" class="nav-link {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-bell"></i>
+                                        <p>{{ __('Alert Contacts') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.notifications.templates.edit') }}" class="nav-link {{ request()->routeIs('admin.notifications.templates.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-envelope-open-text"></i>
+                                        <p>{{ __('Notification Templates') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-chart-line"></i>
+                                        <p>{{ __('Analytics') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-building"></i>
+                                        <p>{{ __('Org Settings') }}</p>
+                                    </a>
+                                </li>
+                            @elseif($isReviewer)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-chart-line"></i>
+                                        <p>{{ __('Analytics') }}</p>
+                                    </a>
+                                </li>
                             @endif
 
                             <li class="nav-item mt-3">
@@ -285,6 +337,19 @@
                                 @yield('breadcrumb')
                             </div>
                         </div>
+                        @php
+                            $layoutOrg = auth()->user()?->org;
+                        @endphp
+                        @if ($layoutOrg && $layoutOrg->billing_status === 'trialing' && $layoutOrg->trial_ends_at)
+                            <div class="alert alert-warning mt-2 mb-0">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                {{ __('Your trial ends on :date.', ['date' => $layoutOrg->trial_ends_at->format('M d, Y')]) }}
+                                @if (! is_null($layoutOrg->trial_days_left))
+                                    <span class="ml-2 text-muted">({{ $layoutOrg->trial_days_left }} {{ __('days left') }})</span>
+                                @endif
+                                <span class="ml-2">{{ __('Payment setup will be available soon.') }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -313,7 +378,9 @@
                 <div>
                     <strong>&copy; {{ now()->year }} {{ config('app.name', 'Admin') }}.</strong> {{ __('All rights reserved.') }}
                     <span class="ml-2">|</span>
-                    <a class="text-reset" href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
+                            <a class="text-reset" href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
+                            <span class="ml-2">|</span>
+                            <a class="text-reset" href="{{ route('signup.show') }}">{{ __('Get Started as New Organization') }}</a>
                 </div>
             </footer>
         </div>

@@ -20,12 +20,17 @@ class UserController extends AdminController
     public function index(Request $request): View
     {
         $search = (string) $request->query('q', '');
+        $orgId = $request->user()?->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
 
         $query = User::query()
             ->with('org')
             ->orderByDesc('created_at');
 
         $this->scopeByRole($query);
+
+        if ($orgId > 0 && $request->user()?->hasRole('platform_admin')) {
+            $query->where('org_id', $orgId);
+        }
 
         if ($search !== '') {
             $query->where(function ($builder) use ($search): void {
@@ -40,6 +45,8 @@ class UserController extends AdminController
         return view('admin.users.index', [
             'users' => $users,
             'search' => $search,
+            'orgOptions' => $this->orgOptions(),
+            'orgId' => $orgId,
         ]);
     }
 

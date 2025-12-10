@@ -19,10 +19,13 @@
         }
     </style>
     <header class="mb-8 border-b border-gray-200 pb-4">
-        <div class="flex justify-end">
-            <div class="text-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+                <a href="{{ url('/') }}" class="text-sm text-indigo-600 hover:underline">{{ config('app.name', 'Asylon') }}</a>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
                 <a href="{{ route('login') }}"
-                    class="inline-flex items-center justify-center rounded-md border border-indigo-500 px-4 py-2 font-semibold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    class="inline-flex items-center justify-center rounded-md border border-gray-300 px-3 py-2 font-semibold text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log In') }}
                 </a>
             </div>
@@ -371,6 +374,21 @@
         </div>
     </form>
 
+    <footer class="mt-8 text-center text-xs text-gray-600 space-y-2 border-t border-gray-200 pt-4">
+        <p class="flex flex-col sm:flex-row items-center justify-center gap-2">
+            <span>{{ __('New organization?') }}</span>
+            <a href="{{ route('signup.show') }}" class="text-indigo-600 underline font-semibold">{{ __('Get Started') }}</a>
+        </p>
+        <p>
+            <a href="{{ route('report.create') }}" class="text-indigo-600 underline">{{ __('Submit A Report') }}</a>
+            &middot;
+            <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
+            &middot;
+            <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
+            &middot;
+            <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+        </p>
+    </footer>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const categoriesMap = @json($categories);

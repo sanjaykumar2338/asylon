@@ -23,7 +23,7 @@
             'high' => 'badge-danger',
             'critical' => 'badge-dark',
         ];
-    @endphp
+@endphp
     <div class="card card-outline card-primary mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
@@ -33,6 +33,17 @@
         <div class="card-body">
             <form method="GET" action="{{ route('reviews.index') }}">
                 <div class="form-row">
+                    @if(auth()->user()?->hasRole('platform_admin'))
+                        <div class="form-group col-md-3">
+                            <label for="org_id">{{ __('Organization') }}</label>
+                            <select id="org_id" name="org_id" class="form-control">
+                                <option value="0">{{ __('All organizations') }}</option>
+                                @foreach (($orgOptions ?? collect()) as $org)
+                                    <option value="{{ $org->id }}" @selected((string)$orgId === (string)$org->id)>{{ $org->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div class="form-group col-md-3">
                         <label for="status">{{ __('Status') }}</label>
                         <select id="status" name="status" class="form-control">

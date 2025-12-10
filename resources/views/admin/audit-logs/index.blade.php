@@ -51,6 +51,17 @@
                         <label for="case_id">{{ __('Case ID') }}</label>
                         <input type="text" name="case_id" id="case_id" class="form-control" value="{{ $caseId }}" placeholder="{{ __('Report ULID') }}">
                     </div>
+                    @if (($orgOptions ?? collect())->isNotEmpty())
+                        <div class="form-group col-md-3">
+                            <label for="org_id">{{ __('Organization') }}</label>
+                            <select name="org_id" id="org_id" class="form-control">
+                                <option value="0">{{ __('All organizations') }}</option>
+                                @foreach ($orgOptions as $org)
+                                    <option value="{{ $org->id }}" @selected((string)($orgId ?? '') === (string)$org->id)>{{ $org->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                 </div>
                 <div class="d-flex flex-column flex-sm-row justify-content-end mt-3">
                     <button type="submit" class="btn btn-primary mr-sm-2 mb-2 mb-sm-0">

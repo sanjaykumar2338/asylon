@@ -165,6 +165,32 @@ class Report extends Model
             ->firstOrFail();
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function (Report $report): void {
+            $org = $report->org;
+
+            if ($org) {
+                $resetAt = $org->reports_month_reset_at;
+                $nowMonth = now()->startOfMonth();
+
+                if (! $resetAt || $resetAt->lt($nowMonth)) {
+                    $org->reports_this_month = 0;
+                    $org->reports_month_reset_at = $nowMonth;
+                }
+            }
+        });
+
+        static::created(function (Report $report): void {
+            $org = $report->org()->lockForUpdate()->first();
+
+            if ($org) {
+                $org->increment('reports_this_month');
+                $org->increment('total_reports');
+            }
+        });
+    }
+
     /**
      * Determine whether the report is anonymous or confidential based on provided contact details.
      */

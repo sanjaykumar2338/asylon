@@ -42,13 +42,13 @@
                         <label for="to">{{ __('Requested to') }}</label>
                         <input type="date" id="to" name="to" class="form-control" value="{{ $to }}">
                     </div>
-                    @if ($orgOptions->isNotEmpty())
+                    @if (($orgOptions ?? collect())->isNotEmpty())
                         <div class="form-group col-md-3">
                             <label for="org_id">{{ __('Organization') }}</label>
                             <select id="org_id" name="org_id" class="form-control">
-                                <option value="">{{ __('All') }}</option>
+                                <option value="0">{{ __('All') }}</option>
                                 @foreach ($orgOptions as $org)
-                                    <option value="{{ $org->id }}" @selected($orgId === $org->id)>{{ $org->name }}</option>
+                                    <option value="{{ $org->id }}" @selected((string)($orgId ?? '') === (string)$org->id)>{{ $org->name }}</option>
                                 @endforeach
                             </select>
                         </div>

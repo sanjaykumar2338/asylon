@@ -10,6 +10,7 @@ use App\Models\Report;
 use App\Models\ReportCategory;
 use App\Models\ReportFile;
 use App\Models\AuditLog;
+use App\Models\Org;
 use App\Models\User;
 use App\Notifications\FirstResponseNotification;
 use App\Notifications\ReportAlertNotification;
@@ -45,6 +46,7 @@ class ReviewController extends Controller
         $severity = (string) $request->query('severity', '');
         $riskLevel = (string) $request->query('risk_level', '');
         $sort = (string) $request->query('sort', 'submitted_desc');
+        $orgId = $request->user()?->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
 
         $query = Report::query()
             ->with(['org', 'files', 'riskAnalysis', 'escalationEvents'])
@@ -52,6 +54,8 @@ class ReviewController extends Controller
 
         if (! $user->can('view-all')) {
             $query->where('org_id', $user->org_id);
+        } elseif ($orgId > 0) {
+            $query->where('org_id', $orgId);
         }
 
         if ($status !== '') {
@@ -129,6 +133,8 @@ class ReviewController extends Controller
             'sort' => $sort,
             'categoriesMap' => $categoriesMap,
             'subcategoryOptions' => $subcategoryOptions,
+            'orgId' => $orgId,
+            'orgOptions' => $user->hasRole('platform_admin') ? $this->orgOptions() : collect(),
         ]);
     }
 
@@ -814,5 +820,21 @@ class ReviewController extends Controller
             'system' => __('System'),
             default => null,
         };
+    }
+
+    /**
+     * Platform admin org options for filters.
+     */
+    protected function orgOptions(): Collection
+    {
+        $user = auth()->user();
+
+        $query = Org::query()->orderBy('name');
+
+        if ($user && ! $user->hasRole('platform_admin')) {
+            $query->whereKey($user->org_id);
+        }
+
+        return $query->get();
     }
 }

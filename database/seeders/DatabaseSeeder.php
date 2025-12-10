@@ -8,9 +8,11 @@ use App\Models\Org;
 use App\Models\OrgAlertContact;
 use App\Models\Page;
 use App\Models\SeoPage;
+use App\Models\Plan;
 use Database\Seeders\BlogSeeder;
 use Database\Seeders\LandingPagesSeeder;
 use Database\Seeders\StaticPagesSeeder;
+use Database\Seeders\PlanSeeder;
 use App\Models\Report;
 use App\Models\ReportCategory;
 use App\Models\ReportChatMessage;
@@ -31,6 +33,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            PlanSeeder::class,
+        ]);
+
         $platformAdmin = User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [

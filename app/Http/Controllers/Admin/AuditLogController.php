@@ -23,9 +23,14 @@ class AuditLogController extends AdminController
         $userId = (string) $request->query('user_id', '');
         $action = (string) $request->query('action', '');
         $caseId = (string) $request->query('case_id', '');
+        $orgId = $user->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
 
         $query = AuditLog::query()->with(['user', 'org', 'case']);
         $this->scopeByRole($query, 'org_id');
+
+        if ($orgId > 0 && $user->hasRole('platform_admin')) {
+            $query->where('org_id', $orgId);
+        }
 
         if ($from !== '' && Carbon::hasFormat($from, 'Y-m-d')) {
             $query->whereDate('created_at', '>=', Carbon::createFromFormat('Y-m-d', $from));
@@ -72,6 +77,8 @@ class AuditLogController extends AdminController
             'caseId' => $caseId,
             'userOptions' => $userOptions,
             'actionOptions' => $actionOptions,
+            'orgOptions' => $user->hasRole('platform_admin') ? $this->orgOptions() : collect(),
+            'orgId' => $orgId,
         ]);
     }
 }

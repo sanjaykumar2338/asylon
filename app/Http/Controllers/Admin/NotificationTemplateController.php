@@ -19,6 +19,7 @@ class NotificationTemplateController extends Controller
         $orgId = Auth::user()?->org_id;
         $definitions = NotificationTemplate::definitions();
         $templates = [];
+        $orgTemplateCount = NotificationTemplate::query()->where('org_id', $orgId)->count();
 
         foreach ($definitions as $channel => $types) {
             foreach ($types as $type => $meta) {
@@ -38,6 +39,7 @@ class NotificationTemplateController extends Controller
             'complianceLine' => $complianceLine,
             'defaults' => $defaults,
             'orgId' => $orgId,
+            'usingGlobalDefaults' => $orgTemplateCount === 0,
         ]);
     }
 

@@ -34,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
             'reviewer',
             'security_lead',
             'org_admin',
+            'executive_admin',
             'platform_admin',
         ], true));
 

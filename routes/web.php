@@ -18,24 +18,46 @@ use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrgSettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TrashReportController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['setLocale'])->group(function () {
     require base_path('routes/public.php');
 });
 
+Route::get('/get-started', [SignupController::class, 'showForm'])->name('signup.show');
+Route::post('/get-started', [SignupController::class, 'store'])->name('signup.store');
+Route::get('/welcome', [SignupController::class, 'welcome'])->name('welcome');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/org-suspended', fn () => view('org.suspended'))->name('org.suspended');
     Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware('role:reviewer,security_lead,org_admin,platform_admin')
+        ->middleware('role:reviewer,security_lead,org_admin,platform_admin,executive_admin')
         ->name('dashboard');
+    Route::get('/settings/organization', [OrgSettingsController::class, 'edit'])
+        ->name('settings.organization.edit');
+    Route::post('/settings/organization', [OrgSettingsController::class, 'update'])
+        ->name('settings.organization.update');
 
-    Route::get('/reviews', [ReviewController::class, 'index'])
+    Route::middleware('role:platform_admin')->prefix('platform')->name('platform.')->group(function () {
+        Route::get('organizations', [\App\Http\Controllers\Platform\OrganizationController::class, 'index'])
+            ->name('organizations.index');
+        Route::get('organizations/{org}', [\App\Http\Controllers\Platform\OrganizationController::class, 'show'])
+            ->name('organizations.show');
+        Route::post('organizations/{org}/update-plan', [\App\Http\Controllers\Platform\OrganizationController::class, 'updatePlan'])
+            ->name('organizations.update_plan');
+        Route::post('organizations/{org}/update-status', [\App\Http\Controllers\Platform\OrganizationController::class, 'updateStatus'])
+            ->name('organizations.update_status');
+    });
+
+    Route::get('/reports/all', [ReviewController::class, 'index'])
         ->middleware('can:review-reports')
         ->name('reviews.index');
     Route::get('/reviews/trash', TrashReportController::class)
@@ -172,3 +194,8 @@ require __DIR__.'/auth.php';
 Route::get('/{slug}', [PageController::class, 'resolve'])
     ->where('slug', '[A-Za-z0-9\\-]+')
     ->name('pages.resolve');
+
+// Legacy redirects
+if (file_exists(__DIR__.'/legacy.php')) {
+    require __DIR__.'/legacy.php';
+}

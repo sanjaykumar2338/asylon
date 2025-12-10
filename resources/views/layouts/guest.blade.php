@@ -54,13 +54,14 @@
                         </nav>
                     @else
                         <nav class="hidden sm:flex items-center gap-4 text-sm font-medium text-gray-700">
-                            <a href="{{ url('/pages/schools') }}" class="hover:text-indigo-600">Schools</a>
-                            <a href="{{ url('/pages/churches') }}" class="hover:text-indigo-600">Churches</a>
-                            <a href="{{ url('/pages/organizations') }}" class="hover:text-indigo-600">Organizations</a>
-                            <a href="{{ route('blog.index') }}" class="hover:text-indigo-600">Blog</a>
-                        </nav>
-                    @endif
-                </div>
+                        <a href="{{ url('/pages/schools') }}" class="hover:text-indigo-600">Schools</a>
+                        <a href="{{ url('/pages/churches') }}" class="hover:text-indigo-600">Churches</a>
+                        <a href="{{ url('/pages/organizations') }}" class="hover:text-indigo-600">Organizations</a>
+                        <a href="{{ route('blog.index') }}" class="hover:text-indigo-600">Blog</a>
+                        <a href="{{ route('signup.show') }}" class="hover:text-indigo-600 font-semibold">{{ __('Get Started') }}</a>
+                    </nav>
+                @endif
+            </div>
             </div>
 
             <div class="{{ $containerClass }}">
@@ -84,25 +85,27 @@
                         </p>
                     @else
                         <p>
-                            <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
-                            &middot;
-                            <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
-                            &middot;
-                            <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
-                            &middot;
-                            <a href="{{ route('blog.index') }}" class="text-indigo-600 underline">Blog</a>
-                            &middot;
-                            <a href="{{ route('privacy.anonymity') }}" class="text-indigo-600 underline">Privacy &amp; Anonymity</a>
-                            &middot;
-                            <a href="{{ route('security.overview') }}" class="text-indigo-600 underline">Security Overview</a>
-                            &middot;
-                            <a href="{{ url('/brand-info') }}" class="text-indigo-600 underline">Brand &amp; SMS Alerts Info</a>
-                            &middot;
-                            <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
-                        </p>
-                    @endif
-                </footer>
-            </div>
+                        <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
+                        &middot;
+                        <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
+                        &middot;
+                        <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
+                        &middot;
+                        <a href="{{ route('blog.index') }}" class="text-indigo-600 underline">Blog</a>
+                        &middot;
+                        <a href="{{ route('privacy.anonymity') }}" class="text-indigo-600 underline">Privacy &amp; Anonymity</a>
+                        &middot;
+                        <a href="{{ route('security.overview') }}" class="text-indigo-600 underline">Security Overview</a>
+                        &middot;
+                        <a href="{{ url('/brand-info') }}" class="text-indigo-600 underline">Brand &amp; SMS Alerts Info</a>
+                        &middot;
+                        <a href="{{ route('report.create') }}" class="text-indigo-600 underline">Submit A Report</a>
+                        &middot;
+                        <a href="{{ route('signup.show') }}" class="text-indigo-600 underline">{{ __('Get Started') }}</a>
+                    </p>
+                @endif
+            </footer>
+        </div>
         </div>
         @php
             $flashOk = session('ok');

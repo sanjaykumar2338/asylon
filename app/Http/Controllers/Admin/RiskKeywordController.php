@@ -18,11 +18,14 @@ class RiskKeywordController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $orgFilter = $user->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
 
         $query = RiskKeyword::query()->orderBy('phrase');
 
         if (! $user->hasRole('platform_admin')) {
             $query->where('org_id', $user->org_id);
+        } elseif ($orgFilter > 0) {
+            $query->where('org_id', $orgFilter);
         }
 
         $keywords = $query->with('org')->paginate(20)->withQueryString();
@@ -36,6 +39,7 @@ class RiskKeywordController extends Controller
             'keywords' => $keywords,
             'orgs' => $orgs,
             'userOrgId' => $user->org_id,
+            'orgFilter' => $orgFilter,
         ]);
     }
 

@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Org;
+use App\Models\Plan;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
+
+class SignupController extends Controller
+{
+    public function showForm(): View
+    {
+        $plans = Plan::query()->where('is_active', true)->orderBy('id')->get(['id', 'name', 'slug', 'trial_days']);
+
+        return view('signup.get-started', [
+            'plans' => $plans,
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $planId = $request->input('plan_id') ?: Plan::where('slug', 'starter')->value('id');
+
+        $validated = $request->validate([
+            'org_name' => ['required', 'string', 'max:255'],
+            'org_type' => ['required', Rule::in(['school', 'church', 'organization', 'other'])],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'plan_id' => ['nullable', 'exists:plans,id'],
+        ]);
+
+        $plan = Plan::find($planId);
+
+        $org = Org::create([
+            'name' => $validated['org_name'],
+            'slug' => \Illuminate\Support\Str::slug($validated['org_name']).'-'.substr(uniqid(), -4),
+            'status' => 'active',
+            'enable_commendations' => true,
+            'enable_hr_reports' => true,
+            'enable_student_reports' => true,
+            'plan_id' => $plan?->id,
+            'billing_status' => 'active',
+            'trial_ends_at' => $plan ? now()->addDays((int) $plan->trial_days) : null,
+            'is_self_service' => true,
+        ]);
+
+        $user = User::create([
+            'org_id' => $org->id,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'executive_admin',
+            'active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->route('welcome');
+    }
+
+    public function welcome(): View
+    {
+        return view('signup.welcome');
+    }
+}

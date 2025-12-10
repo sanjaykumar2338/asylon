@@ -6,6 +6,11 @@
     <div class="row">
         <div class="col-lg-12">
             @include('admin.partials.flash')
+            @if ($usingGlobalDefaults ?? false)
+                <div class="alert alert-info">
+                    {{ __('You are currently using the default system templates. Create a template to override the default for your organization.') }}
+                </div>
+            @endif
         </div>
     </div>
 

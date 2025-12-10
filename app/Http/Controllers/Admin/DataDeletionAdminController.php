@@ -21,7 +21,7 @@ class DataDeletionAdminController extends Controller
         $user = $request->user();
         $status = (string) $request->query('status', '');
         $scope = (string) $request->query('scope', '');
-        $orgId = (int) $request->query('org_id', 0);
+        $orgId = $user->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
         $from = (string) $request->query('from', '');
         $to = (string) $request->query('to', '');
 

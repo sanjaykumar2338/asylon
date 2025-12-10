@@ -80,6 +80,19 @@ class User extends Authenticatable
         return in_array($this->role, (array) $roles, true);
     }
 
+    protected static function booted(): void
+    {
+        static::created(function (User $user): void {
+            if ($user->org_id) {
+                $org = $user->org()->lockForUpdate()->first();
+
+                if ($org) {
+                    $org->increment('seats_used');
+                }
+            }
+        });
+    }
+
     /**
      * Resolve URL for the user's profile photo with fallback avatar.
      */
