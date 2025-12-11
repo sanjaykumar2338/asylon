@@ -26,11 +26,15 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TrashReportController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SignupController;
+use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['setLocale'])->group(function () {
     require base_path('routes/public.php');
 });
+
+// Public Stripe webhook endpoint
+Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');
 
 Route::get('/get-started', [SignupController::class, 'showForm'])->name('signup.show');
 Route::post('/get-started', [SignupController::class, 'store'])->name('signup.store');
