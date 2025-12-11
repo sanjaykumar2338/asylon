@@ -48,32 +48,36 @@ class BillingController extends Controller
 
         $stripe = new StripeClient(config('services.stripe.secret'));
 
+        $metadata = [
+            'org_id' => $org?->id,
+            'plan_slug' => $plan->slug,
+            'interval' => $interval,
+        ];
+
+        // Build params without empty customer.
+        $params = [
+            'mode' => 'subscription',
+            'client_reference_id' => $org?->id,
+            'metadata' => $metadata,
+            'subscription_data' => [
+                'metadata' => $metadata,
+            ],
+            'line_items' => [
+                [
+                    'price' => $stripePriceId,
+                    'quantity' => 1,
+                ],
+            ],
+            'success_url' => route('billing.success'),
+            'cancel_url' => route('billing.cancel'),
+        ];
+
+        if ($org?->stripe_customer_id) {
+            $params['customer'] = $org->stripe_customer_id;
+        }
+
         try {
-            $session = $stripe->checkout->sessions->create([
-                'mode' => 'subscription',
-                'client_reference_id' => $org?->id,
-                'customer' => $org?->stripe_customer_id,
-                'subscription_data' => [
-                    'metadata' => [
-                        'org_id' => $org?->id,
-                        'plan_slug' => $plan->slug,
-                        'interval' => $interval,
-                    ],
-                ],
-                'metadata' => [
-                    'org_id' => $org?->id,
-                    'plan_slug' => $plan->slug,
-                    'interval' => $interval,
-                ],
-                'line_items' => [
-                    [
-                        'price' => $stripePriceId,
-                        'quantity' => 1,
-                    ],
-                ],
-                'success_url' => route('billing.success'),
-                'cancel_url' => route('billing.cancel'),
-            ]);
+            $session = $stripe->checkout->sessions->create($params);
         } catch (\Throwable $e) {
             return back()->with('error', __('Unable to start checkout: :message', ['message' => $e->getMessage()]));
         }
