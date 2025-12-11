@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 use Stripe\StripeClient;
 
 class BillingController extends Controller
@@ -21,6 +22,12 @@ class BillingController extends Controller
 
     public function createCheckout(Request $request): RedirectResponse
     {
+        $org = $request->user()->org;
+
+        if (! $org && ! $request->user()->hasRole('platform_admin')) {
+            return back()->with('error', __('No organization found for this user.'));
+        }
+
         $data = $request->validate([
             'plan_slug' => ['required', Rule::exists('plans', 'slug')],
             'interval' => ['sometimes', 'in:monthly,yearly,custom'],
@@ -44,6 +51,20 @@ class BillingController extends Controller
         try {
             $session = $stripe->checkout->sessions->create([
                 'mode' => 'subscription',
+                'client_reference_id' => $org?->id,
+                'customer' => $org?->stripe_customer_id,
+                'subscription_data' => [
+                    'metadata' => [
+                        'org_id' => $org?->id,
+                        'plan_slug' => $plan->slug,
+                        'interval' => $interval,
+                    ],
+                ],
+                'metadata' => [
+                    'org_id' => $org?->id,
+                    'plan_slug' => $plan->slug,
+                    'interval' => $interval,
+                ],
                 'line_items' => [
                     [
                         'price' => $stripePriceId,

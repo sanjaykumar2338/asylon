@@ -38,6 +38,8 @@ class Org extends Model
         'plan_id',
         'preferred_plan',
         'billing_status',
+        'stripe_customer_id',
+        'stripe_subscription_id',
         'trial_ends_at',
         'is_self_service',
         'reports_this_month',
