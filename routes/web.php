@@ -27,6 +27,7 @@ use App\Http\Controllers\TrashReportController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as VerifyCsrfTokenMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['setLocale'])->group(function () {
@@ -34,7 +35,9 @@ Route::middleware(['setLocale'])->group(function () {
 });
 
 // Public Stripe webhook endpoint
-Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');
+Route::post('/stripe/webhook', StripeWebhookController::class)
+    ->name('stripe.webhook')
+    ->withoutMiddleware([VerifyCsrfTokenMiddleware::class]);
 
 Route::get('/get-started', [SignupController::class, 'showForm'])->name('signup.show');
 Route::post('/get-started', [SignupController::class, 'store'])->name('signup.store');
