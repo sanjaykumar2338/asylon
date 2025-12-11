@@ -7,7 +7,31 @@
 
     @php
         $preferred = $org?->preferred_plan;
+        $activePlanSlug = ($org?->billing_status === 'active') ? $org?->plan?->slug : null;
+        $hasPortal = $org?->stripe_customer_id && $org?->billing_status === 'active';
     @endphp
+
+    @if ($org)
+        <div class="alert alert-secondary d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <strong>{{ __('Organization:') }}</strong> {{ $org->name }}
+                <span class="ml-2 badge badge-{{ $org->billing_status === 'active' ? 'success' : 'warning' }}">
+                    {{ __('Status:') }} {{ ucfirst($org->billing_status ?? 'pending') }}
+                </span>
+                @if ($activePlanSlug)
+                    <span class="ml-2 badge badge-primary text-uppercase">{{ __('Current Plan:') }} {{ $org->plan?->name ?? strtoupper($activePlanSlug) }}</span>
+                @endif
+            </div>
+            @if ($hasPortal)
+                <form method="POST" action="{{ route('billing.portal') }}" class="ml-3">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt mr-1"></i> {{ __('Manage Subscription') }}
+                    </button>
+                </form>
+            @endif
+        </div>
+    @endif
 
     @if ($preferred)
         <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
@@ -57,23 +81,35 @@
                         </div>
 
                         <div class="mt-auto">
-                            <form method="POST" action="{{ route('billing.checkout') }}">
-                                @csrf
-                                <input type="hidden" name="plan_slug" value="{{ $plan->slug }}">
-                                <input type="hidden" name="interval" value="monthly">
-                                <button type="submit" class="btn btn-primary btn-block">
-                                    {{ strtoupper($plan->name) }} – {{ __('Monthly') }}
-                                </button>
-                            </form>
+                            @if ($activePlanSlug === $plan->slug)
+                                <div class="d-flex flex-column align-items-stretch">
+                                    <span class="badge badge-success mb-2">{{ __('Active Subscription') }}</span>
+                                    <form method="POST" action="{{ route('billing.portal') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-primary btn-block">
+                                            <i class="fas fa-external-link-alt mr-1"></i> {{ __('Manage Subscription') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <form method="POST" action="{{ route('billing.checkout') }}">
+                                    @csrf
+                                    <input type="hidden" name="plan_slug" value="{{ $plan->slug }}">
+                                    <input type="hidden" name="interval" value="monthly">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        {{ strtoupper($plan->name) }} – {{ __('Monthly') }}
+                                    </button>
+                                </form>
 
-                            <form method="POST" action="{{ route('billing.checkout') }}">
-                                @csrf
-                                <input type="hidden" name="plan_slug" value="{{ $plan->slug }}">
-                                <input type="hidden" name="interval" value="yearly">
-                                <button type="submit" class="btn btn-outline-primary btn-block mt-2">
-                                    {{ strtoupper($plan->name) }} – {{ __('Yearly') }}
-                                </button>
-                            </form>
+                                <form method="POST" action="{{ route('billing.checkout') }}">
+                                    @csrf
+                                    <input type="hidden" name="plan_slug" value="{{ $plan->slug }}">
+                                    <input type="hidden" name="interval" value="yearly">
+                                    <button type="submit" class="btn btn-outline-primary btn-block mt-2">
+                                        {{ strtoupper($plan->name) }} – {{ __('Yearly') }}
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
