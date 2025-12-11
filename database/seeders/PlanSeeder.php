@@ -11,19 +11,27 @@ class PlanSeeder extends Seeder
     {
         $plans = [
             [
-                'name' => 'Starter',
-                'slug' => 'starter',
+                'name' => 'ASYLON CORE',
+                'slug' => 'core',
                 'max_users' => 25,
                 'max_reports_per_month' => 500,
-                'trial_days' => 14,
+                'trial_days' => 0,
                 'is_active' => true,
             ],
             [
-                'name' => 'Pro',
+                'name' => 'ASYLON PRO',
                 'slug' => 'pro',
                 'max_users' => null,
                 'max_reports_per_month' => null,
-                'trial_days' => 14,
+                'trial_days' => 0,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'ASYLON APEX',
+                'slug' => 'apex',
+                'max_users' => null,
+                'max_reports_per_month' => null,
+                'trial_days' => 0,
                 'is_active' => true,
             ],
         ];

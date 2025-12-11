@@ -36,6 +36,7 @@ class Org extends Model
         'enable_student_reports',
         'enable_ultra_private_mode',
         'plan_id',
+        'preferred_plan',
         'billing_status',
         'trial_ends_at',
         'is_self_service',
@@ -111,9 +112,15 @@ class Org extends Model
         return $this->belongsTo(Plan::class);
     }
 
+    public function activePlan(): ?Plan
+    {
+        return $this->billing_status === 'active' ? $this->plan : null;
+    }
+
     public function getReportsThisMonthLabelAttribute(): string
     {
-        $limit = $this->plan?->max_reports_per_month;
+        $activePlan = $this->activePlan();
+        $limit = $activePlan?->max_reports_per_month;
 
         if ($limit) {
             return $this->reports_this_month.' / '.$limit;
@@ -124,7 +131,8 @@ class Org extends Model
 
     public function getSeatsUsedLabelAttribute(): string
     {
-        $limit = $this->plan?->max_users;
+        $activePlan = $this->activePlan();
+        $limit = $activePlan?->max_users;
 
         if ($limit) {
             return $this->seats_used.' / '.$limit;

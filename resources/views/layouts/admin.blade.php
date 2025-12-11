@@ -206,6 +206,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{{ route('billing.settings') }}" class="nav-link {{ request()->routeIs('billing.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-credit-card"></i>
+                                        <p>{{ __('Billing') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
                                         <p>{{ __('Org Settings') }}</p>
@@ -215,6 +221,12 @@
                                     <a href="{{ route('platform.organizations.index') }}" class="nav-link {{ request()->routeIs('platform.organizations.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-layer-group"></i>
                                         <p>{{ __('Platform Orgs') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-tags"></i>
+                                        <p>{{ __('Plans & Pricing') }}</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -292,6 +304,14 @@
                                         <p>{{ __('Analytics') }}</p>
                                     </a>
                                 </li>
+                                @if ($isExec)
+                                    <li class="nav-item">
+                                        <a href="{{ route('billing.settings') }}" class="nav-link {{ request()->routeIs('billing.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-credit-card"></i>
+                                            <p>{{ __('Billing') }}</p>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="nav-item">
                                     <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
@@ -348,6 +368,17 @@
                                     <span class="ml-2 text-muted">({{ $layoutOrg->trial_days_left }} {{ __('days left') }})</span>
                                 @endif
                                 <span class="ml-2">{{ __('Payment setup will be available soon.') }}</span>
+                            </div>
+                        @endif
+                        @php
+                            $canManageBilling = auth()->user()?->hasRole(['platform_admin', 'executive_admin']);
+                        @endphp
+                        @if ($layoutOrg && $layoutOrg->billing_status !== 'active' && $canManageBilling)
+                            <div class="alert alert-warning d-flex justify-content-between align-items-center mt-3 mb-0">
+                                <span>{{ __('Your organization does not have an active subscription yet. Please choose a plan to continue using Asylon.') }}</span>
+                                <a href="{{ route('billing.choose_plan') }}" class="btn btn-sm btn-primary">
+                                    {{ __('Choose a Plan') }}
+                                </a>
                             </div>
                         @endif
                     </div>

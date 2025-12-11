@@ -68,6 +68,9 @@ class ReportController extends Controller
     public function createByCode(string $org_code): View
     {
         $org = Org::where('org_code', $org_code)->firstOrFail();
+        if ($org->billing_status !== 'active') {
+            return $this->portalDisabled('general');
+        }
         LocaleManager::applyOrgLocale($org);
         [$portalHeading, $portalDescription, $submitPage] = $this->submitPageContent(__('report.submit_title'), __('report.submit_description'));
 
@@ -294,6 +297,7 @@ class ReportController extends Controller
     {
         return Org::query()
             ->where('status', 'active')
+            ->where('billing_status', 'active')
             ->orderBy('name')
             ->get(['id', 'name', 'enable_commendations', 'enable_hr_reports', 'enable_student_reports']);
     }
@@ -355,12 +359,18 @@ class ReportController extends Controller
             if ($request->filled('org_code')) {
                 $orgCode = trim((string) $request->input('org_code'));
                 $org = Org::where('org_code', $orgCode)->firstOrFail();
+                if ($org->billing_status !== 'active') {
+                    abort(403, 'Reporting is disabled for this organization.');
+                }
                 $validated['org_id'] = $org->id;
             }
 
             if (! $org) {
                 $orgId = $validated['org_id'] ?? null;
                 $org = $orgId ? Org::findOrFail($orgId) : null;
+                if ($org && $org->billing_status !== 'active') {
+                    abort(403, 'Reporting is disabled for this organization.');
+                }
             }
 
             $types = $org ? array_keys($org->enabledTypes()) : array_keys($this->defaultTypeOptions());

@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PlanSeeder::class,
+            PlanPriceSeeder::class,
         ]);
 
         $platformAdmin = User::updateOrCreate(

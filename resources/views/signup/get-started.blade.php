@@ -48,13 +48,19 @@
         </div>
 
         <div>
-            <x-input-label for="plan_id" :value="__('Plan (optional)')" />
-            <select id="plan_id" name="plan_id" class="block mt-1 w-full border-gray-300 rounded-md">
+            <x-input-label for="plan_slug" :value="__('Plan (optional)')" />
+            <select id="plan_slug" name="plan_slug" class="block mt-1 w-full border-gray-300 rounded-md">
                 <option value="">{{ __('Starter (default)') }}</option>
                 @foreach ($plans as $plan)
-                    <option value="{{ $plan->id }}" @selected(old('plan_id') == $plan->id)>{{ $plan->name }} ({{ $plan->trial_days }} {{ __('day trial') }})</option>
+                    <option value="{{ $plan->slug }}" @selected(old('plan_slug') == $plan->slug)">
+                        {{ $plan->name }}
+                        @if ($plan->trial_days > 0)
+                            ({{ $plan->trial_days }} {{ __('day trial') }})
+                        @endif
+                    </option>
                 @endforeach
             </select>
+            <x-input-error :messages="$errors->get('plan_slug')" class="mt-2" />
         </div>
 
         <div class="flex items-center justify-end">

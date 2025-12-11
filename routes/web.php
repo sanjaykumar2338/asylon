@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\BlogCategoryController as AdminBlogCategoryContro
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrgSettingsController;
@@ -38,13 +39,30 @@ Route::get('/welcome', [SignupController::class, 'welcome'])->name('welcome');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/org-suspended', fn () => view('org.suspended'))->name('org.suspended');
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware('role:reviewer,security_lead,org_admin,platform_admin,executive_admin')
-        ->name('dashboard');
     Route::get('/settings/organization', [OrgSettingsController::class, 'edit'])
         ->name('settings.organization.edit');
     Route::post('/settings/organization', [OrgSettingsController::class, 'update'])
         ->name('settings.organization.update');
+
+    Route::middleware('role:platform_admin,executive_admin,org_admin')->group(function () {
+        Route::get('/billing/choose-plan', [BillingController::class, 'choosePlan'])
+            ->name('billing.choose_plan');
+
+        Route::post('/billing/checkout', [BillingController::class, 'createCheckout'])
+            ->name('billing.checkout');
+
+        Route::get('/billing/success', [BillingController::class, 'success'])
+            ->name('billing.success');
+
+        Route::get('/billing/cancel', [BillingController::class, 'cancel'])
+            ->name('billing.cancel');
+
+        Route::get('/settings/billing', [BillingController::class, 'settings'])
+            ->name('billing.settings');
+
+        Route::post('/billing/portal', [BillingController::class, 'createPortalSession'])
+            ->name('billing.portal');
+    });
 
     Route::middleware('role:platform_admin')->prefix('platform')->name('platform.')->group(function () {
         Route::get('organizations', [\App\Http\Controllers\Platform\OrganizationController::class, 'index'])
@@ -55,77 +73,88 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('organizations.update_plan');
         Route::post('organizations/{org}/update-status', [\App\Http\Controllers\Platform\OrganizationController::class, 'updateStatus'])
             ->name('organizations.update_status');
+        Route::get('plans', [\App\Http\Controllers\Platform\PlanController::class, 'index'])
+            ->name('plans.index');
+        Route::get('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'editPrices'])
+            ->name('plans.prices.edit');
+        Route::put('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'updatePrices'])
+            ->name('plans.prices.update');
     });
 
-    Route::get('/reports/all', [ReviewController::class, 'index'])
-        ->middleware('can:review-reports')
-        ->name('reviews.index');
-    Route::get('/reviews/trash', TrashReportController::class)
-        ->middleware('can:review-reports')
-        ->name('reviews.trash');
-    Route::patch('/reviews/trash/{report}', [TrashReportController::class, 'restore'])
-        ->middleware('can:review-reports')
-        ->name('reviews.trash.restore');
+    Route::middleware(['active-subscription'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->middleware('role:reviewer,security_lead,org_admin,platform_admin,executive_admin')
+            ->name('dashboard');
 
-    Route::post('/reports/{report}/message', [ReviewController::class, 'messageReporter'])
-        ->middleware('can:review-reports')
-        ->name('reports.message');
+        Route::get('/reports/all', [ReviewController::class, 'index'])
+            ->middleware('can:review-reports')
+            ->name('reviews.index');
+        Route::get('/reviews/trash', TrashReportController::class)
+            ->middleware('can:review-reports')
+            ->name('reviews.trash');
+        Route::patch('/reviews/trash/{report}', [TrashReportController::class, 'restore'])
+            ->middleware('can:review-reports')
+            ->name('reviews.trash.restore');
 
-    Route::post('/reports/{report}/notes', [ReviewController::class, 'storeNote'])
-        ->middleware('can:review-reports')
-        ->name('reports.notes.store');
+        Route::post('/reports/{report}/message', [ReviewController::class, 'messageReporter'])
+            ->middleware('can:review-reports')
+            ->name('reports.message');
 
-    Route::patch('/reports/{report}/status', [ReviewController::class, 'updateStatus'])
-        ->middleware('can:review-reports')
-        ->name('reports.status');
+        Route::post('/reports/{report}/notes', [ReviewController::class, 'storeNote'])
+            ->middleware('can:review-reports')
+            ->name('reports.notes.store');
 
-    Route::get('/reports/export', [AdminExportController::class, 'reports'])
-        ->middleware('can:review-reports')
-        ->name('reports.export.list');
+        Route::patch('/reports/{report}/status', [ReviewController::class, 'updateStatus'])
+            ->middleware('can:review-reports')
+            ->name('reports.status');
 
-    Route::get('/reports/export/pdf', [AdminExportController::class, 'reportsPdf'])
-        ->middleware('can:review-reports')
-        ->name('reports.export.list.pdf');
+        Route::get('/reports/export', [AdminExportController::class, 'reports'])
+            ->middleware('can:review-reports')
+            ->name('reports.export.list');
 
-    Route::get('/reports/{report}/export/csv', [AdminExportController::class, 'reportCsv'])
-        ->middleware('can:review-reports')
-        ->name('reports.export.csv');
+        Route::get('/reports/export/pdf', [AdminExportController::class, 'reportsPdf'])
+            ->middleware('can:review-reports')
+            ->name('reports.export.list.pdf');
 
-    Route::get('/reports/{report}/export/pdf', [AdminExportController::class, 'reportPdf'])
-        ->middleware('can:review-reports')
-        ->name('reports.export.pdf');
+        Route::get('/reports/{report}/export/csv', [AdminExportController::class, 'reportCsv'])
+            ->middleware('can:review-reports')
+            ->name('reports.export.csv');
 
-    Route::get('/reports/{report}/export/audit', [AdminExportController::class, 'auditPacket'])
-        ->middleware('can:review-reports')
-        ->name('reports.export.audit');
+        Route::get('/reports/{report}/export/pdf', [AdminExportController::class, 'reportPdf'])
+            ->middleware('can:review-reports')
+            ->name('reports.export.pdf');
 
-    Route::get('/reports/{report}', [ReviewController::class, 'show'])
-        ->middleware('can:review-reports')
-        ->name('reports.show');
+        Route::get('/reports/{report}/export/audit', [AdminExportController::class, 'auditPacket'])
+            ->middleware('can:review-reports')
+            ->name('reports.export.audit');
 
-    Route::get('/reports/{report}/edit', [ReviewController::class, 'edit'])
-        ->middleware('can:review-reports')
-        ->name('reports.edit');
-    Route::put('/reports/{report}', [ReviewController::class, 'update'])
-        ->middleware('can:review-reports')
-        ->name('reports.update');
-    Route::delete('/reports/{report}', [ReviewController::class, 'destroy'])
-        ->middleware('can:review-reports')
-        ->name('reports.destroy');
+        Route::get('/reports/{report}', [ReviewController::class, 'show'])
+            ->middleware('can:review-reports')
+            ->name('reports.show');
 
-    Route::get('/reports/{report}/files/{file}', [ReviewController::class, 'downloadFile'])
-        ->middleware(['can:review-reports', 'signed'])
-        ->name('reports.files.show');
-    Route::get('/reports/{report}/files/{file}/preview', [ReviewController::class, 'previewFile'])
-        ->middleware(['can:review-reports', 'signed'])
-        ->name('reports.files.preview');
+        Route::get('/reports/{report}/edit', [ReviewController::class, 'edit'])
+            ->middleware('can:review-reports')
+            ->name('reports.edit');
+        Route::put('/reports/{report}', [ReviewController::class, 'update'])
+            ->middleware('can:review-reports')
+            ->name('reports.update');
+        Route::delete('/reports/{report}', [ReviewController::class, 'destroy'])
+            ->middleware('can:review-reports')
+            ->name('reports.destroy');
 
-    Route::middleware(['can:manage-org'])->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('orgs', AdminOrgController::class);
-        Route::resource('users', AdminUserController::class);
-        Route::resource('alerts', AdminAlertController::class)
-            ->parameters(['alerts' => 'alert']);
-        Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
+        Route::get('/reports/{report}/files/{file}', [ReviewController::class, 'downloadFile'])
+            ->middleware(['can:review-reports', 'signed'])
+            ->name('reports.files.show');
+        Route::get('/reports/{report}/files/{file}/preview', [ReviewController::class, 'previewFile'])
+            ->middleware(['can:review-reports', 'signed'])
+            ->name('reports.files.preview');
+
+        Route::middleware(['can:manage-org'])->prefix('admin')->name('admin.')->group(function () {
+            Route::resource('orgs', AdminOrgController::class);
+            Route::resource('users', AdminUserController::class);
+            Route::resource('alerts', AdminAlertController::class)
+                ->parameters(['alerts' => 'alert']);
+            Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
             ->except(['create', 'edit', 'show']);
         Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
             ->name('report-categories.toggle-visibility')
@@ -165,27 +194,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('menus.items.update');
         Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
             ->name('menus.items.destroy');
-        Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
-        Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
+            Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
+            Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
 
-        Route::middleware('can:manage-platform')->group(function () {
-            Route::get('settings', [AdminSettingsController::class, 'edit'])
-                ->name('settings.edit');
-            Route::post('settings', [AdminSettingsController::class, 'update'])
-                ->name('settings.update');
+            Route::middleware('can:manage-platform')->group(function () {
+                Route::get('settings', [AdminSettingsController::class, 'edit'])
+                    ->name('settings.edit');
+                Route::post('settings', [AdminSettingsController::class, 'update'])
+                    ->name('settings.update');
+            });
         });
+
+        Route::get('/notifications', [NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])
+            ->name('notifications.markAllRead');
+        Route::post('/notifications/{notificationId}/mark-read', [NotificationController::class, 'markRead'])
+            ->name('notifications.markRead');
+
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
-
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])
-        ->name('notifications.markAllRead');
-    Route::post('/notifications/{notificationId}/mark-read', [NotificationController::class, 'markRead'])
-        ->name('notifications.markRead');
-
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

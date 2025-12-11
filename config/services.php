@@ -53,4 +53,9 @@ return [
         'connect_timeout' => env('TELNYX_CONNECT_TIMEOUT', 4),
     ],
 
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'public' => env('STRIPE_PUBLIC_KEY'),
+    ],
+
 ];

@@ -25,18 +25,19 @@ class SignupController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $planId = $request->input('plan_id') ?: Plan::where('slug', 'starter')->value('id');
-
         $validated = $request->validate([
             'org_name' => ['required', 'string', 'max:255'],
             'org_type' => ['required', Rule::in(['school', 'church', 'organization', 'other'])],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'plan_id' => ['nullable', 'exists:plans,id'],
+            'plan_slug' => ['nullable', Rule::exists('plans', 'slug')],
         ]);
 
-        $plan = Plan::find($planId);
+        $preferredPlanSlug = $validated['plan_slug'] ?? null;
+        $preferredPlanName = $preferredPlanSlug
+            ? Plan::where('slug', $preferredPlanSlug)->value('name')
+            : null;
 
         $org = Org::create([
             'name' => $validated['org_name'],
@@ -45,9 +46,10 @@ class SignupController extends Controller
             'enable_commendations' => true,
             'enable_hr_reports' => true,
             'enable_student_reports' => true,
-            'plan_id' => $plan?->id,
-            'billing_status' => 'active',
-            'trial_ends_at' => $plan ? now()->addDays((int) $plan->trial_days) : null,
+            'plan_id' => null,
+            'preferred_plan' => $preferredPlanSlug,
+            'billing_status' => 'pending',
+            'trial_ends_at' => null,
             'is_self_service' => true,
         ]);
 
@@ -63,7 +65,11 @@ class SignupController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('welcome');
+        return redirect()
+            ->route('billing.choose_plan')
+            ->with('ok', $preferredPlanName
+                ? __('You selected the :plan plan. Please complete checkout to activate your subscription.', ['plan' => $preferredPlanName])
+                : __('Please choose a plan to activate your subscription.'));
     }
 
     public function welcome(): View
