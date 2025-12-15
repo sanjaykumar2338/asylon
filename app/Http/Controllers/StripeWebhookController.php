@@ -7,11 +7,19 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use App\Models\Org;
 use App\Models\Plan;
+use App\Support\RevenueReporter;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 
 class StripeWebhookController extends Controller
 {
+    protected RevenueReporter $revenue;
+
+    public function __construct(RevenueReporter $revenue)
+    {
+        $this->revenue = $revenue;
+    }
+
     public function __invoke(Request $request): Response
     {
         $payload = $request->getContent();
@@ -55,8 +63,20 @@ class StripeWebhookController extends Controller
                 break;
             case 'customer.subscription.created':
             case 'customer.subscription.updated':
-            case 'invoice.payment_succeeded':
+            case 'customer.subscription.deleted':
                 $this->handleSubscriptionUpdate($data);
+                $this->revenue->storeSubscriptionPayload($this->toArray($data));
+                break;
+            case 'payment_intent.succeeded':
+                $this->revenue->storePaymentPayload($this->toArray($data));
+                break;
+            case 'invoice.payment_succeeded':
+            case 'invoice.payment_failed':
+                $this->handleInvoiceEvent($data);
+                break;
+            case 'charge.refunded':
+            case 'refund.created':
+                $this->handleRefundEvent($data);
                 break;
         }
 
@@ -65,6 +85,7 @@ class StripeWebhookController extends Controller
 
     protected function handleCheckoutSession($session): void
     {
+        $session = $this->toArray($session);
         $orgId = $session['metadata']['org_id'] ?? null;
         $planSlug = $session['metadata']['plan_slug'] ?? null;
         $interval = $session['metadata']['interval'] ?? null;
@@ -92,6 +113,7 @@ class StripeWebhookController extends Controller
 
     protected function handleSubscriptionUpdate($subscription): void
     {
+        $subscription = $this->toArray($subscription);
         $metadata = $subscription['metadata'] ?? [];
         $orgId = $metadata['org_id'] ?? null;
         $planSlug = $metadata['plan_slug'] ?? null;
@@ -107,13 +129,73 @@ class StripeWebhookController extends Controller
         }
 
         $planId = $planSlug ? Plan::where('slug', $planSlug)->value('id') : null;
+        $status = $subscription['status'] ?? null;
+        $billingStatus = in_array($status, ['active', 'trialing'], true) ? 'active' : 'suspended';
 
         $org->update([
             'plan_id' => $planId,
             'preferred_plan' => $planSlug ?: $org->preferred_plan,
-            'billing_status' => 'active',
+            'billing_status' => $billingStatus,
             'stripe_customer_id' => $subscription['customer'] ?? $org->stripe_customer_id,
             'stripe_subscription_id' => $subscription['id'] ?? $org->stripe_subscription_id,
         ]);
+    }
+
+    protected function handleInvoiceEvent($invoice): void
+    {
+        $invoice = $this->toArray($invoice);
+        $this->revenue->storeInvoicePayload($invoice);
+
+        $metadata = $invoice['metadata'] ?? [];
+        $orgId = $metadata['org_id'] ?? null;
+
+        if ($orgId && ($invoice['status'] ?? null) === 'paid') {
+            Org::whereKey($orgId)->update([
+                'billing_status' => 'active',
+            ]);
+        }
+    }
+
+    protected function handleRefundEvent($payload): void
+    {
+        $data = $this->toArray($payload);
+
+        if (($data['object'] ?? null) === 'refund') {
+            $this->revenue->storeRefundPayload($data);
+
+            return;
+        }
+
+        if (($data['object'] ?? null) === 'charge' && ! empty($data['refunds']['data'])) {
+            foreach ($data['refunds']['data'] as $refund) {
+                $refundArray = $this->toArray($refund);
+
+                if (! isset($refundArray['metadata']) && isset($data['metadata'])) {
+                    $refundArray['metadata'] = $data['metadata'];
+                }
+
+                $this->revenue->storeRefundPayload($refundArray);
+            }
+        }
+    }
+
+    /**
+     * @param mixed $payload
+     * @return array<string, mixed>
+     */
+    protected function toArray($payload): array
+    {
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        if (is_object($payload) && method_exists($payload, 'toArray')) {
+            /** @var array<string, mixed> $payloadArray */
+            $payloadArray = $payload->toArray();
+
+            return $payloadArray;
+        }
+
+        return (array) $payload;
     }
 }

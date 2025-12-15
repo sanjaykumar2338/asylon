@@ -223,11 +223,25 @@
                                         <p>{{ __('Platform Orgs') }}</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-tags"></i>
-                                        <p>{{ __('Plans & Pricing') }}</p>
+                                <li class="nav-item has-treeview {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'menu-open' : '' }}">
+                                    <a href="#" class="nav-link {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-credit-card"></i>
+                                        <p>{{ __('Billing') }}<i class="right fas fa-angle-left"></i></p>
                                     </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="{{ route('platform.billing.revenue') }}" class="nav-link {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>{{ __('Revenue Dashboard') }}</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>{{ __('Plans & Pricing') }}</p>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.data_requests.index') }}" class="nav-link {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">

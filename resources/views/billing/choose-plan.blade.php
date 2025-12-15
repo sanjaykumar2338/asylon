@@ -121,14 +121,32 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h3 class="card-title mb-0 text-uppercase">{{ __('ASYLON APEX') }}</h3>
-                        <span class="badge badge-info">{{ __('Custom') }}</span>
+                        <span class="badge badge-info">{{ __('Custom pricing') }}</span>
                     </div>
                     <p class="mb-3 text-muted">
-                        {{ __('APEX is tailored for complex environments. Contact us for a custom quote and dedicated rollout support.') }}
+                        {{ __('APEX is built for multi-campus and enterprise deployments. Partner with us for a tailored rollout, governance, and ongoing executive support.') }}
                     </p>
-                    <a href="{{ url('/contact') }}" class="btn btn-info">
-                        {{ __('Contact Us') }}
-                    </a>
+                    <ul class="list-unstyled mb-3">
+                        <li class="mb-1"><i class="fas fa-check text-info mr-2"></i>{{ __('Dedicated TAM & priority SLA') }}</li>
+                        <li class="mb-1"><i class="fas fa-check text-info mr-2"></i>{{ __('Custom onboarding & training for your teams') }}</li>
+                        <li class="mb-1"><i class="fas fa-check text-info mr-2"></i>{{ __('SSO/SAML & advanced security controls') }}</li>
+                        <li class="mb-1"><i class="fas fa-check text-info mr-2"></i>{{ __('Unlimited seats, reports, and premium analytics') }}</li>
+                        <li class="mb-1"><i class="fas fa-check text-info mr-2"></i>{{ __('Executive reporting & quarterly business reviews') }}</li>
+                    </ul>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <a href="{{ url('/contact') }}" class="btn btn-info mr-2 mb-2">
+                            {{ __('Contact Us') }}
+                        </a>
+                        <button class="btn btn-outline-info mb-2" type="button" data-toggle="collapse" data-target="#apexDetails" aria-expanded="false" aria-controls="apexDetails">
+                            {{ __('View details') }}
+                        </button>
+                    </div>
+                    <div class="collapse mt-3" id="apexDetails">
+                        <div class="card card-body border-info">
+                            <p class="mb-2">{{ __('APEX includes white-glove onboarding, co-authored rollout plans, and direct access to senior support staff.') }}</p>
+                            <p class="mb-0 text-muted">{{ __('We will work with your procurement and security teams to meet compliance, SSO, and data governance requirements.') }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

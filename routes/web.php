@@ -86,6 +86,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('plans.prices.edit');
         Route::put('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'updatePrices'])
             ->name('plans.prices.update');
+        Route::get('billing/revenue', [\App\Http\Controllers\Platform\RevenueController::class, 'index'])
+            ->name('billing.revenue');
     });
 
     Route::middleware(['active-subscription'])->group(function () {

@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Middleware\ContentSecurityPolicy;
+use App\Http\Middleware\EnsureActiveSubscription;
 use App\Http\Middleware\EnsureOrganizationActive;
-use App\Http\Middleware\RequireActiveSubscription;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SetLocaleFromRequest;
 use App\Http\Middleware\UltraPrivateMode;
@@ -28,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'can' => Authorize::class,
             'setLocale' => SetLocaleFromRequest::class,
             'ultra-private' => UltraPrivateMode::class,
-            'active-subscription' => RequireActiveSubscription::class,
+            'active-subscription' => EnsureActiveSubscription::class,
         ]);
 
         $middleware->append(ContentSecurityPolicy::class);
