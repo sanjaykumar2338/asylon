@@ -418,6 +418,7 @@ class RevenueReporter
         $item = $data['items']['data'][0] ?? [];
         $price = $item['price'] ?? [];
         $planSlug = $this->resolvePlanSlug($metadata, $price['id'] ?? null);
+        $planCode = $metadata['plan_code'] ?? ($price['nickname'] ?? $planSlug);
         $quantity = (int) ($item['quantity'] ?? 1);
         $amount = (int) ($price['unit_amount'] ?? 0) * max(1, $quantity);
         $interval = $price['recurring']['interval'] ?? 'month';
@@ -428,7 +429,9 @@ class RevenueReporter
             [
                 'org_id' => $this->resolveOrgId($data['customer'] ?? null, $metadata),
                 'plan_slug' => $planSlug,
+                'plan_code' => $planCode,
                 'status' => $data['status'] ?? 'unknown',
+                'stripe_price_id' => $price['id'] ?? null,
                 'amount' => $amount,
                 'currency' => $price['currency'] ?? 'usd',
                 'interval' => $interval,

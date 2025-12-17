@@ -236,6 +236,12 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('platform.billing.subscriptions.index') }}" class="nav-link {{ request()->routeIs('platform.billing.subscriptions.*') ? 'active' : '' }}">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>{{ __('Subscriptions') }}</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
                                                 <i class="far fa-circle nav-icon"></i>
                                                 <p>{{ __('Plans & Pricing') }}</p>

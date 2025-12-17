@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\BillingSubscription;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -112,6 +114,16 @@ class Org extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    public function billingSubscriptions(): HasMany
+    {
+        return $this->hasMany(BillingSubscription::class);
+    }
+
+    public function latestBillingSubscription(): HasOne
+    {
+        return $this->hasOne(BillingSubscription::class)->latestOfMany('current_period_end');
     }
 
     public function activePlan(): ?Plan

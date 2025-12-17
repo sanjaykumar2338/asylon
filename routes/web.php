@@ -86,6 +86,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('plans.prices.edit');
         Route::put('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'updatePrices'])
             ->name('plans.prices.update');
+        Route::get('billing/subscriptions', [\App\Http\Controllers\Platform\SubscriptionController::class, 'index'])
+            ->name('billing.subscriptions.index');
+        Route::get('billing/subscriptions/{org}', [\App\Http\Controllers\Platform\SubscriptionController::class, 'show'])
+            ->name('billing.subscriptions.show');
+        Route::post('billing/subscriptions/{org}/plan', [\App\Http\Controllers\Platform\SubscriptionController::class, 'changePlan'])
+            ->name('billing.subscriptions.plan');
+        Route::post('billing/subscriptions/{org}/status', [\App\Http\Controllers\Platform\SubscriptionController::class, 'overrideStatus'])
+            ->name('billing.subscriptions.status');
+        Route::post('billing/subscriptions/{org}/sync', [\App\Http\Controllers\Platform\SubscriptionController::class, 'sync'])
+            ->name('billing.subscriptions.sync');
+        Route::post('billing/subscriptions/{org}/cancel', [\App\Http\Controllers\Platform\SubscriptionController::class, 'cancel'])
+            ->name('billing.subscriptions.cancel');
+        Route::post('billing/subscriptions/{org}/resume', [\App\Http\Controllers\Platform\SubscriptionController::class, 'resume'])
+            ->name('billing.subscriptions.resume');
         Route::get('billing/revenue', [\App\Http\Controllers\Platform\RevenueController::class, 'index'])
             ->name('billing.revenue');
     });
