@@ -8,8 +8,6 @@ use App\Http\Controllers\BlogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-
-Route::redirect('/', '/report');
 Route::get('/support', [StaticPageController::class, 'support'])->name('support');
 Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');

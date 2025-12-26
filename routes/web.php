@@ -30,6 +30,25 @@ use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as VerifyCsrfTokenMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['setLocale'])->name('marketing.')->group(function () {
+    Route::get('/', fn () => view('marketing.index'))->name('home');
+    Route::get('/about', fn () => view('marketing.about'))->name('about');
+    Route::get('/how-it-works', fn () => view('marketing.how-it-works'))->name('how');
+    Route::get('/features', fn () => view('marketing.feature'))->name('feature');
+    Route::get('/resources', fn () => view('marketing.resources'))->name('resources');
+    Route::get('/contact', fn () => view('marketing.contact'))->name('contact');
+    Route::get('/demo', fn () => view('marketing.demo-form'))->name('demo');
+    Route::get('/privacy-policy', fn () => response('Coming soon'))->name('privacy');
+    Route::get('/terms-of-use', fn () => response('Coming soon'))->name('terms');
+    Route::get('/data-security-hosting', fn () => view('marketing.data-security'))->name('data_security');
+
+    Route::prefix('solutions')->name('solutions.')->group(function () {
+        Route::get('/school', fn () => view('marketing.solutions-school'))->name('school');
+        Route::get('/churches', fn () => view('marketing.solutions-churches'))->name('churches');
+        Route::get('/organization', fn () => view('marketing.solutions-organization'))->name('organization');
+    });
+});
+
 Route::middleware(['setLocale'])->group(function () {
     require base_path('routes/public.php');
 });
