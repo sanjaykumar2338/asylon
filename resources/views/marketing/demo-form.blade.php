@@ -25,62 +25,79 @@
             <h2>Book a Demo Form</h2>
         </div>
 
-        <form class="demo-form " action="#">
+        @if (session('success'))
+            <div class="alert alert-success text-center" role="status">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form class="demo-form" action="{{ route('marketing.demo.submit') }}" method="POST">
+            @csrf
             <div class="form-grid">
                 <div class="form-group">
                     <label>First Name</label>
-                    <input type="text" placeholder="Enter your first name" name="first_name">
+                    <input type="text" placeholder="Enter your first name" name="first_name" value="{{ old('first_name') }}" required>
                 </div>
 
                 <div class="form-group">
                     <label>Last Name</label>
-                    <input type="text" placeholder="Last Name" name="last_name">
+                    <input type="text" placeholder="Last Name" name="last_name" value="{{ old('last_name') }}" required>
                 </div>
 
                 <div class="form-group">
                     <label>Organization Name</label>
-                    <input type="text" placeholder="Enter organization name" name="organization">
+                    <input type="text" placeholder="Enter organization name" name="organization" value="{{ old('organization') }}" required>
                 </div>
 
                 <div class="form-group">
                     <label>Type</label>
-                    <select name="organization_type">
-                        <option>Select Organization Type</option>
-                        <option>School</option>
-                        <option>Church</option>
-                        <option>Workplace</option>
-                        <option>Other</option>
+                    <select name="organization_type" required>
+                        <option value="" disabled {{ old('organization_type') ? '' : 'selected' }}>Select Organization Type</option>
+                        <option value="School" @selected(old('organization_type') === 'School')>School</option>
+                        <option value="Church" @selected(old('organization_type') === 'Church')>Church</option>
+                        <option value="Workplace" @selected(old('organization_type') === 'Workplace')>Workplace</option>
+                        <option value="Other" @selected(old('organization_type') === 'Other')>Other</option>
 
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Role</label>
-                    <input type="text" placeholder="Enter role" name="role">
+                    <input type="text" placeholder="Enter role" name="role" value="{{ old('role') }}">
                 </div>
 
                 <div class="form-group">
                     <label>Work Email</label>
-                    <input type="email" placeholder="Enter your email" name="email">
+                    <input type="email" placeholder="Enter your email" name="email" value="{{ old('email') }}" required>
                     <small>Please use your work or organization email.</small>
                 </div>
 
                 <div class="form-group">
                     <label>Phone Number <span>(optional)</span></label>
-                    <input type="tel" placeholder="Enter Phone Number" name="phone">
+                    <input type="tel" placeholder="Enter Phone Number" name="phone" value="{{ old('phone') }}">
                 </div>
 
                 <div class="form-group g1">
                     <label>Preferred Meeting Type</label>
                     <div class="radio-group custom-radio">
                         <label class="radio-box">
-                            <input type="radio" name="meeting" value="15-minute intro">
+                            <input type="radio" name="meeting" value="15-minute intro" @checked(old('meeting') === '15-minute intro')>
                             <span class="radio-custom"></span>
                             <span class="radio-text">15-minute intro</span>
                         </label>
 
                         <label class="radio-box">
-                            <input type="radio" name="meeting" value="30-minute full demo">
+                            <input type="radio" name="meeting" value="30-minute full demo" @checked(old('meeting') === '30-minute full demo')>
                             <span class="radio-custom"></span>
                             <span class="radio-text">30-minute full demo</span>
                         </label>
@@ -90,17 +107,17 @@
                 <div class="form-group full">
                     <label>Preferred Time Window (CST)</label>
                     <select name="time_window">
-                        <option>Select</option>
-                        <option>Morning</option>
-                        <option>Afternoon</option>
-                        <option>Evening</option>
+                        <option value="" disabled {{ old('time_window') ? '' : 'selected' }}>Select</option>
+                        <option value="Morning" @selected(old('time_window') === 'Morning')>Morning</option>
+                        <option value="Afternoon" @selected(old('time_window') === 'Afternoon')>Afternoon</option>
+                        <option value="Evening" @selected(old('time_window') === 'Evening')>Evening</option>
 
                     </select>
                 </div>
 
                 <div class="form-group full">
                     <label>What are your top 1-2 concerns right now?</label>
-                    <textarea placeholder="Type here" name="concerns"></textarea>
+                    <textarea placeholder="Type here" name="concerns">{{ old('concerns') }}</textarea>
                 </div>
             </div>
 

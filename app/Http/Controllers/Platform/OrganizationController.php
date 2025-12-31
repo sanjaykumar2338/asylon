@@ -14,6 +14,8 @@ class OrganizationController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorizePlatformAccess();
+
         $status = (string) $request->query('status', '');
         $planSlug = (string) $request->query('plan', '');
         $planId = (string) $request->query('plan_id', '');
@@ -63,6 +65,8 @@ class OrganizationController extends Controller
 
     public function show(Org $org): View
     {
+        $this->authorizePlatformAccess();
+
         $org->load('plan');
         $plans = Plan::orderBy('name')->get(['id', 'name']);
 
@@ -74,6 +78,8 @@ class OrganizationController extends Controller
 
     public function updatePlan(Request $request, Org $org): RedirectResponse
     {
+        $this->authorizeSuperAdmin();
+
         $data = $request->validate([
             'plan_id' => ['required', 'exists:plans,id'],
         ]);
@@ -96,6 +102,8 @@ class OrganizationController extends Controller
 
     public function updateStatus(Request $request, Org $org): RedirectResponse
     {
+        $this->authorizeSuperAdmin();
+
         $data = $request->validate([
             'billing_status' => ['required', 'in:active,trialing,suspended'],
         ]);
@@ -114,5 +122,15 @@ class OrganizationController extends Controller
         ]);
 
         return back()->with('ok', __('Billing status updated.'));
+    }
+
+    protected function authorizeSuperAdmin(): void
+    {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+    }
+
+    protected function authorizePlatformAccess(): void
+    {
+        abort_unless(auth()->user()?->isSuperAdmin() || auth()->user()?->isPlatformAdmin(), 403);
     }
 }

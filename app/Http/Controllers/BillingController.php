@@ -24,7 +24,7 @@ class BillingController extends Controller
     {
         $org = $request->user()->org;
 
-        if (! $org && ! $request->user()->hasRole('platform_admin')) {
+        if (! $org && ! $request->user()->hasRole('platform_admin') && ! $request->user()->isSuperAdmin()) {
             return back()->with('error', __('No organization found for this user.'));
         }
 

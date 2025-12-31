@@ -70,6 +70,26 @@ class User extends Authenticatable
         return $this->hasMany(ReportNote::class);
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isPlatformAdmin(): bool
+    {
+        return $this->role === 'platform_admin';
+    }
+
+    public function isOrgAdmin(): bool
+    {
+        return in_array($this->role, ['org_admin', 'executive_admin'], true);
+    }
+
+    public function isOrgUser(): bool
+    {
+        return $this->isOrgAdmin() || in_array($this->role, ['org_user', 'security_lead', 'reviewer'], true);
+    }
+
     /**
      * Check if the user has any of the provided roles.
      *
@@ -77,6 +97,10 @@ class User extends Authenticatable
      */
     public function hasRole(string|array $roles): bool
     {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
         return in_array($this->role, (array) $roles, true);
     }
 

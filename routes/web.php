@@ -14,11 +14,15 @@ use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\MenuItemController as AdminMenuItemController;
 use App\Http\Controllers\Admin\BlogCategoryController as AdminBlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
+use App\Http\Controllers\Admin\DemoRequestController as AdminDemoRequestController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\Admin\EscalationRuleController as AdminEscalationRuleController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoRequestController;
 use App\Http\Controllers\OrgSettingsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
@@ -37,9 +41,11 @@ Route::middleware(['setLocale'])->name('marketing.')->group(function () {
     Route::get('/features', fn () => view('marketing.feature'))->name('feature');
     Route::get('/resources', fn () => view('marketing.resources'))->name('resources');
     Route::get('/contact', fn () => view('marketing.contact'))->name('contact');
+    Route::post('/contact', [ContactMessageController::class, 'store'])->name('contact.submit');
     Route::get('/demo', fn () => view('marketing.demo-form'))->name('demo');
-    Route::get('/privacy-policy', fn () => response('Coming soon'))->name('privacy');
-    Route::get('/terms-of-use', fn () => response('Coming soon'))->name('terms');
+    Route::post('/demo', [DemoRequestController::class, 'store'])->name('demo.submit');
+    Route::get('/privacy-policy', fn () => view('marketing.privacy'))->name('privacy');
+    Route::get('/terms-of-use', fn () => view('marketing.terms'))->name('terms');
     Route::get('/data-security-hosting', fn () => view('marketing.data-security'))->name('data_security');
 
     Route::prefix('solutions')->name('solutions.')->group(function () {
@@ -70,7 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/settings/organization', [OrgSettingsController::class, 'update'])
         ->name('settings.organization.update');
 
-    Route::middleware('role:platform_admin,executive_admin,org_admin')->group(function () {
+    Route::middleware('role:super_admin,executive_admin,org_admin')->group(function () {
         Route::get('/billing/choose-plan', [BillingController::class, 'choosePlan'])
             ->name('billing.choose_plan');
 
@@ -90,42 +96,47 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('billing.portal');
     });
 
-    Route::middleware('role:platform_admin')->prefix('platform')->name('platform.')->group(function () {
-        Route::get('organizations', [\App\Http\Controllers\Platform\OrganizationController::class, 'index'])
-            ->name('organizations.index');
-        Route::get('organizations/{org}', [\App\Http\Controllers\Platform\OrganizationController::class, 'show'])
-            ->name('organizations.show');
-        Route::post('organizations/{org}/update-plan', [\App\Http\Controllers\Platform\OrganizationController::class, 'updatePlan'])
-            ->name('organizations.update_plan');
-        Route::post('organizations/{org}/update-status', [\App\Http\Controllers\Platform\OrganizationController::class, 'updateStatus'])
-            ->name('organizations.update_status');
-        Route::get('plans', [\App\Http\Controllers\Platform\PlanController::class, 'index'])
-            ->name('plans.index');
-        Route::get('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'editPrices'])
-            ->name('plans.prices.edit');
-        Route::put('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'updatePrices'])
-            ->name('plans.prices.update');
-        Route::get('billing/subscriptions', [\App\Http\Controllers\Platform\SubscriptionController::class, 'index'])
-            ->name('billing.subscriptions.index');
-        Route::get('billing/subscriptions/{org}', [\App\Http\Controllers\Platform\SubscriptionController::class, 'show'])
-            ->name('billing.subscriptions.show');
-        Route::post('billing/subscriptions/{org}/plan', [\App\Http\Controllers\Platform\SubscriptionController::class, 'changePlan'])
-            ->name('billing.subscriptions.plan');
-        Route::post('billing/subscriptions/{org}/status', [\App\Http\Controllers\Platform\SubscriptionController::class, 'overrideStatus'])
-            ->name('billing.subscriptions.status');
-        Route::post('billing/subscriptions/{org}/sync', [\App\Http\Controllers\Platform\SubscriptionController::class, 'sync'])
-            ->name('billing.subscriptions.sync');
-        Route::post('billing/subscriptions/{org}/cancel', [\App\Http\Controllers\Platform\SubscriptionController::class, 'cancel'])
-            ->name('billing.subscriptions.cancel');
-        Route::post('billing/subscriptions/{org}/resume', [\App\Http\Controllers\Platform\SubscriptionController::class, 'resume'])
-            ->name('billing.subscriptions.resume');
-        Route::get('billing/revenue', [\App\Http\Controllers\Platform\RevenueController::class, 'index'])
-            ->name('billing.revenue');
+    Route::prefix('platform')->name('platform.')->group(function () {
+        Route::middleware('platform_access')->group(function () {
+            Route::get('organizations', [\App\Http\Controllers\Platform\OrganizationController::class, 'index'])
+                ->name('organizations.index');
+            Route::get('organizations/{org}', [\App\Http\Controllers\Platform\OrganizationController::class, 'show'])
+                ->name('organizations.show');
+        });
+
+        Route::middleware('super_admin')->group(function () {
+            Route::post('organizations/{org}/update-plan', [\App\Http\Controllers\Platform\OrganizationController::class, 'updatePlan'])
+                ->name('organizations.update_plan');
+            Route::post('organizations/{org}/update-status', [\App\Http\Controllers\Platform\OrganizationController::class, 'updateStatus'])
+                ->name('organizations.update_status');
+            Route::get('plans', [\App\Http\Controllers\Platform\PlanController::class, 'index'])
+                ->name('plans.index');
+            Route::get('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'editPrices'])
+                ->name('plans.prices.edit');
+            Route::put('plans/{plan}/prices', [\App\Http\Controllers\Platform\PlanController::class, 'updatePrices'])
+                ->name('plans.prices.update');
+            Route::get('billing/subscriptions', [\App\Http\Controllers\Platform\SubscriptionController::class, 'index'])
+                ->name('billing.subscriptions.index');
+            Route::get('billing/subscriptions/{org}', [\App\Http\Controllers\Platform\SubscriptionController::class, 'show'])
+                ->name('billing.subscriptions.show');
+            Route::post('billing/subscriptions/{org}/plan', [\App\Http\Controllers\Platform\SubscriptionController::class, 'changePlan'])
+                ->name('billing.subscriptions.plan');
+            Route::post('billing/subscriptions/{org}/status', [\App\Http\Controllers\Platform\SubscriptionController::class, 'overrideStatus'])
+                ->name('billing.subscriptions.status');
+            Route::post('billing/subscriptions/{org}/sync', [\App\Http\Controllers\Platform\SubscriptionController::class, 'sync'])
+                ->name('billing.subscriptions.sync');
+            Route::post('billing/subscriptions/{org}/cancel', [\App\Http\Controllers\Platform\SubscriptionController::class, 'cancel'])
+                ->name('billing.subscriptions.cancel');
+            Route::post('billing/subscriptions/{org}/resume', [\App\Http\Controllers\Platform\SubscriptionController::class, 'resume'])
+                ->name('billing.subscriptions.resume');
+            Route::get('billing/revenue', [\App\Http\Controllers\Platform\RevenueController::class, 'index'])
+                ->name('billing.revenue');
+        });
     });
 
     Route::middleware(['active-subscription'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->middleware('role:reviewer,security_lead,org_admin,platform_admin,executive_admin')
+            ->middleware('role:reviewer,security_lead,org_admin,platform_admin,executive_admin,super_admin')
             ->name('dashboard');
 
         Route::get('/reports/all', [ReviewController::class, 'index'])
@@ -197,45 +208,47 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('alerts', AdminAlertController::class)
                 ->parameters(['alerts' => 'alert']);
             Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
-            ->except(['create', 'edit', 'show']);
-        Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
-            ->name('report-categories.toggle-visibility')
-            ->middleware('can:manage-categories');
-        Route::resource('report-categories', AdminReportCategoryController::class);
-        Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
-        Route::get('reports/export', [AdminExportController::class, 'reports'])
-            ->name('reports.export');
-        Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
-            ->middleware('role:platform_admin,executive_admin')
-            ->name('audit-logs.index');
-        Route::middleware('can:manage-data-requests')->group(function () {
-            Route::get('data-requests', [AdminDataDeletionAdminController::class, 'index'])->name('data_requests.index');
-            Route::get('data-requests/{dataRequest}', [AdminDataDeletionAdminController::class, 'show'])->name('data_requests.show');
-            Route::post('data-requests/{dataRequest}/status', [AdminDataDeletionAdminController::class, 'updateStatus'])->name('data_requests.update_status');
-            Route::post('data-requests/from-case/{report}', [AdminDataDeletionAdminController::class, 'storeFromCase'])->name('data_requests.from_case');
-        });
-        Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
-            ->name('report-categories.subcategories.store');
-        Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
-            ->name('report-categories.subcategories.update');
-        Route::delete('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'destroy'])
-            ->name('report-categories.subcategories.destroy');
-        Route::get('analytics', [AdminAnalyticsController::class, 'index'])
-            ->name('analytics');
-        Route::get('notifications/templates', [AdminNotificationTemplateController::class, 'edit'])
-            ->name('notifications.templates.edit');
-        Route::post('notifications/templates', [AdminNotificationTemplateController::class, 'update'])
-            ->name('notifications.templates.update');
-        Route::resource('pages', AdminPageController::class)->except(['show']);
-        Route::resource('menus', AdminMenuController::class)->except(['show']);
-        Route::post('menus/{menu}/items/reorder', [AdminMenuItemController::class, 'reorder'])
-            ->name('menus.items.reorder');
-        Route::post('menus/{menu}/items', [AdminMenuItemController::class, 'store'])
-            ->name('menus.items.store');
-        Route::put('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'update'])
-            ->name('menus.items.update');
-        Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
-            ->name('menus.items.destroy');
+                ->except(['create', 'edit', 'show']);
+            Route::resource('demo-requests', AdminDemoRequestController::class)->only(['index', 'show', 'destroy']);
+            Route::resource('contact-messages', AdminContactMessageController::class)->only(['index', 'show', 'destroy']);
+            Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
+                ->name('report-categories.toggle-visibility')
+                ->middleware('can:manage-categories');
+            Route::resource('report-categories', AdminReportCategoryController::class);
+            Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
+            Route::get('reports/export', [AdminExportController::class, 'reports'])
+                ->name('reports.export');
+            Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
+                ->middleware('role:super_admin')
+                ->name('audit-logs.index');
+            Route::middleware('can:manage-data-requests')->group(function () {
+                Route::get('data-requests', [AdminDataDeletionAdminController::class, 'index'])->name('data_requests.index');
+                Route::get('data-requests/{dataRequest}', [AdminDataDeletionAdminController::class, 'show'])->name('data_requests.show');
+                Route::post('data-requests/{dataRequest}/status', [AdminDataDeletionAdminController::class, 'updateStatus'])->name('data_requests.update_status');
+                Route::post('data-requests/from-case/{report}', [AdminDataDeletionAdminController::class, 'storeFromCase'])->name('data_requests.from_case');
+            });
+            Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
+                ->name('report-categories.subcategories.store');
+            Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
+                ->name('report-categories.subcategories.update');
+            Route::delete('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'destroy'])
+                ->name('report-categories.subcategories.destroy');
+            Route::get('analytics', [AdminAnalyticsController::class, 'index'])
+                ->name('analytics');
+            Route::get('notifications/templates', [AdminNotificationTemplateController::class, 'edit'])
+                ->name('notifications.templates.edit');
+            Route::post('notifications/templates', [AdminNotificationTemplateController::class, 'update'])
+                ->name('notifications.templates.update');
+            Route::resource('pages', AdminPageController::class)->except(['show']);
+            Route::resource('menus', AdminMenuController::class)->except(['show']);
+            Route::post('menus/{menu}/items/reorder', [AdminMenuItemController::class, 'reorder'])
+                ->name('menus.items.reorder');
+            Route::post('menus/{menu}/items', [AdminMenuItemController::class, 'store'])
+                ->name('menus.items.store');
+            Route::put('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'update'])
+                ->name('menus.items.update');
+            Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
+                ->name('menus.items.destroy');
             Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
             Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
 

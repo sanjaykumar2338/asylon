@@ -150,13 +150,14 @@
 
                             @php
                                 $navUser = auth()->user();
-                                $isPlatform = $navUser?->hasRole('platform_admin');
+                                $isSuper = $navUser?->isSuperAdmin();
+                                $isPlatform = $navUser?->isPlatformAdmin();
                                 $isExec = $navUser?->hasRole('executive_admin');
-                                $isOrgAdmin = $navUser?->hasRole('org_admin');
+                                $isOrgAdmin = $navUser?->isOrgAdmin();
                                 $isReviewer = $navUser?->hasRole('reviewer');
                             @endphp
 
-                            @if($isPlatform)
+                            @if($isSuper || $isPlatform)
                                 <li class="nav-item">
                                     <a href="{{ route('admin.orgs.index') }}" class="nav-link {{ request()->routeIs('admin.orgs.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
@@ -206,15 +207,15 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('billing.settings') }}" class="nav-link {{ request()->routeIs('billing.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-credit-card"></i>
-                                        <p>{{ __('Billing') }}</p>
+                                    <a href="{{ route('admin.demo-requests.index') }}" class="nav-link {{ request()->routeIs('admin.demo-requests.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-calendar-check"></i>
+                                        <p>{{ __('Demo Requests') }}</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-building"></i>
-                                        <p>{{ __('Org Settings') }}</p>
+                                    <a href="{{ route('admin.contact-messages.index') }}" class="nav-link {{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-envelope"></i>
+                                        <p>{{ __('Contact Messages') }}</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -223,44 +224,48 @@
                                         <p>{{ __('Platform Orgs') }}</p>
                                     </a>
                                 </li>
-                                <li class="nav-item has-treeview {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'menu-open' : '' }}">
-                                    <a href="#" class="nav-link {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-credit-card"></i>
-                                        <p>{{ __('Billing') }}<i class="right fas fa-angle-left"></i></p>
-                                    </a>
-                                    <ul class="nav nav-treeview">
-                                        <li class="nav-item">
-                                            <a href="{{ route('platform.billing.revenue') }}" class="nav-link {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>{{ __('Revenue Dashboard') }}</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('platform.billing.subscriptions.index') }}" class="nav-link {{ request()->routeIs('platform.billing.subscriptions.*') ? 'active' : '' }}">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>{{ __('Subscriptions') }}</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>{{ __('Plans & Pricing') }}</p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                @if ($isSuper)
+                                    <li class="nav-item has-treeview {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'menu-open' : '' }}">
+                                        <a href="#" class="nav-link {{ request()->routeIs('platform.billing.*') || request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-credit-card"></i>
+                                            <p>{{ __('Billing') }}<i class="right fas fa-angle-left"></i></p>
+                                        </a>
+                                        <ul class="nav nav-treeview">
+                                            <li class="nav-item">
+                                                <a href="{{ route('platform.billing.revenue') }}" class="nav-link {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
+                                                    <i class="far fa-circle nav-icon"></i>
+                                                    <p>{{ __('Revenue Dashboard') }}</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{{ route('platform.billing.subscriptions.index') }}" class="nav-link {{ request()->routeIs('platform.billing.subscriptions.*') ? 'active' : '' }}">
+                                                    <i class="far fa-circle nav-icon"></i>
+                                                    <p>{{ __('Subscriptions') }}</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="{{ route('platform.plans.index') }}" class="nav-link {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                                    <i class="far fa-circle nav-icon"></i>
+                                                    <p>{{ __('Plans & Pricing') }}</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                @endif
                                 <li class="nav-item">
                                     <a href="{{ route('admin.data_requests.index') }}" class="nav-link {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-eraser"></i>
                                         <p>{{ __('Data Requests') }}</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-clipboard-list"></i>
-                                        <p>{{ __('Audit Logs') }}</p>
-                                    </a>
-                                </li>
+                                @if ($isSuper)
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                                            <i class="nav-icon fas fa-clipboard-list"></i>
+                                            <p>{{ __('Audit Logs') }}</p>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="nav-item">
                                     <a href="{{ route('admin.pages.index') }}" class="nav-link {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-file-alt"></i>
@@ -322,6 +327,18 @@
                                     <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-chart-line"></i>
                                         <p>{{ __('Analytics') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.demo-requests.index') }}" class="nav-link {{ request()->routeIs('admin.demo-requests.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-calendar-check"></i>
+                                        <p>{{ __('Demo Requests') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.contact-messages.index') }}" class="nav-link {{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-envelope"></i>
+                                        <p>{{ __('Contact Messages') }}</p>
                                     </a>
                                 </li>
                                 @if ($isExec)

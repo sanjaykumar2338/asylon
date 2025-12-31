@@ -14,7 +14,7 @@ class StoreUserRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null && $user->hasRole(['platform_admin', 'org_admin']);
+        return $user !== null && ($user->isSuperAdmin() || $user->hasRole(['platform_admin', 'org_admin']));
     }
 
     /**
@@ -28,9 +28,25 @@ class StoreUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'phone' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', Rule::in(['platform_admin', 'org_admin', 'security_lead', 'reviewer'])],
+            'role' => ['required', Rule::in(['super_admin', 'platform_admin', 'org_admin', 'security_lead', 'reviewer', 'org_user', 'executive_admin'])],
             'org_id' => ['nullable', 'exists:orgs,id'],
             'active' => ['sometimes', 'boolean'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            $role = $this->input('role');
+            $orgId = $this->input('org_id');
+
+            if (in_array($role, ['super_admin', 'platform_admin'], true) && $orgId) {
+                $validator->errors()->add('org_id', 'Global roles cannot be assigned to an organization.');
+            }
+
+            if (in_array($role, ['org_admin', 'executive_admin', 'security_lead', 'reviewer', 'org_user'], true) && empty($orgId)) {
+                $validator->errors()->add('org_id', 'An organization is required for this role.');
+            }
+        });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Org;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -28,6 +29,8 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'org_admin',
+            'org_id' => Org::factory(),
             'remember_token' => Str::random(10),
         ];
     }
@@ -39,6 +42,30 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'super_admin',
+            'org_id' => null,
+        ]);
+    }
+
+    public function platformAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'platform_admin',
+            'org_id' => null,
+        ]);
+    }
+
+    public function reviewer(Org $org = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'reviewer',
+            'org_id' => $org?->id ?? Org::factory(),
         ]);
     }
 }

@@ -14,6 +14,8 @@ class PlanController extends Controller
 {
     public function index(): View
     {
+        $this->authorizeSuperAdmin();
+
         $plans = Plan::with(['prices' => function ($query): void {
             $query->orderByRaw("FIELD(billing_interval, 'monthly','yearly','custom')")
                 ->orderBy('is_early_adopter');
@@ -26,6 +28,8 @@ class PlanController extends Controller
 
     public function editPrices(Plan $plan): View
     {
+        $this->authorizeSuperAdmin();
+
         $plan->load(['prices' => function ($query): void {
             $query->orderByRaw("FIELD(billing_interval, 'monthly','yearly','custom')")
                 ->orderBy('is_early_adopter');
@@ -45,6 +49,8 @@ class PlanController extends Controller
 
     public function updatePrices(Request $request, Plan $plan): RedirectResponse
     {
+        $this->authorizeSuperAdmin();
+
         $plan->load('prices');
         $existingIds = $plan->prices->pluck('id')->all();
 
@@ -113,5 +119,10 @@ class PlanController extends Controller
         }
 
         return back()->with('ok', __('Plan prices updated.'));
+    }
+
+    protected function authorizeSuperAdmin(): void
+    {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
     }
 }

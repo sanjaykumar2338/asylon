@@ -44,20 +44,37 @@
             </div>
 
             <div class="contact-bx contact-right">
-                <form action="#">
+                @if (session('success'))
+                    <div class="alert alert-success" role="status">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('marketing.contact.submit') }}" method="POST">
+                    @csrf
                     <div class="input-root">
                         <label for="">First Name</label>
-                        <input type="text" placeholder="Enter your first name" name="first_name">
+                        <input type="text" placeholder="Enter your first name" name="first_name" value="{{ old('first_name') }}" required>
                     </div>
 
                     <div class="input-root">
-                        <label for="">last Name</label>
-                        <input type="text" placeholder="Last Name" name="last_name">
+                        <label for="">Last Name</label>
+                        <input type="text" placeholder="Last Name" name="last_name" value="{{ old('last_name') }}" required>
                     </div>
 
                     <div class="input-root full-width">
                         <label for="">Message</label>
-                        <textarea name="message" placeholder="Type here" id=""></textarea>
+                        <textarea name="message" placeholder="Type here" id="" required>{{ old('message') }}</textarea>
                     </div>
                     <div class="input-root full-width">
                         <button type="submit" class="site-btn-dark">Send</button>

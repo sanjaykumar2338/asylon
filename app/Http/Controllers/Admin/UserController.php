@@ -20,7 +20,9 @@ class UserController extends AdminController
     public function index(Request $request): View
     {
         $search = (string) $request->query('q', '');
-        $orgId = $request->user()?->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
+        $authUser = $request->user();
+        $isGlobal = $authUser?->isPlatformAdmin() || $authUser?->isSuperAdmin();
+        $orgId = $isGlobal ? (int) $request->query('org_id', 0) : 0;
 
         $query = User::query()
             ->with('org')
@@ -28,7 +30,7 @@ class UserController extends AdminController
 
         $this->scopeByRole($query);
 
-        if ($orgId > 0 && $request->user()?->hasRole('platform_admin')) {
+        if ($orgId > 0 && $isGlobal) {
             $query->where('org_id', $orgId);
         }
 
@@ -134,7 +136,15 @@ class UserController extends AdminController
             abort(403);
         }
 
-        if ($authUser->hasRole('platform_admin')) {
+        if ($authUser->isSuperAdmin()) {
+            return;
+        }
+
+        if ($authUser->isPlatformAdmin()) {
+            if ($user->isSuperAdmin()) {
+                abort(403);
+            }
+
             return;
         }
 
@@ -142,7 +152,7 @@ class UserController extends AdminController
             abort(403);
         }
 
-        if ($user->hasRole('platform_admin')) {
+        if ($user->isPlatformAdmin() || $user->isSuperAdmin()) {
             abort(403);
         }
     }
@@ -156,18 +166,33 @@ class UserController extends AdminController
     protected function prepareUserData(array $data, Request $request, ?User $existing = null): array
     {
         $authUser = $request->user();
+        $role = $data['role'] ?? $existing?->role ?? null;
 
         $data['active'] = $request->boolean('active', $existing?->active ?? true);
 
-        if ($authUser && ! $authUser->hasRole('platform_admin')) {
-            $data['org_id'] = $authUser->org_id;
+        if ($authUser && ! $authUser->isSuperAdmin()) {
+            if ($role === 'super_admin') {
+                abort(403, 'Only super administrators can assign the super admin role.');
+            }
 
-            if (($data['role'] ?? null) === 'platform_admin') {
-                abort(403, 'Org administrators cannot assign the platform admin role.');
+            if (! $authUser->isPlatformAdmin()) {
+                $data['org_id'] = $authUser->org_id;
+
+                if (in_array($role, ['platform_admin', 'super_admin'], true)) {
+                    abort(403, 'Org administrators cannot assign global roles.');
+                }
+            } else {
+                if ($role === 'platform_admin') {
+                    $data['org_id'] = null;
+                }
             }
         }
 
-        if (($data['role'] ?? null) !== 'platform_admin' && empty($data['org_id'])) {
+        if (in_array($role, ['platform_admin', 'super_admin'], true)) {
+            $data['org_id'] = null;
+        }
+
+        if (in_array($role, ['org_admin', 'executive_admin', 'security_lead', 'reviewer', 'org_user'], true) && empty($data['org_id'])) {
             throw ValidationException::withMessages([
                 'org_id' => 'An organization is required for this role.',
             ]);

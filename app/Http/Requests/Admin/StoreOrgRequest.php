@@ -14,7 +14,7 @@ class StoreOrgRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null && $user->hasRole('platform_admin');
+        return $user !== null && ($user->isSuperAdmin() || $user->hasRole('platform_admin'));
     }
 
     /**

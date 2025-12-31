@@ -14,6 +14,8 @@ class RevenueController extends Controller
 {
     public function index(Request $request, RevenueReporter $reporter): View
     {
+        $this->authorizeSuperAdmin();
+
         $startDate = $this->parseDate($request->input('start_date'));
         $endDate = $this->parseDate($request->input('end_date'));
 
@@ -53,6 +55,11 @@ class RevenueController extends Controller
             'plans' => $plans,
             'organizations' => $organizations,
         ]);
+    }
+
+    protected function authorizeSuperAdmin(): void
+    {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
     }
 
     protected function parseDate(?string $value): ?Carbon

@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\EnsureActiveSubscription;
+use App\Http\Middleware\EnsurePlatformAccess;
+use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureOrganizationActive;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SetLocaleFromRequest;
@@ -29,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'setLocale' => SetLocaleFromRequest::class,
             'ultra-private' => UltraPrivateMode::class,
             'active-subscription' => EnsureActiveSubscription::class,
+            'super_admin' => EnsureSuperAdmin::class,
+            'platform_access' => EnsurePlatformAccess::class,
         ]);
 
         $middleware->append(ContentSecurityPolicy::class);

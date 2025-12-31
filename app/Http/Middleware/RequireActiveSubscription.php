@@ -16,7 +16,7 @@ class RequireActiveSubscription
             return redirect()->route('login');
         }
 
-        if ($user->hasRole('platform_admin')) {
+        if ($user->hasRole('platform_admin') || $user->isSuperAdmin()) {
             return $next($request);
         }
 
