@@ -278,25 +278,17 @@
                                         <p>Menus</p>
                                     </a>
                                 </li>
-                                <li class="nav-item has-treeview {{ request()->routeIs('admin.blog-*') ? 'menu-open' : '' }}">
-                                    <a href="#" class="nav-link {{ request()->routeIs('admin.blog-*') ? 'active' : '' }}">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.blog-posts.index') }}" class="nav-link {{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-blog"></i>
-                                        <p>Blog<i class="right fas fa-angle-left"></i></p>
+                                        <p>Blog Posts</p>
                                     </a>
-                                    <ul class="nav nav-treeview">
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.blog-posts.index') }}" class="nav-link {{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Posts</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.blog-categories.index') }}" class="nav-link {{ request()->routeIs('admin.blog-categories.*') ? 'active' : '' }}">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Categories</p>
-                                            </a>
-                                        </li>
-                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.blog-categories.index') }}" class="nav-link {{ request()->routeIs('admin.blog-categories.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-folder-open"></i>
+                                        <p>Blog Categories</p>
+                                    </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
@@ -353,6 +345,18 @@
                                     <a href="{{ route('settings.organization.edit') }}" class="nav-link {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-building"></i>
                                         <p>{{ __('Org Settings') }}</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.blog-posts.index') }}" class="nav-link {{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-blog"></i>
+                                        <p>Blog Posts</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.blog-categories.index') }}" class="nav-link {{ request()->routeIs('admin.blog-categories.*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-folder-open"></i>
+                                        <p>Blog Categories</p>
                                     </a>
                                 </li>
                             @elseif($isReviewer)

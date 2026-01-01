@@ -13,9 +13,9 @@
             <div class="page-link">
                 <span><a href="{{ route('marketing.home') }}">Home </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.organization') }}">Solutions</a></span>
+                <span><a href="{{ route('marketing.solutions.organizations') }}">Solutions</a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.organization') }}">Organization</a></span>
+                <span><a href="{{ route('marketing.solutions.organizations') }}">Organizations</a></span>
 
             </div>
 

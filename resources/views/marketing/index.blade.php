@@ -54,7 +54,7 @@
                         Give students and staff a confidential way to report bullying, threats, weapons talk, and
                         self-harm and route every concern through a clear, documented threat-assessment process.
                     </p>
-                    <a href="{{ route('marketing.solutions.school') }}" class="site-btn-light">Explore Asylon for Schools</a>
+                    <a href="{{ route('marketing.solutions.schools') }}" class="site-btn-light">Explore Asylon for Schools</a>
                 </div>
 
                 <div class="serve-card">
@@ -78,7 +78,7 @@
                         Create a trusted channel for reporting workplace violence, harassment, and policy violations,
                         and connect every report to HR, legal, and security workflows.
                     </p>
-                    <a href="{{ route('marketing.solutions.organization') }}" class="site-btn-light">Explore Asylon for Organizations</a>
+                    <a href="{{ route('marketing.solutions.organizations') }}" class="site-btn-light">Explore Asylon for Organizations</a>
                 </div>
             </div>
 

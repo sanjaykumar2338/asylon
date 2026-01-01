@@ -1,4 +1,8 @@
-<x-guest-layout>
+@extends('marketing.layout')
+
+@section('title', 'Asylon | Submit a Report')
+
+@section('content')
     @php
         $portalSource = $portalSource ?? 'general';
         $formAction = $formAction ?? route('report.store');
@@ -12,72 +16,117 @@
         $infoEmail = config('asylon.info_email', 'info@asylon.cc');
     @endphp
     <style>
-        @media (min-width: 640px) {
-            .sm\:max-w-md {
-                max-width: 30rem;
-            }
-        }
+        .report-form .grid { display: grid; gap: 1rem; }
+        @media (min-width: 768px) { .report-form .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .report-form .rounded-md { border-radius: .375rem; }
+        .report-form .border { border: 1px solid #dee2e6; }
+        .report-form .border-gray-200 { border-color: #e9ecef; }
+        .report-form .border-gray-300 { border-color: #dee2e6; }
+        .report-form .bg-gray-50 { background-color: #f8f9fa; }
+        .report-form .bg-white { background-color: #fff; }
+        .report-form .text-sm { font-size: .875rem; }
+        .report-form .text-gray-700 { color: #495057; }
+        .report-form .text-gray-600 { color: #6c757d; }
+        .report-form .text-indigo-600 { color: #0d6efd; }
+        .report-form .mt-1 { margin-top: .25rem; }
+        .report-form .mt-2 { margin-top: .5rem; }
+        .report-form .mt-3 { margin-top: 1rem; }
+        .report-form .mt-4 { margin-top: 1.5rem; }
+        .report-form .mb-4 { margin-bottom: 1.5rem; }
+        .report-form .space-y-4 > * + * { margin-top: 1rem; }
+        .report-form .space-y-3 > * + * { margin-top: .75rem; }
+        .report-form .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); }
+        .report-form .p-4 { padding: 1.5rem; }
+        .report-form .flex { display: flex; }
+        .report-form .inline-flex { display: inline-flex; }
+        .report-form .items-center { align-items: center; }
+        .report-form .justify-between { justify-content: space-between; }
+        .report-form .gap-2 { gap: .5rem; }
+        .report-form .gap-3 { gap: 1rem; }
+        .report-form .gap-4 { gap: 1.5rem; }
+        .report-form .w-full { width: 100%; }
+        .report-form .block { display: block; }
+        .report-form .px-3 { padding-left: 1rem; padding-right: 1rem; }
+        .report-form .py-2 { padding-top: .5rem; padding-bottom: .5rem; }
+        .report-form .px-4 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .report-form .py-1\.5 { padding-top: .375rem; padding-bottom: .375rem; }
+        .report-form .py-1 { padding-top: .25rem; padding-bottom: .25rem; }
+        .report-form .pt-6 { padding-top: 1.5rem; }
+        .report-form > div { margin-bottom: 1.25rem; }
+        .report-form .grid > div { margin-bottom: 1rem; }
+        .voice-recorder-wrap { display: grid; gap: .75rem; }
+        @media (min-width: 768px) { .voice-recorder-wrap { grid-template-columns: auto 1fr; align-items: center; } }
+        .voice-buttons { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+        .voice-recorder-control .recorder-button { margin: 0; }
+        .voice-recorder-control .recorder-button .recorder-icon--record { margin-left: 2px; }
     </style>
-    <header class="mb-8 border-b border-gray-200 pb-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-                <a href="{{ url('/') }}" class="text-sm text-indigo-600 hover:underline">{{ config('app.name', 'Asylon') }}</a>
-            </div>
-            <div class="flex items-center gap-2 text-sm">
-                <a href="{{ route('login') }}"
-                    class="inline-flex items-center justify-center rounded-md border border-gray-300 px-3 py-2 font-semibold text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <i class="fas fa-sign-in-alt mr-2"></i> {{ __('Log In') }}
-                </a>
+    <section class="inner-pages-header">
+        <div class="site-container">
+            <div class="page-header">
+                <div class="section-title">
+                    <h2>Submit a Report</h2>
+                </div>
+                <div class="page-link">
+                    <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                    <span>/</span>
+                    <span><a href="{{ route('report.create') }}">Submit a Report </a></span>
+                </div>
             </div>
         </div>
-    </header>
+    </section>
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">{{ $portalHeading }}</h1>
+    <section class="block-left py-5 bg-light">
+        <div class="site-container container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4 p-md-5">
+    <div class="mb-4">
+        <h1 class="h3 mb-2">{{ $portalHeading }}</h1>
         @if(isset($submitPage) && $submitPage)
             @if($portalDescription)
-                <p class="mt-2 text-sm text-gray-700">{{ $portalDescription }}</p>
+                <p class="text-muted mb-2">{{ $portalDescription }}</p>
             @endif
-            <div class="mt-3 space-y-3 prose prose-indigo max-w-none text-sm text-gray-700">
+            <div class="mb-3 text-muted">
                 {!! $submitPage->content !!}
             </div>
         @else
-            <div class="mt-2 space-y-3 text-sm text-gray-700">
-                <p>You stay anonymous unless YOU choose to share your information.<br>
+            <div class="text-muted mb-3">
+                <p class="mb-2">You stay anonymous unless YOU choose to share your information.<br>
                     Your identity is completely protected.</p>
 
-                <p>Your voice matters.<br>
+                <p class="mb-2">Your voice matters.<br>
                     Use this form to report a concern, share information, or speak up about something that doesn't feel right.<br>
                     You may remain anonymous if you prefer.</p>
 
-                <p>If this is an emergency, please contact 911 immediately.</p>
+                <p class="mb-0">If this is an emergency, please contact 911 immediately.</p>
             </div>
             @if ($portalDescription && $portalDescription !== __('report.submit_description'))
-                <p class="mt-3 text-sm text-gray-600">
+                <p class="text-muted">
                     {{ $portalDescription }}
                 </p>
             @endif
         @endif
-        <p class="text-sm text-gray-600 mt-4">
+        <p class="text-muted mt-3 mb-2">
             {{ __('report.already_have_case') }}
-            <a href="{{ route('followup.entry') }}" class="text-indigo-600 underline">
+            <a href="{{ route('followup.entry') }}" class="fw-semibold">
                 {{ __('report.followup_cta') }}
             </a>.
         </p>
-        <p class="mt-3 text-sm text-indigo-700">
-            <a href="{{ route('privacy.anonymity') }}" class="underline">Learn how privacy &amp; anonymity work</a>
+        <p class="text-primary small mb-2">
+            <a href="{{ route('privacy.anonymity') }}" class="text-primary">Learn how privacy &amp; anonymity work</a>
             &middot;
-            <a href="{{ route('security.overview') }}" class="underline">Security overview</a>
+            <a href="{{ route('security.overview') }}" class="text-primary">Security overview</a>
         </p>
-        <p class="mt-3 text-sm font-medium text-indigo-700">
+        <p class="fw-semibold text-primary small mb-0">
             {{ __('report.privacy_header') }}
         </p>
     </div>
 
     @if ($errors->any())
-        <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <strong class="block font-semibold">{{ __('report.errors.title') }}</strong>
-            <ul class="mt-2 list-disc space-y-1 pl-5">
+        <div class="alert alert-danger mb-4">
+            <strong class="d-block mb-2">{{ __('report.errors.title') }}</strong>
+            <ul class="mb-0 ps-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -94,12 +143,12 @@
     @endphp
 
     @unless ($hasCategories)
-        <div class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-700">
+        <div class="alert alert-warning mb-4">
             {{ __('report.no_categories') }}
         </div>
     @endunless
 
-    <form method="POST" action="{{ $formAction }}" enctype="multipart/form-data" class="space-y-6">
+    <form id="report-form" method="POST" action="{{ $formAction }}" enctype="multipart/form-data" class="report-form">
         @csrf
 
         @if (isset($lockedOrg))
@@ -325,40 +374,42 @@
             <p class="mt-1 text-sm text-gray-600">
                 Your voice can be automatically disguised to protect your identity.
             </p>
-            <div class="mt-4 voice-recorder-control">
-                <button type="button" id="recorder" class="recorder-button" aria-pressed="false">
-                    <span class="sr-only">{{ __('report.voice_toggle_label') }}</span>
-                    <svg class="recorder-icon recorder-icon--record" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"></circle>
-                    </svg>
-                    <svg class="recorder-icon recorder-icon--arrow" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M12 3a1 1 0 0 1 1 1v9.586l2.293-2.293a1 1 0 0 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 13.586V4a1 1 0 0 1 1-1Z">
-                        </path>
-                        <path d="M5 19a1 1 0 0 1 1-1h12a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1Z"></path>
-                    </svg>
-                </button>
-                <button type="button" id="recordClearBtn"
-                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled>
-                    {{ __('report.voice_remove_button') }}
-                </button>
+            <div class="mt-4 voice-recorder-wrap">
+                <div class="voice-recorder-control">
+                    <button type="button" id="recorder" class="recorder-button" aria-pressed="false">
+                        <span class="sr-only">{{ __('report.voice_toggle_label') }}</span>
+                        <svg class="recorder-icon recorder-icon--record" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                        <svg class="recorder-icon recorder-icon--arrow" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M12 3a1 1 0 0 1 1 1v9.586l2.293-2.293a1 1 0 0 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 13.586V4a1 1 0 0 1 1-1Z">
+                            </path>
+                            <path d="M5 19a1 1 0 0 1 1-1h12a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="voice-buttons">
+                    <button type="button" id="recordClearBtn"
+                        class="btn btn-outline-secondary btn-sm"
+                        disabled>
+                        {{ __('report.voice_remove_button') }}
+                    </button>
+                    <button type="button" id="voicePlayBtn"
+                        class="btn btn-outline-primary btn-sm"
+                        disabled>
+                        {{ __('report.voice_play') }}
+                    </button>
+                </div>
             </div>
             <p id="recordingStatus" class="mt-3 text-sm text-gray-500"></p>
             <audio id="voicePreview" controls class="mt-4 hidden w-full rounded-lg bg-white"></audio>
-            <div class="mt-2 flex gap-2">
-                <button type="button" id="voicePlayBtn"
-                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled>
-                    {{ __('report.voice_play') }}
-                </button>
-            </div>
-            <input type="file" id="voiceRecordingInput" name="voice_recording" class="hidden" accept="audio/webm">
+            <input type="file" id="voiceRecordingInput" name="voice_recording" class="form-control mt-3" accept="audio/webm">
             <x-input-error class="mt-3" :messages="$errors->get('voice_recording')" />
             <div class="mt-4">
                 <x-input-label for="voice_comment" :value="__('report.voice_comment_label')" />
                 <textarea id="voice_comment" name="voice_comment" rows="2" maxlength="500"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('voice_comment') }}</textarea>
+                    class="form-control">{{ old('voice_comment') }}</textarea>
                 <x-input-error class="mt-2" :messages="$errors->get('voice_comment')" />
             </div>
         </div>
@@ -369,8 +420,10 @@
             </p>
         </div>
 
-        <div class="flex justify-end">
-            <x-primary-button>{{ __('report.submit_button') }}</x-primary-button>
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="site-btn-dark px-4 py-2">
+                {{ __('report.submit_button') }}
+            </button>
         </div>
     </form>
 
@@ -378,15 +431,6 @@
         <p class="flex flex-col sm:flex-row items-center justify-center gap-2">
             <span>{{ __('New organization?') }}</span>
             <a href="{{ route('signup.show') }}" class="text-indigo-600 underline font-semibold">{{ __('Get Started') }}</a>
-        </p>
-        <p>
-            <a href="{{ route('report.create') }}" class="text-indigo-600 underline">{{ __('Submit A Report') }}</a>
-            &middot;
-            <a href="{{ route('support') }}" class="text-indigo-600 underline">Support</a>
-            &middot;
-            <a href="{{ route('privacy') }}" class="text-indigo-600 underline">Privacy</a>
-            &middot;
-            <a href="{{ route('terms') }}" class="text-indigo-600 underline">Terms</a>
         </p>
     </footer>
     <script>
@@ -1156,6 +1200,22 @@
         })();
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('report-form');
+            if (!form) {
+                return;
+            }
+
+            form.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea')
+                .forEach(el => el.classList.add('form-control'));
+
+            form.querySelectorAll('input[type=file]').forEach(el => el.classList.add('form-control'));
+            form.querySelectorAll('input[type=checkbox]').forEach(el => el.classList.add('form-check-input'));
+            form.querySelectorAll('label').forEach(el => el.classList.add('form-label'));
+        });
+    </script>
+
     @if ($recipientsEnabled)
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -1217,13 +1277,19 @@
         </script>
     @endif
 
-    <footer class="mt-16 border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-        <p>
+    <footer class="mt-4 pt-3 border-top text-center text-muted small">
+        <p class="mb-1">
             {{ __('report.footer_monitoring') }}
         </p>
-        <p class="mt-2 text-gray-600">
-            Need help? Email <a href="mailto:{{ $infoEmail }}" class="text-indigo-600 underline">{{ $infoEmail }}</a> or <a href="mailto:{{ $supportEmail }}" class="text-indigo-600 underline">{{ $supportEmail }}</a>.
+        <p class="mb-1">
+            Need help? Email <a href="mailto:{{ $infoEmail }}" class="text-primary">{{ $infoEmail }}</a> or <a href="mailto:{{ $supportEmail }}" class="text-primary">{{ $supportEmail }}</a>.
         </p>
-        <p class="mt-2">&copy; {{ now()->year }} {{ __('report.footer_brand') }}</p>
+      
     </footer>
-</x-guest-layout>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection

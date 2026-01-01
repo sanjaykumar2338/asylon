@@ -49,9 +49,9 @@ Route::middleware(['setLocale'])->name('marketing.')->group(function () {
     Route::get('/data-security-hosting', fn () => view('marketing.data-security'))->name('data_security');
 
     Route::prefix('solutions')->name('solutions.')->group(function () {
-        Route::get('/school', fn () => view('marketing.solutions-school'))->name('school');
+        Route::get('/schools', fn () => view('marketing.solutions-school'))->name('schools');
         Route::get('/churches', fn () => view('marketing.solutions-churches'))->name('churches');
-        Route::get('/organization', fn () => view('marketing.solutions-organization'))->name('organization');
+        Route::get('/organizations', fn () => view('marketing.solutions-organization'))->name('organizations');
     });
 });
 

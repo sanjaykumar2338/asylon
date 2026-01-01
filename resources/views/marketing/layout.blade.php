@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Asylon')</title>
+    @stack('meta')
     @php($assetBase = asset('asylonhtml/asylon'))
     <link rel="stylesheet" href="{{ $assetBase }}/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ $assetBase }}/css/slick.css">
@@ -13,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
           integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
           crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        .dropdown-toggle-no-caret::after { display: none !important; }
+    </style>
 </head>
 <body>
 <header class="site-header">
@@ -34,13 +38,19 @@
                     <li class="nav-item"><a href="{{ route('marketing.home') }}" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="{{ route('marketing.about') }}" class="nav-link">About</a></li>
                     <li class="nav-item"><a href="{{ route('marketing.how') }}" class="nav-link">How it works</a></li>
-                    <li class="nav-item">
-                        <a href="{{ route('marketing.solutions.school') }}" class="nav-link">Solutions
-                            <img src="{{ $assetBase }}/images/vVector.png" alt="">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle dropdown-toggle-no-caret" href="#" id="solutionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Solutions <img src="{{ asset('asylonhtml/asylon/images/vVector.png') }}" alt="">
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="solutionsDropdown">
+                            <li><a class="dropdown-item" href="{{ route('marketing.solutions.schools') }}">Schools</a></li>
+                            <li><a class="dropdown-item" href="{{ route('marketing.solutions.churches') }}">Churches</a></li>
+                            <li><a class="dropdown-item" href="{{ route('marketing.solutions.organizations') }}">Organizations</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item"><a href="{{ route('marketing.feature') }}" class="nav-link">Features</a></li>
                     <li class="nav-item"><a href="{{ route('marketing.resources') }}" class="nav-link">Resources</a></li>
+                    <li class="nav-item"><a href="{{ route('blog.index') }}" class="nav-link">Blog</a></li>
                     <li class="nav-item"><a href="{{ route('marketing.contact') }}" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
@@ -59,13 +69,13 @@
         <li class="nav-item"><a href="{{ route('marketing.home') }}" class="nav-link">Home</a></li>
         <li class="nav-item"><a href="{{ route('marketing.about') }}" class="nav-link">About</a></li>
         <li class="nav-item"><a href="{{ route('marketing.how') }}" class="nav-link">How it works</a></li>
-        <li class="nav-item"><a href="{{ route('marketing.solutions.school') }}" class="nav-link">Solutions
-                <img src="{{ $assetBase }}/images/vVector.png" alt=""></a></li>
-        <li class="nav-item"><a href="{{ route('marketing.solutions.school') }}" class="nav-link">School</a></li>
+        <li class="nav-item"><a href="{{ route('marketing.solutions.schools') }}" class="nav-link">Solutions</a></li>
+        <li class="nav-item"><a href="{{ route('marketing.solutions.schools') }}" class="nav-link">Schools</a></li>
         <li class="nav-item"><a href="{{ route('marketing.solutions.churches') }}" class="nav-link">Churches</a></li>
-        <li class="nav-item"><a href="{{ route('marketing.solutions.organization') }}" class="nav-link">Organization</a></li>
+        <li class="nav-item"><a href="{{ route('marketing.solutions.organizations') }}" class="nav-link">Organizations</a></li>
         <li class="nav-item"><a href="{{ route('marketing.feature') }}" class="nav-link">Features</a></li>
         <li class="nav-item"><a href="{{ route('marketing.resources') }}" class="nav-link">Resources</a></li>
+        <li class="nav-item"><a href="{{ route('blog.index') }}" class="nav-link">Blog</a></li>
         <li class="nav-item"><a href="{{ route('marketing.contact') }}" class="nav-link">Contact</a></li>
         <li class="nav-item"><a href="{{ route('marketing.demo') }}" class="nav-link">Book a Demo</a></li>
     </ul>
@@ -97,9 +107,9 @@
                         <li><a href="{{ route('marketing.home') }}">Home</a></li>
                         <li><a href="{{ route('marketing.about') }}">About</a></li>
                         <li><a href="{{ route('marketing.how') }}">How it works</a></li>
-                        <li><a href="{{ route('marketing.solutions.school') }}">Solutions <img src="{{ $assetBase }}/images/Vectora1.png" alt=""></a></li>
                         <li><a href="{{ route('marketing.feature') }}">Features</a></li>
                         <li><a href="{{ route('marketing.resources') }}">Resources</a></li>
+                        <li><a href="{{ route('blog.index') }}">Blog</a></li>
                         <li><a href="{{ route('report.create') }}">Submit a Report</a></li>
                         <li><a href="{{ route('marketing.contact') }}">Contact</a></li>
                     </ul>
