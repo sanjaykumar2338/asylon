@@ -1,72 +1,103 @@
-<x-guest-layout>
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold">{{ __('Get Started with Asylon') }}</h1>
-        <p class="text-gray-600">{{ __('Create your organization and admin account to begin.') }}</p>
+@extends('marketing.layout')
+
+@section('title', 'Asylon | Get Started')
+
+@section('content')
+<section class="inner-pages-header">
+    <div class="site-container">
+        <div class="page-header">
+            <div class="section-title">
+                <h2>{{ __('Get Started with Asylon') }}</h2>
+            </div>
+            <div class="page-link">
+                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span>/</span>
+                <span><a href="{{ route('signup.show') }}">{{ __('Get Started') }}</a></span>
+            </div>
+        </div>
     </div>
+</section>
 
-    <form method="POST" action="{{ route('signup.store') }}" class="space-y-4">
-        @csrf
-        <div>
-            <x-input-label for="org_name" :value="__('Organization Name')" />
-            <x-text-input id="org_name" class="block mt-1 w-full" type="text" name="org_name" :value="old('org_name')" required autofocus />
-            <x-input-error :messages="$errors->get('org_name')" class="mt-2" />
-        </div>
+<section class="block-left py-5 bg-light">
+    <div class="site-container container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <h1 class="h4 mb-2">{{ __('Create your organization and admin account to begin.') }}</h1>
+                        <p class="text-muted mb-4">{{ __('We will set up your portal and send a confirmation email to the admin contact below.') }}</p>
 
-        <div>
-            <x-input-label for="org_type" :value="__('Organization Type')" />
-            <select id="org_type" name="org_type" class="block mt-1 w-full border-gray-300 rounded-md" required>
-                @foreach (['school' => __('School'), 'church' => __('Church'), 'organization' => __('Organization'), 'other' => __('Other')] as $value => $label)
-                    <option value="{{ $value }}" @selected(old('org_type') === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('org_type')" class="mt-2" />
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <x-input-label for="name" :value="__('Admin Full Name')" />
-                <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required />
-                <x-input-error :messages="$errors->get('name')" class="mt-2" />
-            </div>
-            <div>
-                <x-input-label for="email" :value="__('Admin Work Email')" />
-                <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <x-input-label for="password" :value="__('Password')" />
-                <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
-            <div>
-                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-                <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
-            </div>
-        </div>
-
-        <div>
-            <x-input-label for="plan_slug" :value="__('Plan (optional)')" />
-            <select id="plan_slug" name="plan_slug" class="block mt-1 w-full border-gray-300 rounded-md">
-                <option value="">{{ __('Starter (default)') }}</option>
-                @foreach ($plans as $plan)
-                    <option value="{{ $plan->slug }}" @selected(old('plan_slug') == $plan->slug)">
-                        {{ $plan->name }}
-                        @if ($plan->trial_days > 0)
-                            ({{ $plan->trial_days }} {{ __('day trial') }})
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="mb-0 ps-3">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
-                    </option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('plan_slug')" class="mt-2" />
-        </div>
 
-        <div class="flex items-center justify-end">
-            <x-primary-button>
-                {{ __('Create Account') }}
-            </x-primary-button>
+                        <form method="POST" action="{{ route('signup.store') }}" class="row g-3">
+                            @csrf
+                            <div class="col-12">
+                                <label for="org_name" class="form-label">{{ __('Organization Name') }}</label>
+                                <input type="text" id="org_name" name="org_name" value="{{ old('org_name') }}" required autofocus class="form-control">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="org_type" class="form-label">{{ __('Organization Type') }}</label>
+                                <select id="org_type" name="org_type" class="form-select" required>
+                                    @foreach (['school' => __('School'), 'church' => __('Church'), 'organization' => __('Organization'), 'other' => __('Other')] as $value => $label)
+                                        <option value="{{ $value }}" @selected(old('org_type') === $value)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="plan_slug" class="form-label">{{ __('Plan (optional)') }}</label>
+                                <select id="plan_slug" name="plan_slug" class="form-select">
+                                    <option value="">{{ __('Starter (default)') }}</option>
+                                    @foreach ($plans as $plan)
+                                        <option value="{{ $plan->slug }}" @selected(old('plan_slug') == $plan->slug)>
+                                            {{ $plan->name }}
+                                            @if ($plan->trial_days > 0)
+                                                ({{ $plan->trial_days }} {{ __('day trial') }})
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="name" class="form-label">{{ __('Admin Full Name') }}</label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required class="form-control">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="email" class="form-label">{{ __('Admin Work Email') }}</label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" required class="form-control">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="password" class="form-label">{{ __('Password') }}</label>
+                                <input type="password" id="password" name="password" required autocomplete="new-password" class="form-control">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
+                                <input type="password" id="password_confirmation" name="password_confirmation" required class="form-control">
+                            </div>
+
+                            <div class="col-12 d-flex justify-content-end pt-2">
+                                <button type="submit" class="site-btn-dark px-4 py-2">
+                                    {{ __('Create Account') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+</section>
+@endsection
