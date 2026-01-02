@@ -307,19 +307,19 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 attachment-comment-input">{{ old('attachments.' . $index . '.comment') }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('attachments.' . $index . '.comment')" />
                         </div>
-                        <div class="mt-3 text-right">
-                            <button type="button" class="inline-flex items-center text-sm font-semibold text-red-600 hover:text-red-500 remove-attachment-btn"
+            <div class="mt-3 text-end">
+                <button type="button" class="btn btn-outline-danger btn-sm remove-attachment-btn"
                                 data-remove-index="{{ $index }}">
-                                <i class="fas fa-times mr-1"></i> {{ __('report.attachments_remove') }}
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
+                    <i class="fas fa-times me-1"></i> {{ __('report.attachments_remove') }}
+                </button>
+            </div>
+        </div>
+    @endforeach
             </div>
             <div class="mt-3">
                 <button type="button" id="addAttachmentBtn"
-                    class="inline-flex items-center rounded-md border border-indigo-500 px-3 py-1.5 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <i class="fas fa-plus mr-1"></i> {{ __('report.attachments_add') }}
+                    class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+                    <i class="fas fa-plus"></i> {{ __('report.attachments_add') }}
                 </button>
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('attachments')" />
@@ -354,10 +354,10 @@
                     <textarea id="attachment-comment-__INDEX__" name="attachments[__INDEX__][comment]" rows="2" maxlength="500"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 attachment-comment-input"></textarea>
                 </div>
-                <div class="mt-3 text-right">
-                    <button type="button" class="inline-flex items-center text-sm font-semibold text-red-600 hover:text-red-500 remove-attachment-btn"
+                <div class="mt-3 text-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-attachment-btn"
                         data-remove-index="__INDEX__">
-                        <i class="fas fa-times mr-1"></i> Remove attachment
+                        <i class="fas fa-times me-1"></i> Remove attachment
                     </button>
                 </div>
             </div>

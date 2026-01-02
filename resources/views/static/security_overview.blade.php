@@ -1,55 +1,93 @@
-<x-guest-layout container-class="w-full max-w-5xl mt-8 px-6 sm:px-10 py-10 bg-white shadow-md overflow-hidden sm:rounded-lg">
-    <div class="border-b border-gray-200 pb-6">
-        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500">Asylon</p>
-        <h1 class="text-3xl font-semibold text-gray-900">Security Overview</h1>
-        <p class="mt-2 text-sm text-gray-700 max-w-3xl">
-            A quick summary of how we secure reports, attachments, and follow-up conversations.
-        </p>
-    </div>
+@extends('marketing.layout')
 
-    <div class="mt-8 space-y-8 text-gray-800">
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">Data in transit &amp; at rest</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li>HTTPS everywhere; signed links for attachment previews and downloads.</li>
-                <li>Stored files are protected in restricted storage with access limited to authorized reviewers.</li>
-                <li>Audit logs track administrative actions for accountability.</li>
-            </ul>
-        </section>
+@section('title', 'Asylon | Security Overview')
 
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">Anonymity safeguards</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li>Anonymous submissions by default; contact info optional.</li>
-                <li>Voice anonymization available for uploaded/recorded audio.</li>
-                <li>IP and device details are suppressed when ultra-private mode is enabled.</li>
-            </ul>
-        </section>
+@section('content')
+@php
+    $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+    $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+@endphp
 
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">Data retention &amp; access</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li>Retention follows your organization’s policies; data can be removed upon authorized requests.</li>
-                <li>Role-based access limits who can view or act on reports.</li>
-                <li>No third-party analytics or tracking on reporting portals.</li>
-            </ul>
-        </section>
-
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">Operational practices</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li>Signed URLs for attachments expire and cannot be guessed.</li>
-                <li>Alerts are routed to authorized administrators and reviewers only.</li>
-                <li>Incident response playbooks ensure timely review of urgent cases.</li>
-            </ul>
-        </section>
-
-        <div class="rounded-lg border border-indigo-100 bg-indigo-50 px-6 py-5 text-sm text-indigo-900">
-            <p class="font-semibold text-indigo-900">Questions or requests?</p>
-            <p class="mt-2">
-                Reach us at <a href="mailto:{{ config('asylon.info_email', 'info@asylon.cc') }}" class="font-semibold underline">{{ config('asylon.info_email', 'info@asylon.cc') }}</a>
-                or <a href="mailto:{{ config('asylon.support_email', 'support@asylon.cc') }}" class="font-semibold underline">{{ config('asylon.support_email', 'support@asylon.cc') }}</a>.
-            </p>
+<section class="inner-pages-header">
+    <div class="site-container">
+        <div class="page-header">
+            <div class="section-title">
+                <h2>Security Overview</h2>
+            </div>
+            <div class="page-link">
+                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span>/</span>
+                <span><a href="{{ route('report.create') }}">Submit a Report</a></span>
+                <span>/</span>
+                <span><a href="{{ route('security.overview') }}">Security Overview</a></span>
+            </div>
         </div>
     </div>
-</x-guest-layout>
+</section>
+
+<section class="policy-section">
+    <div class="site-container">
+        <div class="policy-content">
+            <div class="inner-text-block">
+                <h2>How we secure reports</h2>
+                <p>
+                    A quick summary of how we protect reports, attachments, and follow-up conversations on the Asylon
+                    reporting portal.
+                </p>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>Data in transit and at rest</h3>
+                <ul>
+                    <li>HTTPS everywhere with signed links for attachment previews and downloads.</li>
+                    <li>Stored files are protected in restricted storage with access limited to authorized reviewers.</li>
+                    <li>Audit logs track administrative actions for accountability.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>Anonymity safeguards</h3>
+                <ul>
+                    <li>Anonymous submissions by default; contact info is optional.</li>
+                    <li>Voice anonymization is available for uploaded or recorded audio.</li>
+                    <li>IP and device details are suppressed when ultra-private mode is enabled.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>Data retention and access</h3>
+                <ul>
+                    <li>Retention follows your organization policies; data can be removed on authorized requests.</li>
+                    <li>Role-based access limits who can view or act on reports.</li>
+                    <li>No third-party analytics or tracking on reporting portals.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>Operational practices</h3>
+                <ul>
+                    <li>Signed URLs for attachments expire and cannot be guessed.</li>
+                    <li>Alerts are routed to authorized administrators and reviewers only.</li>
+                    <li>Incident response playbooks ensure timely review of urgent cases.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <div class="alert alert-success mb-0">
+                    <p class="mb-1 fw-semibold">Questions or requests?</p>
+                    <p class="mb-0">
+                        Reach us at <a href="mailto:{{ $infoEmail }}">{{ $infoEmail }}</a>
+                        or <a href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="policy-sidebar">
+            <a href="{{ route('privacy.anonymity') }}" class="policy-btn">Privacy &amp; Anonymity</a>
+            <a href="{{ route('security.overview') }}" class="policy-btn active">Security Overview</a>
+            <a href="{{ route('report.create') }}" class="policy-btn">Submit a Report</a>
+        </div>
+    </div>
+</section>
+@endsection

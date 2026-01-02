@@ -1,53 +1,94 @@
-<x-guest-layout container-class="w-full max-w-5xl mt-8 px-6 sm:px-10 py-10 bg-white shadow-md overflow-hidden sm:rounded-lg">
-    <div class="border-b border-gray-200 pb-6">
-        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500">Asylon</p>
-        <h1 class="text-3xl font-semibold text-gray-900">Privacy &amp; Anonymity</h1>
-        <p class="mt-2 text-sm text-gray-700 max-w-3xl">
-            We protect reporters by default. Your identity stays private unless <strong>you</strong> choose to share it. Below is a plain-language summary of what we collect, how anonymity works, and how long we retain data.
-        </p>
-    </div>
+@extends('marketing.layout')
 
-    <div class="mt-8 space-y-8 text-gray-800">
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">What we collect — and what we don’t</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li><strong>Report details you provide</strong> (description, attachments, optional contact info).</li>
-                <li><strong>Optional follow-up contact</strong> if you choose to share your email/phone.</li>
-                <li><strong>We do not require names</strong>, sign-ins, or personal identifiers to submit.</li>
-                <li><strong>No tracking cookies or analytics</strong> on the reporting and follow-up pages.</li>
-            </ul>
-        </section>
+@section('title', 'Asylon | Privacy & Anonymity')
 
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">How anonymity works</h2>
-            <ul class="list-disc space-y-2 pl-5 text-sm">
-                <li>You can submit entirely anonymous reports—leave contact fields blank to stay anonymous.</li>
-                <li>If you share contact info, it’s only used for follow-up about your report.</li>
-                <li>Voice recordings can be automatically anonymized to disguise your voice.</li>
-                <li>Internal audit logs are limited to authorized reviewers and administrators.</li>
-            </ul>
-        </section>
+@section('content')
+@php
+    $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+    $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+@endphp
 
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">How voice and attachments are stored</h2>
-            <p class="text-sm text-gray-700">
-                Files are stored securely with access limited to authorized reviewers. Sensitive audio is queued for anonymization, and all downloads are signed to prevent public access.
-            </p>
-        </section>
-
-        <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-gray-900">Data retention &amp; deletion</h2>
-            <p class="text-sm text-gray-700">
-                Reports and files are retained only as long as required by your organization’s policies. Deletion requests can be made through your administrator. When the “ultra-private” mode is enabled, IP and device details are suppressed on intake.
-            </p>
-        </section>
-
-        <div class="rounded-lg border border-indigo-100 bg-indigo-50 px-6 py-5 text-sm text-indigo-900">
-            <p class="font-semibold text-indigo-900">Questions?</p>
-            <p class="mt-2">
-                Contact <a href="mailto:{{ config('asylon.info_email', 'info@asylon.cc') }}" class="font-semibold underline">{{ config('asylon.info_email', 'info@asylon.cc') }}</a>
-                or <a href="mailto:{{ config('asylon.support_email', 'support@asylon.cc') }}" class="font-semibold underline">{{ config('asylon.support_email', 'support@asylon.cc') }}</a>.
-            </p>
+<section class="inner-pages-header">
+    <div class="site-container">
+        <div class="page-header">
+            <div class="section-title">
+                <h2>Privacy &amp; Anonymity</h2>
+            </div>
+            <div class="page-link">
+                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span>/</span>
+                <span><a href="{{ route('report.create') }}">Submit a Report</a></span>
+                <span>/</span>
+                <span><a href="{{ route('privacy.anonymity') }}">Privacy &amp; Anonymity</a></span>
+            </div>
         </div>
     </div>
-</x-guest-layout>
+</section>
+
+<section class="policy-section">
+    <div class="site-container">
+        <div class="policy-content">
+            <div class="inner-text-block">
+                <h2>How we protect reporters</h2>
+                <p>
+                    We keep your identity private unless you choose to share it. This page summarizes how privacy,
+                    anonymity, and retention work on the reporting portal.
+                </p>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>What we collect and what we do not</h3>
+                <ul>
+                    <li><strong>Report details you provide</strong> such as descriptions, attachments, and optional contact info.</li>
+                    <li><strong>Optional follow-up contact</strong> if you choose to share your email or phone.</li>
+                    <li><strong>We do not require names</strong> or personal identifiers to submit a report.</li>
+                    <li><strong>No tracking cookies or analytics</strong> on reporting and follow-up pages.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>How anonymity works</h3>
+                <ul>
+                    <li>You can submit anonymously; leave contact fields blank to stay anonymous.</li>
+                    <li>If you share contact details, they are only used for follow-up about your report.</li>
+                    <li>Voice recordings can be anonymized to disguise your voice.</li>
+                    <li>Internal audit logs are limited to authorized reviewers and administrators.</li>
+                </ul>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>How voice and attachments are stored</h3>
+                <p>
+                    Files are stored securely with access limited to authorized reviewers. Sensitive audio is queued for
+                    anonymization, and all downloads are signed to prevent public access.
+                </p>
+            </div>
+
+            <div class="inner-text-block">
+                <h3>Data retention and deletion</h3>
+                <p>
+                    Reports and files are retained only as long as required by your organization policies. Deletion
+                    requests can be made through your administrator. When the ultra-private mode is enabled, IP and
+                    device details are suppressed on intake.
+                </p>
+            </div>
+
+            <div class="inner-text-block">
+                <div class="alert alert-success mb-0">
+                    <p class="mb-1 fw-semibold">Questions?</p>
+                    <p class="mb-0">
+                        Contact <a href="mailto:{{ $infoEmail }}">{{ $infoEmail }}</a>
+                        or <a href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="policy-sidebar">
+            <a href="{{ route('privacy.anonymity') }}" class="policy-btn active">Privacy &amp; Anonymity</a>
+            <a href="{{ route('security.overview') }}" class="policy-btn">Security Overview</a>
+            <a href="{{ route('report.create') }}" class="policy-btn">Submit a Report</a>
+        </div>
+    </div>
+</section>
+@endsection

@@ -1,33 +1,87 @@
-<x-guest-layout>
-    <div class="mx-auto max-w-lg space-y-6">
-        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                    <h1 class="text-xl font-semibold text-gray-900">{{ __('Follow up on an existing case') }}</h1>
-                    <p class="mt-2 text-sm text-gray-600">
-                        {{ __('Paste the Case ID or follow-up link you saved after submitting your report.') }}
-                    </p>
-                </div>
-            </div>
+@extends('marketing.layout')
 
-            <form method="POST" action="{{ route('followup.redirect') }}" class="mt-4 space-y-4">
-                @csrf
-                <div>
-                    <label for="case_id" class="block text-sm font-medium text-gray-700">
-                        {{ __('Case ID or follow-up link') }}
-                    </label>
-                    <input type="text" name="case_id" id="case_id" required
-                        value="{{ old('case_id') }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        placeholder="{{ __('e.g. case ID or https://.../followup/your-token') }}">
-                    @error('case_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div class="flex justify-end">
-                    <x-primary-button>{{ __('Continue') }}</x-primary-button>
-                </div>
-            </form>
+@section('title', 'Asylon | Follow Up')
+
+@section('content')
+@php($supportEmail = config('asylon.support_email', 'support@asylon.cc'))
+@php($infoEmail = config('asylon.info_email', 'info@asylon.cc'))
+
+<section class="inner-pages-header">
+    <div class="site-container">
+        <div class="page-header">
+            <div class="section-title">
+                <h2>{{ __('Follow up on an existing case') }}</h2>
+            </div>
+            <div class="page-link">
+                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span>/</span>
+                <span><a href="{{ route('report.create') }}">Submit a Report</a></span>
+                <span>/</span>
+                <span><a href="{{ route('followup.entry') }}">Follow Up</a></span>
+            </div>
         </div>
     </div>
-</x-guest-layout>
+</section>
+
+<section class="block-left py-5 bg-light">
+    <div class="site-container container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <h1 class="h4 mb-2">{{ __('Follow up on an existing case') }}</h1>
+                        <p class="text-muted mb-4">
+                            {{ __('Paste the Case ID or follow-up link you saved after submitting your report.') }}
+                        </p>
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="mb-0 ps-3">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form method="POST" action="{{ route('followup.redirect') }}" class="mt-3">
+                            @csrf
+                            <div class="mb-4">
+                                <label for="case_id" class="form-label">{{ __('Case ID or follow-up link') }}</label>
+                                <input type="text"
+                                       name="case_id"
+                                       id="case_id"
+                                       value="{{ old('case_id') }}"
+                                       required
+                                       class="form-control"
+                                       placeholder="{{ __('e.g. case ID or https://.../followup/your-token') }}">
+                                @error('case_id')
+                                    <p class="text-danger small mb-0 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <a href="{{ route('report.create') }}" class="text-primary">
+                                    {{ __('Submit a new report instead') }}
+                                </a>
+                                <button type="submit" class="site-btn-dark px-4 py-2">
+                                    {{ __('Continue') }}
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-4 text-muted small">
+                            <p class="mb-1">{{ __('Need help finding your case ID? Check the confirmation message you saved when you first submitted your report.') }}</p>
+                            <p class="mb-0">
+                                {{ __('Questions?') }}
+                                <a href="mailto:{{ $infoEmail }}" class="text-primary">{{ $infoEmail }}</a>
+                                {{ __('or') }}
+                                <a href="mailto:{{ $supportEmail }}" class="text-primary">{{ $supportEmail }}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
