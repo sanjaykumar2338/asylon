@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asylon</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+    <!-- Font Awesome CDN -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <main class="admin-root">
+        <div class="admin-block-wrapper">
+
+            <aside class="admin-sidebar">
+                <div class="sidebar-logo">
+                    <img src="images/IMG_6451 1 (1).png" alt="Asylon">
+
+
+                </div>
+
+                <nav class="sidebar-nav">
+                    <ul class="sidebar-menu">
+
+                        <li class="sidebar-item active">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol.png" alt=""> </span>
+                                <span class="text">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="Reports.html">
+                                <span class="icon"> <img src="images/Symbol-1.png" alt=""> </span>
+                                <span class="text">Reports</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol3.png" alt=""> </span>
+                                <span class="text">Organizations</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol4.png" alt=""> </span>
+                                <span class="text">Escalation Rules</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol5.png" alt=""></span>
+                                <span class="text">Users</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol6.png" alt=""> </span>
+                                <span class="text">Alert Contacts</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol7.png" alt=""> </span>
+                                <span class="text">Notification Templates</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol8.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Report Categories</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol9.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Analytics</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol10.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Risk Keywords</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol11.png" alt=""></span>
+                                <span class="text">Pages</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol13.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Menus</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol14.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Settings</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+                
+            <div id="closeSidebar" class="sidebar-close">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            </aside>
+
+            <div class="admin-content">
+                <div class="admin-header">
+                    <div class="left-block">
+                        <span>Dashboard</span>
+                        <div class="mobile-menu">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="right-block">
+                        <button><img src="images/Icon (1).png" class="img-fluid " alt="" />
+                        </button>
+
+                        <!-- 
+                        <div class="account-root">
+                            <span class="profile-image">
+                                <img src="images/TopBar.png" alt="Profile Picture">
+                            </span>
+                            <span class="icon-wrapper">
+                                <div class="icon">
+                                    <img src="images/right-arrow.png" alt="Icon">
+                                </div>
+                            </span>
+                        </div> -->
+
+
+                        <div class="account-root" id="accountRoot">
+                            <span class="profile-image">
+                                <img src="images/TopBar.png" alt="Profile Picture">
+                            </span>
+                            <span class="icon-wrapper" id="dropdownToggle">
+                                <div class="icon">
+                                    <img src="images/right-arrow.png" alt="Icon">
+                                </div>
+                            </span>
+
+                            <!-- Dropdown Menu -->
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <ul>
+                                    <li><a href="#">Edit</a></li>
+                                    <li><a href="#">View Details</a></li>
+                                    <li><a href="#">Attachments</a></li>
+                                    <li><a href="#">Delete</a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="admin-root-block">
+                    <div class="Users-Grid">
+                        <div class="users-data-card">
+
+                            <div class="card-header">
+                                <span>Total Users</span>
+                                <span><img src="images/Group.png" class="img-fluid " alt="" />
+                                </span>
+                            </div>
+                            <div class="card-center-head">
+
+                                <span>38</span>
+                                <div class="right-block-card">
+                                    <span>+12.5%</span>
+                                    <span>vs last period</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <div class="users-data-card">
+
+                            <div class="card-header">
+                                <span>Total Reports</span>
+                                <span><img src="images/Group.png" class="img-fluid " alt="" />
+                                </span>
+                            </div>
+                            <div class="card-center-head">
+
+                                <span>67</span>
+                                <div class="right-block-card">
+                                    <span>+12.5%</span>
+                                    <span>vs last period</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+
+                        <div class="users-data-card">
+
+                            <div class="card-header">
+                                <span>Open Reports</span>
+                                <span><img src="images/Group.png" class="img-fluid " alt="" />
+                                </span>
+                            </div>
+                            <div class="card-center-head">
+
+                                <span>30</span>
+                                <div class="right-block-card">
+                                    <span>+12.5%</span>
+                                    <span>vs last period</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="users-data-card">
+
+                            <div class="card-header">
+                                <span>Urgent Reports</span>
+                                <span><img src="images/Group.png" class="img-fluid " alt="" />
+                                </span>
+                            </div>
+                            <div class="card-center-head">
+
+                                <span>12</span>
+                                <div class="right-block-card">
+                                    <span>+12.5%</span>
+                                    <span>vs last period</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+
+
+
+                    <div class="report-volume">
+                        <div class="section-header">
+                            <h2>Report Volume</h2>
+                            <span> This week <img src="images/right-arrow.png" alt=""></span>
+
+                        </div>
+                        <!-- 
+                        <div id="chartContainer">
+                            <canvas id="myChart" width="760" height="350"></canvas>
+                        </div> -->
+                        <div class="chart-image">
+                            <img src="images/Group 1000002498.png" alt="">
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div class="report-volume">
+                        <div class="section-header">
+                            <h2 style="color: #4AB178;">Reports Statics</h2>
+
+                        </div>
+                        <!-- <div id="chartContainer">
+                            <canvas id="lineChart" width="860" height="350"></canvas>
+                        </div> -->
+                        <div class="chart-image">
+                            <img src="images/Chart&Axis.png" alt="">
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </main>
+    <script src="js/admin.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+
+</body>
+
+</html>

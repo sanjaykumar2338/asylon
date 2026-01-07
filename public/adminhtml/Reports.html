@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asylon</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+</head>
+
+<body>
+    <main class="admin-root">
+        <div class="admin-block-wrapper">
+
+            <aside class="admin-sidebar">
+                <div class="sidebar-logo">
+                    <img src="images/IMG_6451 1 (1).png" alt="Asylon">
+
+
+                </div>
+
+                <nav class="sidebar-nav">
+                    <ul class="sidebar-menu">
+
+                        <li class="sidebar-item active">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol.png" alt=""> </span>
+                                <span class="text">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="Reports.html">
+                                <span class="icon"> <img src="images/Symbol-1.png" alt=""> </span>
+                                <span class="text">Reports</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol3.png" alt=""> </span>
+                                <span class="text">Organizations</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol4.png" alt=""> </span>
+                                <span class="text">Escalation Rules</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol5.png" alt=""></span>
+                                <span class="text">Users</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol6.png" alt=""> </span>
+                                <span class="text">Alert Contacts</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"> <img src="images/Symbol7.png" alt=""> </span>
+                                <span class="text">Notification Templates</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol8.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Report Categories</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol9.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Analytics</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol10.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Risk Keywords</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol11.png" alt=""></span>
+                                <span class="text">Pages</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol13.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Menus</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="#">
+                                <span class="icon"><img src="images/Symbol14.png" class="img-fluid " alt="" />
+                                </span>
+                                <span class="text">Settings</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+                <div id="closeSidebar" class="sidebar-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+
+
+
+            </aside>
+            <div class="admin-content">
+                <div class="admin-header">
+                    <div class="left-block">
+                        <span>Reports</span>
+
+
+                        <div class="mobile-menu">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+
+                        </div>
+                    </div>
+                    <div class="right-block">
+                        <button><img src="images/Icon (1).png" class="img-fluid " alt="" />
+                        </button>
+
+
+                        <!-- <div class="account-root">
+                            <span class="profile-image">
+                                <img src="images/TopBar.png" alt="Profile Picture">
+                            </span>
+                            <span class="icon-wrapper" id="dropdownToggle">
+                                <div class="icon">
+                                    <img src="images/right-arrow.png" alt="Icon">
+                                </div>
+                            </span>
+                        </div> -->
+
+
+
+                        <div class="account-root" id="accountRoot">
+                            <span class="profile-image">
+                                <img src="images/TopBar.png" alt="Profile Picture">
+                            </span>
+                            <span class="icon-wrapper" id="dropdownToggle">
+                                <div class="icon">
+                                    <img src="images/right-arrow.png" alt="Icon">
+                                </div>
+                            </span>
+
+                            <!-- Dropdown Menu -->
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <ul>
+                                    <li><a href="#">Edit</a></li>
+                                    <li><a href="#">View Details</a></li>
+                                    <li><a href="#">Attachments</a></li>
+                                    <li><a href="#">Delete</a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="admin-root-block">
+
+
+
+
+                    <div class="admin-reports-block">
+                        <div class="section-title">
+                            <h2>All Reports</h2>
+                        </div>
+                        <div class="search-filter">
+                            <input type="search" placeholder="Search Filter">
+                            <!-- Filter Icon -->
+
+
+
+                            <div id="filter-block" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample">
+                                <img src="images/Group (1).png" alt="Filter">
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="table-container">
+                        <table>
+                            <tbody>
+                                <tr class="table-head">
+                                    <td>Number</td>
+                                    <td>Organization</td>
+                                    <td>Category</td>
+                                    <td>Risk</td>
+                                    <td>Urgent</td>
+                                    <td>Status</td>
+                                    <td>Violation Date</td>
+                                    <td>Submission Date</td>
+                                    <td>Action</td>
+                                </tr>
+
+                                <tr>
+                                    <td>48144</td>
+                                    <td>The Walt Disney Company</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>16/08/2013</td>
+                                    <td>16/08/2013</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>20441</td>
+                                    <td>McDonald's</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>28/10/2012</td>
+                                    <td>16/08/2013</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>30321</td>
+                                    <td>Facebook</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>07/05/2016</td>
+                                    <td>18/09/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>85486</td>
+                                    <td>Louis Vuitton</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>28/10/2012</td>
+                                    <td>16/08/2013</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>82738</td>
+                                    <td>Mitsubishi</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>18/09/2016</td>
+                                    <td>18/09/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>69822</td>
+                                    <td>Ferrari</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>16/08/2013</td>
+                                    <td>07/05/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>14355</td>
+                                    <td>IBM</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>18/09/2016</td>
+                                    <td>15/08/2017</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>78577</td>
+                                    <td>Louis Vuitton</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>18/09/2016</td>
+                                    <td>15/08/2017</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>40322</td>
+                                    <td>Gillette</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>07/05/2016</td>
+                                    <td>12/06/2020</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>52152</td>
+                                    <td>Louis Vuitton</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>18/09/2016</td>
+                                    <td>07/05/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>12473</td>
+                                    <td>Nintendo</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>15/08/2017</td>
+                                    <td>28/10/2012</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>93126</td>
+                                    <td>Sony</td>
+                                    <td>Safety / Threat</td>
+                                    <td><span class="badge low">Low</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>28/10/2012</td>
+                                    <td>28/10/2012</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>42574</td>
+                                    <td>eBay</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>15/08/2017</td>
+                                    <td>07/05/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>97133</td>
+                                    <td>General Electric</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>18/09/2016</td>
+                                    <td>07/05/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>68545</td>
+                                    <td>MasterCard</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>16/08/2013</td>
+                                    <td>07/05/2016</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+
+                                <tr>
+                                    <td>32116</td>
+                                    <td>eBay</td>
+                                    <td>Positive Reporting</td>
+                                    <td><span class="badge high">High</span></td>
+                                    <td>Yes</td>
+                                    <td><span class="status">Open <img src="images/right-arrow.png" alt=""></span></td>
+                                    <td>12/06/2020</td>
+                                    <td>15/08/2017</td>
+                                    <td class="dots"><img src="images/Vectors.png" alt=""></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </main>
+
+
+
+
+    <!-- Overlay -->
+    <!-- <div class="overlay" id="overlay"></div> -->
+
+    <!-- Sidebar -->
+    <!-- <div class="sidebar" id="sidebar">
+
+
+
+        <div class="head-root">
+            <div class="btn-block">
+                <button class="close-btn" id="closeSidebar"><img src="images/Vectorclose.png" class="img-fluid"
+                        alt="" />
+                </button>
+            </div>
+
+
+
+            <h3>Filters</h3>
+        </div>
+
+
+        <div class="filter-root">
+            <div class="sidebar-form">
+
+                <div class="form-group">
+                    <label>Urgent</label>
+                    <select>
+                        <option>Enter Url</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Type</label>
+                    <select>
+                        <option>Enter Url</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Severity</label>
+                    <select>
+                        <option>Enter Url</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select>
+                        <option>Enter email</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Sub Category</label>
+                    <select>
+                        <option>Enter Password</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-group-root ">
+                    <label>Submitted From</label>
+                    <input type="text" placeholder="Enter Password">
+                </div>
+
+                <div class="form-group form-group-root">
+                    <label>Submitted To</label>
+                    <input type="text" placeholder="Enter Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Sorted By</label>
+                    <select>
+                        <option>Enter Password</option>
+                    </select>
+                </div>
+
+
+
+
+
+
+            </div>
+            <div class="btn-root"><button>Apply Filters</button></div>
+        </div>
+    </div> -->
+
+
+
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample">
+
+
+
+
+
+
+
+
+
+
+
+        <div class="offcanvas-body">
+            <div class="offcanvas-header-block">
+
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"><img src="images/Vectorclose.png"
+                    class="img-fluid" alt="" />
+            </button>
+                <div class="offcanvas-head">
+                    <h3>Filters</h3>
+                </div>
+
+            </div>
+
+
+            <div class="filter-root">
+                <div class="sidebar-form">
+
+                    <div class="form-group">
+                        <label>Urgent</label>
+                        <select>
+                            <option>Enter Url</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select>
+                            <option>Enter Url</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Severity</label>
+                        <select>
+                            <option>Enter Url</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select>
+                            <option>Enter email</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sub Category</label>
+                        <select>
+                            <option>Enter Password</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-group-root ">
+                        <label>Submitted From</label>
+                        <input type="text" placeholder="Enter Password">
+                    </div>
+
+                    <div class="form-group form-group-root">
+                        <label>Submitted To</label>
+                        <input type="text" placeholder="Enter Password">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sorted By</label>
+                        <select>
+                            <option>Enter Password</option>
+                        </select>
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="btn-root"><button>Apply Filters</button></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="js/admin.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+</body>
+
+</html>

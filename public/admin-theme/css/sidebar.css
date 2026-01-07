@@ -1,0 +1,11 @@
+:root {
+    /* Sidebar */
+    --sidebar-bg: #0C2448;
+}
+
+
+.admin-sidebar {
+    background-color: var(--sidebar-bg);
+}
+
+

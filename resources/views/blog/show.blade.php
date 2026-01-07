@@ -40,11 +40,11 @@
     <section class="py-5">
         <div class="site-container">
             <article class="col-lg-10 mx-auto p-0">
-                <?php
+                @php
                     $imageUrl = $post->featuredImageUrl();
                     $imageSrc = $imageUrl ?: $blogImageFallback;
                     $imageAlt = $post->featured_image_alt ?? $post->title;
-                ?>
+                @endphp
                 <img src="{{ $imageSrc }}"
                      onerror="this.src='{{ $blogImageFallback }}';"
                      alt="{{ $imageAlt }}"
@@ -56,24 +56,21 @@
                     {!! $post->content !!}
                 </div>
 
-                <?php
-                if($related->isNotEmpty()){ ?>
+                @if($related->isNotEmpty())
                     <div class="pt-4 border-top">
                         <h3 class="h5 fw-bold mb-3">Related Posts</h3>
                         <div class="row">
-                            <?php
-                            foreach($related as $rel){
-                                ?>
+                            @foreach($related as $rel)
                                 <div class="col-md-6 mb-3">
                                     <div class="p-3 border rounded h-100">
                                         <a href="{{ route('blog.show', $rel->slug) }}" class="fw-bold text-dark text-decoration-none">{{ $rel->title }}</a>
                                         <p class="text-muted mb-0 small">{{ Str::limit($rel->excerpt, 120) }}</p>
                                     </div>
                                 </div>
-                            <?php } ?>
+                            @endforeach
                         </div>
                     </div>
-                <?php } ?>
+                @endif
 
                 <div class="pt-3">
                     <a href="{{ route('blog.index') }}" class="text-primary text-decoration-none">&larr; Back to Blog</a>

@@ -51,13 +51,12 @@
     <section class="py-5">
         <div class="site-container">
             <div class="row g-4">
-
-                <?php
-                    foreach($posts as $post) {
+                @foreach($posts as $post)
+                    @php
                         $imageUrl = $post->featuredImageUrl();
                         $imageSrc = $imageUrl ?: $blogImageFallback;
                         $imageAlt = $post->featured_image_alt ?? $post->title;
-                ?>
+                    @endphp
                     <div class="col-md-4">
                         <article class="card h-100 shadow-sm border-0">
                             <img src="{{ $imageSrc }}"
@@ -80,7 +79,7 @@
                             </div>
                         </article>
                     </div>
-                    <?php } ?>
+                @endforeach
             </div>
 
             <div class="mt-4">
