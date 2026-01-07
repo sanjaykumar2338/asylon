@@ -179,7 +179,7 @@
 .right-block {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     justify-content: center;
 }
 
@@ -212,8 +212,10 @@
 }
 
 .profile-image img {
-    width: 100%;
-    max-width: 100px;
+    width: 44px;
+    height: 44px;
+    max-width: 44px;
+    border-radius: 50%;
 }
 
 .icon-wrapper .icon img {

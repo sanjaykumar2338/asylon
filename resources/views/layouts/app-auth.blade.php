@@ -12,9 +12,7 @@
         <link rel="stylesheet" href="{{ asset('admin-theme/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('admin-theme/css/style.css') }}">
         <link rel="stylesheet" href="{{ asset('admin-theme/css/responsive-ui.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-            integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer">
+        <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
         @stack('styles')
     </head>
     <body>
@@ -32,8 +30,8 @@
             $isReviewer = $navUser?->hasRole('reviewer');
         @endphp
         <main class="admin-root">
-            <div class="admin-block-wrapper">
-                <aside class="admin-sidebar">
+        <div class="admin-block-wrapper">
+            <aside class="admin-sidebar">
                     <div class="sidebar-logo">
                         <a href="{{ route('dashboard') }}" class="text-decoration-none d-inline-block">
                             <img src="{{ asset('admin-theme/images/IMG_6451 1 (1).png') }}"
@@ -308,11 +306,11 @@
                                 <div></div>
                             </div>
                         </div>
-                        <div class="right-block">
+                        <div class="right-block" style="gap: 8px;">
                             <div class="account-root" id="notificationsRoot">
                                 <button type="button" id="notificationsToggle">
                                     <img src="{{ asset('admin-theme/images/Icon (1).png') }}" class="img-fluid"
-                                        alt="{{ __('Notifications') }}">
+                                        alt="{{ __('common.notifications') }}">
                                     @if ($navUnreadCount > 0)
                                         <span
                                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -321,17 +319,17 @@
                                     @endif
                                 </button>
 
-                                <div class="dropdown-menu" id="notificationsMenu">
-                                    <div class="px-3 py-2 d-flex justify-content-between align-items-center border-bottom">
+                                <div class="dropdown-menu shadow-lg border-0 p-0" id="notificationsMenu" style="min-width: 320px;">
+                                    <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom" style="background: #f8fafc;">
                                         <span class="fw-semibold">{{ __('common.notifications') }}</span>
                                         <form method="POST" action="{{ route('notifications.markAllRead') }}">
                                             @csrf
-                                            <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                                            <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none">
                                                 {{ __('common.mark_all_read') }}
                                             </button>
                                         </form>
                                     </div>
-                                    <ul class="list-unstyled mb-0">
+                                    <ul class="list-unstyled mb-0" style="max-height: 360px; overflow-y: auto;">
                                         @forelse ($navRecentNotifications as $notification)
                                             @php
                                                 $data = $notification->data ?? [];
@@ -341,40 +339,41 @@
                                             @endphp
                                             <li class="border-bottom">
                                                 <a href="{{ $url }}" class="d-block text-decoration-none px-3 py-2">
-                                                    <span class="d-block fw-semibold">{{ $title }}</span>
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <span class="fw-semibold">{{ $title }}</span>
+                                                        <small class="text-muted ms-2">{{ $notification->created_at->diffForHumans() }}</small>
+                                                    </div>
                                                     @if ($message)
-                                                        <small
-                                                            class="d-block text-muted">{{ \Illuminate\Support\Str::limit($message, 90) }}</small>
+                                                        <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($message, 90) }}</small>
                                                     @endif
-                                                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                                 </a>
                                                 <form method="POST"
                                                     action="{{ route('notifications.markRead', $notification->getKey()) }}"
                                                     class="px-3 pb-2">
                                                     @csrf
                                                     <button type="submit"
-                                                        class="btn btn-link p-0 text-decoration-none">
+                                                        class="btn btn-link p-0 text-decoration-none small">
                                                         {{ $notification->read_at ? __('Viewed') : __('Mark read') }}
                                                     </button>
                                                 </form>
                                             </li>
                                         @empty
-                                            <li class="px-3 py-3 text-muted text-center">
+                                            <li class="px-3 py-4 text-muted text-center">
                                                 {{ __('common.no_notifications') }}
                                             </li>
                                         @endforelse
                                     </ul>
-                                    <div class="px-3 py-2 text-center border-top">
-                                        <a href="{{ route('notifications.index') }}" class="text-decoration-none">
+                                    <div class="px-3 py-3 text-center border-top">
+                                        <a href="{{ route('notifications.index') }}" class="text-decoration-none fw-semibold">
                                             {{ __('common.view_all_notifications') }}
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="account-root" id="accountRoot">
-                                <span class="profile-image">
-                                    <img src="{{ $profilePhoto }}" alt="{{ $navUser?->name ?? 'User' }}">
+                            <div class="account-root" id="accountRoot" style="gap: 8px;">
+                                <span class="profile-image" style="width: 44px; height: 44px;">
+                                    <img src="{{ $profilePhoto }}" alt="{{ $navUser?->name ?? 'User' }}" style="width: 44px; height: 44px;">
                                 </span>
                                 <span class="icon-wrapper" id="dropdownToggle">
                                     <div class="icon">
@@ -406,7 +405,7 @@
                             <div class="mb-3">
                                 @yield('breadcrumb')
                             </div>
-                        @endhasSection
+                        @endif
 
                         @php
                             $layoutOrg = auth()->user()?->org;
@@ -443,9 +442,9 @@
                                     @yield('body')
                                 @else
                                     {{ $slot ?? '' }}
-                                @endhasSection
-                            @endhasSection
-                        @endhasSection
+                                @endif
+                            @endif
+                        @endif
                     </div>
 
                     @php
