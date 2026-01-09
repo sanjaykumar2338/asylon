@@ -1,4 +1,4 @@
-<div class="card card-outline card-primary mb-4">
+<div class="card admin-index-card mb-4">
     <div class="card-header">
         <h3 class="card-title mb-0">{{ __('Update Password') }}</h3>
     </div>
@@ -6,15 +6,6 @@
         <p class="text-muted small mb-4">
             {{ __('Ensure your account is using a long, random password to stay secure.') }}
         </p>
-
-        @if (session('status') === 'password-updated')
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle mr-2"></i> {{ __('Password updated successfully.') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
 
         <form method="post" action="{{ route('password.update') }}">
             @csrf
@@ -51,11 +42,10 @@
             </div>
 
             <div class="text-right">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary px-3 py-2">
                     <i class="fas fa-save mr-1"></i> {{ __('Save Password') }}
                 </button>
             </div>
         </form>
     </div>
 </div>
-

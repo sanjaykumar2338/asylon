@@ -47,60 +47,73 @@
         {{ $translate('Analytics') }}
     </x-slot>
 
-    <div class="alert alert-info mb-4">
-        {{ $translate('These analytics help your team see where risk is concentrated and how reports are trending over time.') }}
-    </div>
+    @include('admin.partials.flash')
 
-    <div class="card card-outline card-primary mb-4">
-        <div class="card-body">
-            <form method="GET" class="form-row">
-                <div class="form-group col-md-3">
-                    <label class="small text-uppercase text-muted">{{ $translate('Portal') }}</label>
-                    <select name="portal" class="form-control">
-                        <option value="">{{ $translate('All portals') }}</option>
-                        <option value="student" @selected($portalValue === 'student')>{{ $translate('Student only') }}</option>
-                        <option value="employee" @selected($portalValue === 'employee')>{{ $translate('HR/Employee only') }}</option>
-                        <option value="general" @selected($portalValue === 'general')>{{ $translate('General') }}</option>
-                    </select>
-                </div>
-                @if (isset($orgOptions) && $orgOptions->count() > 1)
-                    <div class="form-group col-md-3">
-                        <label class="small text-uppercase text-muted">{{ $translate('Organization') }}</label>
-                        <select name="org_id" class="form-control">
-                            <option value="">{{ $translate('All visible') }}</option>
-                            @foreach ($orgOptions as $org)
-                                <option value="{{ (string) $org->id }}" @selected($orgIdValue === $org->id)>{{ $displayValue($org->name) ?: __('(Unnamed organization)') }}</option>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3 admin-page-header">
+            <div>
+                <h1 class="h4 mb-1">{{ $translate('Analytics') }}</h1>
+                <p class="text-muted mb-0 small">{{ $translate('Risk insights, trends, and reviewer performance.') }}</p>
+            </div>
+            <span class="badge badge-info badge-pill px-3 py-2">
+                {{ $translate('Range') }}: {{ $rangeValue }} {{ $translate('days') }}
+            </span>
+        </div>
+
+        <div class="alert alert-info mb-3">
+            {{ $translate('These analytics help your team see where risk is concentrated and how reports are trending over time.') }}
+        </div>
+
+        <div class="card admin-index-card mb-3">
+            <div class="card-body">
+                <form method="GET" class="row g-2 align-items-end admin-filter-bar mb-0">
+                    <div class="col-md-3">
+                        <label class="small text-uppercase text-muted">{{ $translate('Portal') }}</label>
+                        <select name="portal" class="form-control">
+                            <option value="">{{ $translate('All portals') }}</option>
+                            <option value="student" @selected($portalValue === 'student')>{{ $translate('Student only') }}</option>
+                            <option value="employee" @selected($portalValue === 'employee')>{{ $translate('HR/Employee only') }}</option>
+                            <option value="general" @selected($portalValue === 'general')>{{ $translate('General') }}</option>
+                        </select>
+                    </div>
+                    @if (isset($orgOptions) && $orgOptions->count() > 1)
+                        <div class="col-md-3">
+                            <label class="small text-uppercase text-muted">{{ $translate('Organization') }}</label>
+                            <select name="org_id" class="form-control">
+                                <option value="">{{ $translate('All visible') }}</option>
+                                @foreach ($orgOptions as $org)
+                                    <option value="{{ (string) $org->id }}" @selected($orgIdValue === $org->id)>{{ $displayValue($org->name) ?: __('(Unnamed organization)') }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+                    <div class="col-md-3">
+                        <label class="small text-uppercase text-muted">{{ $translate('From date') }}</label>
+                        <input type="date" name="from" value="{{ $fromValue }}" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small text-uppercase text-muted">{{ $translate('To date') }}</label>
+                        <input type="date" name="to" value="{{ $toValue }}" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small text-uppercase text-muted">{{ $translate('Range (days)') }}</label>
+                        <select name="range" class="form-control">
+                            @foreach ([7, 14, 30, 60, 90] as $rangeOption)
+                                <option value="{{ $rangeOption }}" @selected($rangeValue === $rangeOption)>{{ $rangeOption }} {{ $translate('days') }}</option>
                             @endforeach
                         </select>
                     </div>
-                @endif
-                <div class="form-group col-md-3">
-                    <label class="small text-uppercase text-muted">{{ $translate('From date') }}</label>
-                    <input type="date" name="from" value="{{ $fromValue }}" class="form-control">
-                </div>
-                <div class="form-group col-md-3">
-                    <label class="small text-uppercase text-muted">{{ $translate('To date') }}</label>
-                    <input type="date" name="to" value="{{ $toValue }}" class="form-control">
-                </div>
-                <div class="form-group col-md-3">
-                    <label class="small text-uppercase text-muted">{{ $translate('Range (days)') }}</label>
-                    <select name="range" class="form-control">
-                        @foreach ([7, 14, 30, 60, 90] as $rangeOption)
-                            <option value="{{ $rangeOption }}" @selected($rangeValue === $rangeOption)>{{ $rangeOption }} {{ $translate('days') }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-md-12 text-right mb-0">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-filter mr-1"></i> {{ $translate('Apply filters') }}
-                    </button>
-                    <a href="{{ route('admin.analytics') }}" class="btn btn-outline-secondary">
-                        {{ $translate('Reset') }}
-                    </a>
-                </div>
-            </form>
+                    <div class="col-md-12 text-md-end">
+                        <button type="submit" class="btn btn-outline-primary mr-1">
+                            <i class="fas fa-filter mr-1"></i> {{ $translate('Apply filters') }}
+                        </button>
+                        <a href="{{ route('admin.analytics') }}" class="btn btn-light">
+                            {{ $translate('Reset') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
     @php
         $totals = $metrics['totals'] ?? [];
@@ -108,8 +121,8 @@
         $byCategory = collect($metrics['by_category'] ?? []);
     @endphp
 
-    <div class="row">
-        <div class="col-sm-6 col-xl-3 mb-3">
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-md-3">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body">
                     <p class="text-muted text-uppercase mb-2">{{ $translate('Total reports') }}</p>
@@ -117,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3 mb-3">
+        <div class="col-sm-6 col-md-3">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body">
                     <p class="text-muted text-uppercase mb-2">{{ $translate('High / Critical risk') }}</p>
@@ -126,7 +139,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3 mb-3">
+        <div class="col-sm-6 col-md-3">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body">
                     <p class="text-muted text-uppercase mb-2">{{ $translate('Low / Medium risk') }}</p>
@@ -135,7 +148,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3 mb-3">
+        <div class="col-sm-6 col-md-3">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body">
                     <p class="text-muted text-uppercase mb-2">{{ $translate('Unscored reports') }}</p>
@@ -144,20 +157,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3 mb-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <p class="text-muted text-uppercase mb-2">{{ $translate('Open urgent reports') }}</p>
-                    <h3 class="font-weight-bold mb-1">{{ number_format($totals['urgent_reports_open'] ?? 0) }}</h3>
-                    <span class="text-muted">{{ $translate('Marked urgent and still open') }}</span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <div class="card card-outline card-primary h-100">
+            <div class="card admin-index-card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-shield-alt mr-2"></i> {{ $translate('Risk distribution') }}
@@ -204,41 +208,69 @@
             </div>
         </div>
         <div class="col-lg-6 mb-4">
-            <div class="card card-outline card-primary h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-exclamation-triangle mr-2"></i> {{ $translate('High-risk & urgent snapshot') }}
-                    </h3>
+            <div class="card risk-urgent-card h-100">
+                <div class="card-header d-flex align-items-center">
+                    <span class="risk-icon me-2">⚠️</span>
+                    <h2 class="h5 mb-0">{{ $translate('High-risk & urgent snapshot') }}</h2>
                 </div>
+
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-muted text-uppercase small mb-2">{{ $translate('High / Critical') }}</h6>
-                            <p class="mb-1">
-                                <span class="badge badge-danger mr-1">{{ number_format($highRiskSummary['total'] ?? 0) }}</span>
-                                {{ $translate('total high-risk reports') }}
-                            </p>
-                            <p class="mb-1 text-muted">{{ $translate('Open high-risk') }}:
-                                <strong>{{ number_format($highRiskSummary['open'] ?? 0) }}</strong>
-                            </p>
-                            <p class="mb-0 text-muted">{{ $translate('Last 7 days') }}:
-                                <strong>{{ number_format($highRiskSummary['last_7_days'] ?? 0) }}</strong>
-                            </p>
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h3 class="risk-column-title">{{ $translate('High / Critical') }}</h3>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Total high-risk reports') }}</span>
+                                <span class="metric-pill metric-pill--danger">
+                                    {{ number_format($highRiskSummary['total'] ?? 0) }}
+                                </span>
+                            </div>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Open high-risk') }}</span>
+                                <span class="metric-pill">
+                                    {{ number_format($highRiskSummary['open'] ?? 0) }}
+                                </span>
+                            </div>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Last 7 days') }}</span>
+                                <span class="metric-pill">
+                                    {{ number_format($highRiskSummary['last_7_days'] ?? 0) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-muted text-uppercase small mb-2">{{ $translate('Urgent signals') }}</h6>
-                            <p class="mb-1">
-                                <span class="badge badge-warning text-dark mr-1">{{ number_format($urgentInsights['total'] ?? 0) }}</span>
-                                {{ $translate('urgent reports') }}
-                            </p>
-                            <p class="mb-1 text-muted">{{ $translate('Open urgent') }}:
-                                <strong>{{ number_format($urgentInsights['open'] ?? 0) }}</strong>
-                            </p>
-                            <p class="mb-0 text-muted">{{ $translate('High-risk & urgent') }}:
-                                <strong>{{ number_format($urgentInsights['high_risk'] ?? 0) }}</strong>
-                                {{ $translate('Last 7 days') }}:
-                                <strong>{{ number_format($urgentInsights['last_7_days'] ?? 0) }}</strong>
-                            </p>
+
+                        <div class="col-md-6">
+                            <h3 class="risk-column-title">{{ $translate('Urgent signals') }}</h3>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Urgent reports') }}</span>
+                                <span class="metric-pill metric-pill--warning">
+                                    {{ number_format($urgentInsights['total'] ?? 0) }}
+                                </span>
+                            </div>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Open urgent') }}</span>
+                                <span class="metric-pill">
+                                    {{ number_format($urgentInsights['open'] ?? 0) }}
+                                </span>
+                            </div>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('High-risk & urgent') }}</span>
+                                <span class="metric-pill">
+                                    {{ number_format($urgentInsights['high_risk'] ?? 0) }}
+                                </span>
+                            </div>
+
+                            <div class="risk-metric-row">
+                                <span class="risk-metric-label">{{ $translate('Last 7 days') }}</span>
+                                <span class="metric-pill">
+                                    {{ number_format($urgentInsights['last_7_days'] ?? 0) }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -248,7 +280,7 @@
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <div class="card card-outline card-primary h-100">
+            <div class="card admin-index-card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-chart-line mr-2"></i> {{ $translate('30-day trend (Total vs High/Critical vs Urgent)') }}
@@ -285,7 +317,7 @@
             </div>
         </div>
         <div class="col-lg-6 mb-4">
-            <div class="card card-outline card-primary h-100">
+            <div class="card admin-index-card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-th mr-2"></i> {{ $translate('Category heatmap (risk level counts)') }}
@@ -343,7 +375,7 @@
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <div class="card card-outline card-primary h-100">
+            <div class="card admin-index-card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-user-check mr-2"></i> {{ $translate('Reviewer activity') }}
@@ -379,5 +411,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </x-admin-layout>

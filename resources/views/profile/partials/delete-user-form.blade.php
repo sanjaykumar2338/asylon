@@ -1,4 +1,4 @@
-<div class="card card-outline card-danger mb-4">
+<div class="card admin-index-card mb-4">
     <div class="card-header">
         <h3 class="card-title mb-0">{{ __('Delete Account') }}</h3>
     </div>
@@ -6,7 +6,7 @@
         <p class="text-muted small mb-4">
             {{ __('Once your account is deleted, all of its resources and data will be permanently removed. Download any data you wish to keep before proceeding.') }}
         </p>
-        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmUserDeletionModal">
+        <button type="button" class="btn btn-danger px-3 py-2" data-toggle="modal" data-target="#confirmUserDeletionModal">
             <i class="fas fa-user-slash mr-1"></i> {{ __('Delete Account') }}
         </button>
     </div>
@@ -58,4 +58,3 @@
         });
     </script>
 @endpush
-

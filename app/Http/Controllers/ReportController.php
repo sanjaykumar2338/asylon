@@ -297,7 +297,6 @@ class ReportController extends Controller
     {
         return Org::query()
             ->where('status', 'active')
-            ->where('billing_status', 'active')
             ->orderBy('name')
             ->get(['id', 'name', 'enable_commendations', 'enable_hr_reports', 'enable_student_reports']);
     }

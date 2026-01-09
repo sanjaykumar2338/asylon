@@ -21,8 +21,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orgs', function (Blueprint $table): void {
-            $table->dropColumn('default_locale');
-        });
+        if (Schema::hasColumn('orgs', 'default_locale')) {
+            Schema::table('orgs', function (Blueprint $table): void {
+                $table->dropColumn('default_locale');
+            });
+        }
     }
 };

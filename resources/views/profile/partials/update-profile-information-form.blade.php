@@ -1,4 +1,4 @@
-<div class="card card-outline card-primary mb-4">
+<div class="card admin-index-card mb-4">
     <div class="card-header">
         <h3 class="card-title mb-0">{{ __('Profile Information') }}</h3>
     </div>
@@ -10,24 +10,6 @@
         <form id="send-verification" method="post" action="{{ route('verification.send') }}">
             @csrf
         </form>
-
-        @if (session('status') === 'profile-updated')
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle mr-2"></i> {{ __('Your profile has been updated.') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
-
-        @if (session('status') === 'verification-link-sent')
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <i class="fas fa-info-circle mr-2"></i> {{ __('A new verification link has been sent to your email address.') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="{{ __('Close') }}">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
 
         <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
             @csrf
@@ -84,7 +66,7 @@
             </div>
 
             <div class="text-right">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary px-3 py-2">
                     <i class="fas fa-save mr-1"></i> {{ __('Save Changes') }}
                 </button>
             </div>

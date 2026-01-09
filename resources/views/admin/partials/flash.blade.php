@@ -1,9 +1,17 @@
-@if (session('status'))
+@php
+    $status = session('status');
+    $statusMessages = [
+        'profile-updated' => __('Your profile has been updated.'),
+        'password-updated' => __('Password updated successfully.'),
+        'verification-link-sent' => __('A new verification link has been sent to your email address.'),
+    ];
+    $statusText = $statusMessages[$status] ?? $status;
+@endphp
+
+@if ($status)
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle mr-2"></i> {{ session('status') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <i class="fas fa-check-circle mr-2"></i> {{ $statusText }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" data-dismiss="alert" aria-label="{{ __('Close') }}"></button>
     </div>
 @endif
 
@@ -15,8 +23,6 @@
                 <li>{{ $error }}</li>
             @endforeach
         </ul>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" data-dismiss="alert" aria-label="{{ __('Close') }}"></button>
     </div>
 @endif

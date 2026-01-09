@@ -13,6 +13,153 @@
         <link rel="stylesheet" href="{{ asset('admin-theme/css/style.css') }}">
         <link rel="stylesheet" href="{{ asset('admin-theme/css/responsive-ui.css') }}">
         <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
+        <style>
+            .badge-info {
+                color: #0f172a !important;
+                background-color: #e6f0ff !important;
+                border: 1px solid #d0defc !important;
+            }
+            .badge-warning {
+                color: #4a3b02 !important;
+                background-color: #fff4d1 !important;
+                border: 1px solid #f2e2a4 !important;
+            }
+            .badge-secondary {
+                color: #0f172a !important;
+                background-color: #e5e7eb !important;
+                border: 1px solid #d1d5db !important;
+            }
+
+            .badge-success {
+                color: #0f172a !important;
+                background-color: #dcfce7 !important;
+                border: 1px solid #bbf7d0 !important;
+            }
+
+            .badge-primary {
+                color: #0f172a !important;
+                background-color: #dbeafe !important;
+                border: 1px solid #bfdbfe !important;
+            }
+
+            .badge-danger {
+                color: #0f172a !important;
+                background-color: #fee2e2 !important;
+                border: 1px solid #fecdd3 !important;
+            }
+
+            /* High-risk & urgent snapshot */
+            .risk-urgent-card {
+                border-radius: 1.25rem;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+                border: 1px solid #e5e7eb;
+                overflow: hidden;
+            }
+
+            .risk-urgent-card .card-header {
+                background: #fafafa;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 0.9rem 1.4rem;
+            }
+
+            .risk-urgent-card .card-body {
+                padding: 1.4rem 1.6rem 1.5rem;
+            }
+
+            .risk-icon {
+                font-size: 1.2rem;
+            }
+
+            .risk-column-title {
+                font-size: 0.85rem;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: #6b7280;
+                margin-bottom: 0.75rem;
+            }
+
+            .risk-metric-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 0.45rem;
+                gap: 0.75rem;
+            }
+
+            .risk-metric-label {
+                font-size: 0.95rem;
+                color: #374151;
+            }
+
+            .metric-pill {
+                min-width: 38px;
+                text-align: center;
+                padding: 0.15rem 0.75rem;
+                border-radius: 999px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                background: #e5e7eb;
+                color: #111827;
+            }
+
+            .metric-pill--danger {
+                background: #fee2e2;
+                color: #b91c1c;
+            }
+
+            .metric-pill--warning {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            @media (max-width: 767.98px) {
+                .risk-urgent-card .card-body {
+                    padding: 1.1rem 1.1rem 1.3rem;
+                }
+            }
+
+            /* Button spacing in flex rows (avoid tight adjacency) */
+            .d-flex.align-items-center > .btn + .btn,
+            .d-flex.justify-content-end > .btn + .btn,
+            .d-flex.justify-content-between > .btn + .btn {
+                margin-left: 0.75rem;
+            }
+            .d-flex > .btn + .btn {
+                margin-left: 0.75rem;
+            }
+
+            /* Ensure collapse rows inside tables render correctly */
+            table tr.collapse:not(.show) {
+                display: none;
+            }
+            table tr.collapse.show {
+                display: table-row;
+            }
+
+            .menu-sort-handle {
+                cursor: grab;
+            }
+
+            /* Modern close button for alerts (works with Bootstrap 4/5) */
+            .btn-close {
+                float: right;
+                width: 1rem;
+                height: 1rem;
+                padding: 0.25rem;
+                border: none;
+                background: transparent;
+                opacity: 0.6;
+                cursor: pointer;
+            }
+            .btn-close::before {
+                content: "\00d7";
+                font-size: 1rem;
+                line-height: 1;
+            }
+            .btn-close:hover {
+                opacity: 1;
+            }
+        </style>
         @stack('styles')
     </head>
     <body>
@@ -31,7 +178,7 @@
         @endphp
         <main class="admin-root">
         <div class="admin-block-wrapper">
-            <aside class="admin-sidebar">
+            <aside class="admin-sidebar" style="overflow-y: auto; max-height: 100vh;">
                     <div class="sidebar-logo">
                         <a href="{{ route('dashboard') }}" class="text-decoration-none d-inline-block">
                             <img src="{{ asset('admin-theme/images/IMG_6451 1 (1).png') }}"
@@ -290,7 +437,7 @@
                     </div>
                 </aside>
 
-                <div class="admin-content">
+                <div class="admin-content d-flex flex-column" style="min-height: 100vh;">
                     <div class="admin-header">
                         <div class="left-block">
                             <span>
@@ -400,7 +547,7 @@
                         </div>
                     </div>
 
-                    <div class="admin-root-block">
+                    <div class="admin-root-block flex-grow-1">
                         @hasSection('breadcrumb')
                             <div class="mb-3">
                                 @yield('breadcrumb')

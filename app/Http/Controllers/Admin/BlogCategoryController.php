@@ -21,14 +21,16 @@ class BlogCategoryController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'slug' => $request->filled('slug')
+                ? Str::slug($request->input('slug'))
+                : Str::slug($request->input('name')),
+        ]);
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'alpha_dash', 'unique:blog_categories,slug'],
         ]);
-
-        if (blank($data['slug'] ?? null)) {
-            $data['slug'] = Str::slug($data['name']);
-        }
 
         BlogCategory::create($data);
 
@@ -37,14 +39,30 @@ class BlogCategoryController extends Controller
 
     public function update(Request $request, BlogCategory $category): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'alpha_dash', Rule::unique('blog_categories', 'slug')->ignore($category->id)],
+        $request->merge([
+            'slug' => $request->filled('slug')
+                ? Str::slug($request->input('slug'))
+                : Str::slug($request->input('name')),
         ]);
 
-        if (blank($data['slug'] ?? null)) {
-            $data['slug'] = Str::slug($data['name']);
+        $slug = $request->input('slug');
+
+        $slugRule = [
+            'nullable',
+            'string',
+            'max:255',
+            'alpha_dash',
+        ];
+
+        // Only enforce unique when slug changes to avoid false positives on unchanged slugs
+        if ($slug !== $category->slug) {
+            $slugRule[] = Rule::unique('blog_categories', 'slug')->ignore($category->id);
         }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => $slugRule,
+        ]);
 
         $category->update($data);
 

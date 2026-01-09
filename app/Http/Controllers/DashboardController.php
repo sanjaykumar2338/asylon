@@ -31,7 +31,7 @@ class DashboardController extends Controller
             $userQuery->where('org_id', $user->org_id);
         }
         $totalUsers = $userQuery->count();
-
+        //echo "lll"; die;
         return view('dashboard.index', [
             'stats' => [
                 'totalReports' => $totalReports,

@@ -3,20 +3,22 @@
         {{ __('Escalation Rules') }}
     </x-slot>
 
-    <div class="card card-outline card-primary">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title mb-0">{{ __('Rules') }}</h3>
-            <a href="{{ route('admin.escalation-rules.create') }}" class="btn btn-primary btn-sm">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3 admin-page-header">
+            <div>
+                <h1 class="h4 mb-1">{{ __('Escalation Rules') }}</h1>
+                <p class="text-muted mb-0 small">{{ __('Configure automatic escalation based on risk and urgency.') }}</p>
+            </div>
+            <a href="{{ route('admin.escalation-rules.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus mr-1"></i> {{ __('Add rule') }}
             </a>
         </div>
-        <div class="card-body p-0">
-            @if ($rules->isEmpty())
-                <p class="text-muted p-3 mb-0">{{ __('No escalation rules yet.') }}</p>
-            @else
+
+        <div class="card admin-index-card">
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped mb-0">
-                        <thead>
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="thead-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('Org') }}</th>
@@ -28,7 +30,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($rules as $rule)
+                            @forelse ($rules as $rule)
                                 <tr>
                                     <td>{{ $rule->name }}</td>
                                     <td>{{ $rule->org?->name ?? __('All orgs') }}</td>
@@ -50,11 +52,17 @@
                                         </form>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        {{ __('No escalation rules yet.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </x-admin-layout>
