@@ -112,6 +112,24 @@
                 color: #92400e;
             }
 
+            /* Notification badge sizing/position */
+            #notificationsRoot .notifications-badge {
+                min-width: 26px;
+                height: 22px;
+                font-size: 11px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 6px;
+                right: -6px;
+                top: -6px;
+                position: absolute;
+            }
+
+            #notificationsRoot.notifications-open .notifications-badge {
+                display: none;
+            }
+
             @media (max-width: 767.98px) {
                 .risk-urgent-card .card-body {
                     padding: 1.1rem 1.1rem 1.3rem;
@@ -278,7 +296,7 @@
                                         <span class="text">{{ __('Platform Orgs') }}</span>
                                     </a>
                                 </li>
-                                @if ($isSuper)
+                                @if ($isSuper || $isPlatform)
                                     <li class="sidebar-item {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
                                         <a href="{{ route('platform.billing.revenue') }}">
                                             <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
@@ -454,13 +472,12 @@
                             </div>
                         </div>
                         <div class="right-block" style="gap: 8px;">
-                            <div class="account-root" id="notificationsRoot">
-                                <button type="button" id="notificationsToggle">
+                            <div class="account-root position-relative" id="notificationsRoot" style="min-width: 44px;">
+                                <button type="button" id="notificationsToggle" class="position-relative btn p-0 border-0 bg-transparent">
                                     <img src="{{ asset('admin-theme/images/Icon (1).png') }}" class="img-fluid"
                                         alt="{{ __('common.notifications') }}">
                                     @if ($navUnreadCount > 0)
-                                        <span
-                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        <span class="notifications-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                             {{ $navUnreadCount > 9 ? '9+' : $navUnreadCount }}
                                         </span>
                                     @endif
@@ -633,24 +650,31 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const notificationsToggle = document.getElementById('notificationsToggle');
                 const notificationsMenu = document.getElementById('notificationsMenu');
+                const notificationsRoot = document.getElementById('notificationsRoot');
 
-                if (!notificationsToggle || !notificationsMenu) {
+                if (!notificationsToggle || !notificationsMenu || !notificationsRoot) {
                     return;
                 }
+
+                const closeNotifications = () => {
+                    notificationsMenu.style.display = 'none';
+                    notificationsRoot.classList.remove('notifications-open');
+                };
 
                 notificationsToggle.addEventListener('click', function (event) {
                     event.stopPropagation();
                     const isOpen = notificationsMenu.style.display === 'block';
                     notificationsMenu.style.display = isOpen ? 'none' : 'block';
+                    notificationsRoot.classList.toggle('notifications-open', !isOpen);
                 });
 
                 document.body.addEventListener('click', function () {
-                    notificationsMenu.style.display = 'none';
+                    closeNotifications();
                 });
 
                 document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape') {
-                        notificationsMenu.style.display = 'none';
+                        closeNotifications();
                     }
                 });
             });

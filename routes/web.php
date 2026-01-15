@@ -104,7 +104,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('organizations.show');
         });
 
-        Route::middleware('super_admin')->group(function () {
+        Route::middleware('platform_access')->group(function () {
             Route::post('organizations/{org}/update-plan', [\App\Http\Controllers\Platform\OrganizationController::class, 'updatePlan'])
                 ->name('organizations.update_plan');
             Route::post('organizations/{org}/update-status', [\App\Http\Controllers\Platform\OrganizationController::class, 'updateStatus'])

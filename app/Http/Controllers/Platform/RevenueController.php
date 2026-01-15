@@ -14,7 +14,7 @@ class RevenueController extends Controller
 {
     public function index(Request $request, RevenueReporter $reporter): View
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $startDate = $this->parseDate($request->input('start_date'));
         $endDate = $this->parseDate($request->input('end_date'));
@@ -57,9 +57,9 @@ class RevenueController extends Controller
         ]);
     }
 
-    protected function authorizeSuperAdmin(): void
+    protected function authorizePlatformAdmin(): void
     {
-        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+        abort_unless(auth()->user()?->hasRole('platform_admin'), 403);
     }
 
     protected function parseDate(?string $value): ?Carbon

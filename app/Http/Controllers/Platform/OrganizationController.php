@@ -78,7 +78,7 @@ class OrganizationController extends Controller
 
     public function updatePlan(Request $request, Org $org): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $data = $request->validate([
             'plan_id' => ['required', 'exists:plans,id'],
@@ -102,7 +102,7 @@ class OrganizationController extends Controller
 
     public function updateStatus(Request $request, Org $org): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $data = $request->validate([
             'billing_status' => ['required', 'in:active,trialing,suspended'],
@@ -124,9 +124,9 @@ class OrganizationController extends Controller
         return back()->with('ok', __('Billing status updated.'));
     }
 
-    protected function authorizeSuperAdmin(): void
+    protected function authorizePlatformAdmin(): void
     {
-        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+        abort_unless(auth()->user()?->hasRole('platform_admin'), 403);
     }
 
     protected function authorizePlatformAccess(): void

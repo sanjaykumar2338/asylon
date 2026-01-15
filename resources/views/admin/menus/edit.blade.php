@@ -97,7 +97,7 @@
                     <div class="card-body p-0">
                         <form action="{{ route('admin.menus.items.reorder', $menu) }}" method="POST" id="reorder-form">
                             @csrf
-                            <input type="hidden" name="order[]" id="order-field">
+                            <input type="hidden" name="order[]" id="order-field" type="hidden">
                         </form>
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
@@ -112,8 +112,8 @@
                                 </thead>
                                 <tbody id="menu-items-sortable">
                                     @forelse($menu->items as $item)
-                                        <tr data-id="{{ $item->id }}">
-                                            <td class="align-middle"><i class="fas fa-grip-vertical text-muted menu-sort-handle"></i></td>
+                                    <tr data-id="{{ $item->id }}">
+                                            <td class="align-middle"><i class="fas fa-grip-vertical text-muted menu-sort-handle" style="cursor: grab;"></i></td>
                                             <td class="align-middle">
                                                 {{ $item->title }}
                                                 @if($item->parent_id)
@@ -238,6 +238,7 @@
 </x-admin-layout>
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const typeSelect = document.getElementById('item-type');
@@ -283,6 +284,18 @@
                     return;
                 }
 
+                const updateOrder = () => {
+                    const rows = Array.from(sortableEl.querySelectorAll('tr[data-id]'));
+                    rows.forEach(row => {
+                        const collapseRow = document.getElementById(`edit-item-${row.dataset.id}`);
+                        if (collapseRow) {
+                            row.insertAdjacentElement('afterend', collapseRow);
+                        }
+                    });
+                    const ids = rows.map(row => row.dataset.id);
+                    orderField.value = ids.join(',');
+                };
+
                 new Sortable(sortableEl, {
                     handle: '.menu-sort-handle',
                     animation: 150,
@@ -290,17 +303,16 @@
                     forceFallback: true,
                     fallbackOnBody: true,
                     fallbackTolerance: 3,
-                    onSort: function () {
-                        const ids = Array.from(sortableEl.querySelectorAll('tr[data-id]')).map(row => row.dataset.id);
-                        orderField.value = ids.join(',');
-                    }
+                    onEnd: updateOrder,
+                    onSort: updateOrder,
                 });
-                const initialIds = Array.from(sortableEl.querySelectorAll('tr[data-id]')).map(row => row.dataset.id);
-                orderField.value = initialIds.join(',');
+
+                updateOrder();
 
                 const reorderForm = document.getElementById('reorder-form');
                 if (reorderForm) {
                     reorderForm.addEventListener('submit', function () {
+                        updateOrder();
                         const container = reorderForm;
                         const current = orderField.value ? orderField.value.split(',') : [];
                         orderField.remove();
@@ -315,31 +327,7 @@
                 }
             }
 
-            (function loadSortable() {
-                if (window.Sortable) {
-                    initSortable();
-                    return;
-                }
-                const localScript = document.createElement('script');
-                localScript.src = "{{ asset('vendor/sortable.min.js') }}";
-                localScript.onload = function () {
-                    if (window.Sortable) {
-                        initSortable();
-                    } else {
-                        const cdn = document.createElement('script');
-                        cdn.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js';
-                        cdn.onload = initSortable;
-                        document.head.appendChild(cdn);
-                    }
-                };
-                localScript.onerror = function () {
-                    const cdn = document.createElement('script');
-                    cdn.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js';
-                    cdn.onload = initSortable;
-                    document.head.appendChild(cdn);
-                };
-                document.head.appendChild(localScript);
-            })();
+            initSortable();
         });
     </script>
 @endpush

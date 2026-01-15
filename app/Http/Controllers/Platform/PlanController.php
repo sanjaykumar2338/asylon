@@ -14,7 +14,7 @@ class PlanController extends Controller
 {
     public function index(): View
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $plans = Plan::with(['prices' => function ($query): void {
             $query->orderByRaw("FIELD(billing_interval, 'monthly','yearly','custom')")
@@ -28,7 +28,7 @@ class PlanController extends Controller
 
     public function editPrices(Plan $plan): View
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $plan->load(['prices' => function ($query): void {
             $query->orderByRaw("FIELD(billing_interval, 'monthly','yearly','custom')")
@@ -49,7 +49,7 @@ class PlanController extends Controller
 
     public function updatePrices(Request $request, Plan $plan): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $plan->load('prices');
         $existingIds = $plan->prices->pluck('id')->all();
@@ -121,8 +121,8 @@ class PlanController extends Controller
         return back()->with('ok', __('Plan prices updated.'));
     }
 
-    protected function authorizeSuperAdmin(): void
+    protected function authorizePlatformAdmin(): void
     {
-        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+        abort_unless(auth()->user()?->hasRole('platform_admin'), 403);
     }
 }

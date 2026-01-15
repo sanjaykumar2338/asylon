@@ -18,7 +18,7 @@ class SubscriptionController extends Controller
 {
     public function index(Request $request): View
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
@@ -65,7 +65,7 @@ class SubscriptionController extends Controller
 
     public function show(Org $org): View
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $org->load(['plan', 'latestBillingSubscription']);
         $subscriptions = $org->billingSubscriptions()->latest('current_period_end')->limit(5)->get();
@@ -86,7 +86,7 @@ class SubscriptionController extends Controller
 
     public function changePlan(Request $request, Org $org, StripeSubscriptionManager $manager): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $data = $request->validate([
             'plan_slug' => ['required', Rule::in(['core', 'pro', 'apex'])],
@@ -112,7 +112,7 @@ class SubscriptionController extends Controller
 
     public function overrideStatus(Request $request, Org $org, StripeSubscriptionManager $manager): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $data = $request->validate([
             'status' => ['required', Rule::in(['active', 'past_due', 'canceled', 'pending'])],
@@ -125,7 +125,7 @@ class SubscriptionController extends Controller
 
     public function sync(Request $request, Org $org, StripeSubscriptionManager $manager): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $result = $manager->syncOrg($org);
 
@@ -134,7 +134,7 @@ class SubscriptionController extends Controller
 
     public function cancel(Request $request, Org $org, StripeSubscriptionManager $manager): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $result = $manager->cancelAtPeriodEnd($org, $request->user()->id);
 
@@ -143,15 +143,15 @@ class SubscriptionController extends Controller
 
     public function resume(Request $request, Org $org, StripeSubscriptionManager $manager): RedirectResponse
     {
-        $this->authorizeSuperAdmin();
+        $this->authorizePlatformAdmin();
 
         $result = $manager->resume($org, $request->user()->id);
 
         return back()->with($result['ok'] ? 'ok' : 'error', $result['message']);
     }
 
-    protected function authorizeSuperAdmin(): void
+    protected function authorizePlatformAdmin(): void
     {
-        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+        abort_unless(auth()->user()?->hasRole('platform_admin'), 403);
     }
 }

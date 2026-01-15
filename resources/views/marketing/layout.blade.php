@@ -109,6 +109,7 @@
                         <li><a href="{{ route('marketing.resources') }}">Resources</a></li>
                         <li><a href="{{ route('blog.index') }}">Blog</a></li>
                         <li><a href="{{ route('report.create') }}">Submit a Report</a></li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
                         <li><a href="{{ route('marketing.contact') }}">Contact</a></li>
                     </ul>
                 </div>
