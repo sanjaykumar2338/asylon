@@ -458,13 +458,13 @@
                 <div class="admin-content d-flex flex-column" style="min-height: 100vh;">
                     <div class="admin-header">
                         <div class="left-block">
-                            <span>
-                                @isset($header)
-                                    {{ $header }}
-                                @else
-                                    {{ $headerTitle ?? '' }}
-                                @endisset
-                            </span>
+                            @php
+                                $headerContent = $header ?? ($headerTitle ?? '');
+                                if (is_array($headerContent)) {
+                                    $headerContent = implode(' ', array_filter($headerContent, 'is_scalar'));
+                                }
+                            @endphp
+                            <span>{{ $headerContent }}</span>
                             <div class="mobile-menu">
                                 <div></div>
                                 <div></div>
