@@ -49,6 +49,7 @@ return [
     'attachments_comment_label' => 'Comment (optional)',
     'attachments_remove' => 'Remove attachment',
     'attachments_add' => 'Add another attachment',
+    'video_preview' => 'Video preview',
     'voice_heading' => 'Optional voice message',
     'voice_description' => 'Record up to three minutes of audio. You can play it back before submitting.',
     'voice_toggle_label' => 'Toggle voice recording',

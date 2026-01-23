@@ -94,8 +94,8 @@
                                             <span class="ml-1">({{ $report->riskAnalysis->risk_score }})</span>
                                         @endif
                                     </span>
-                                @endif
-                            </div>
+                            @endif
+                        </div>
                             <span class="badge badge-light text-muted text-monospace">{{ $report->type_label }}</span>
                         </div>
 
@@ -417,12 +417,12 @@
                                     @enderror
                                 </div>
                             @endif
-                            <div class="alert alert-info d-flex align-items-center py-2 px-3">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <span class="small">
-                                    {{ __('First reviewer reply sets the first response timestamp. Org admins can get an email when this happens.') }}
-                                </span>
-                            </div>
+                        <div class="alert alert-info d-flex align-items-center py-2 px-3">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span class="small">
+                                {{ __('First reviewer reply sets the first response timestamp. Org admins can get an email when this happens.') }}
+                            </span>
+                        </div>
                             <button type="submit" class="btn btn-primary btn-block">
                                 <i class="fas fa-save mr-1"></i> {{ __('Save status') }}
                             </button>
@@ -484,6 +484,11 @@
                                                 <a href="{{ $previewUrl }}" class="btn btn-outline-secondary" target="_blank" rel="noopener" title="{{ __('Open in new tab') }}">
                                                     <i class="fas fa-external-link-alt"></i>
                                                 </a>
+                                                @if (str_starts_with($mime, 'video/'))
+                                                    <button type="button" class="btn btn-outline-success play-video-btn" data-video-url="{{ $previewUrl }}" data-video-name="{{ $file->original_name }}"{{ $sensitive ? ' disabled title=Sensitive' : '' }}>
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="mt-3">
@@ -546,6 +551,24 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="videoPreviewModal" tabindex="-1" role="dialog" aria-labelledby="videoPreviewTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoPreviewTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <video id="videoPreviewElement" controls preload="metadata" class="w-100 rounded" style="max-height: 480px;">
+                        <source id="videoPreviewSource">
+                        {{ __('Your browser does not support the video element.') }}
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-admin-layout>
 
 @push('scripts')
@@ -596,6 +619,52 @@
                 const overlay = document.querySelector(`[data-sensitive-overlay="${id}"]`);
                 content?.classList.remove('safety-blurred');
                 overlay?.classList.add('d-none');
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const videoModal = $('#videoPreviewModal');
+            const videoElement = document.getElementById('videoPreviewElement');
+            const videoSource = document.getElementById('videoPreviewSource');
+            const videoTitle = document.getElementById('videoPreviewTitle');
+
+            document.body.addEventListener('click', function (event) {
+                const button = event.target.closest('.play-video-btn');
+                if (!button) {
+                    return;
+                }
+
+                const url = button.getAttribute('data-video-url');
+                const label = button.getAttribute('data-video-name') || '{{ __('report.video_preview') }}';
+                if (!url) {
+                    return;
+                }
+
+                if (videoSource) {
+                    videoSource.setAttribute('src', url);
+                }
+                if (videoElement) {
+                    videoElement.load();
+                }
+                if (videoTitle) {
+                    videoTitle.textContent = label;
+                }
+
+                videoModal.modal('show');
+            });
+
+            videoModal.on('hidden.bs.modal', function () {
+                if (videoElement) {
+                    videoElement.pause();
+                    videoElement.removeAttribute('src');
+                    const source = videoElement.querySelector('source');
+                    source?.removeAttribute('src');
+                    videoElement.load();
+                }
+                if (videoTitle) {
+                    videoTitle.textContent = '';
+                }
             });
         });
     </script>
