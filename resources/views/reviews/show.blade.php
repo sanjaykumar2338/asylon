@@ -637,44 +637,48 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const entries = document.querySelectorAll('#timelineEntries .timeline-entry');
-            const pagination = document.getElementById('timelinePagination');
-            if (!entries.length || !pagination) {
-                return;
-            }
-
-            const pageSize = 5;
-            const totalPages = Math.ceil(entries.length / pageSize);
-            let currentPage = 1;
-            const label = document.getElementById('timelinePageLabel');
-
-            const renderPage = page => {
-                const start = (page - 1) * pageSize;
-                const end = start + pageSize;
-                entries.forEach((entry, index) => {
-                    entry.style.display = index >= start && index < end ? '' : 'none';
-                });
-                if (label) {
-                    label.textContent = `Page ${page} of ${totalPages}`;
-                }
-            };
-
-            pagination.addEventListener('click', event => {
-                const button = event.target.closest('button[data-direction]');
-                if (!button) {
+            const initTimelinePagination = () => {
+                const entries = document.querySelectorAll('#timelineEntries .timeline-entry');
+                const pagination = document.getElementById('timelinePagination');
+                if (!entries.length || !pagination) {
                     return;
                 }
 
-                const direction = button.getAttribute('data-direction');
-                if (direction === 'prev') {
-                    currentPage = Math.max(1, currentPage - 1);
-                } else if (direction === 'next') {
-                    currentPage = Math.min(totalPages, currentPage + 1);
-                }
-                renderPage(currentPage);
-            });
+                const pageSize = 5;
+                const totalPages = Math.ceil(entries.length / pageSize);
+                let currentPage = 1;
+                const label = document.getElementById('timelinePageLabel');
 
-            renderPage(currentPage);
+                const renderPage = page => {
+                    const start = (page - 1) * pageSize;
+                    const end = start + pageSize;
+                    entries.forEach((entry, index) => {
+                        entry.style.display = index >= start && index < end ? '' : 'none';
+                    });
+                    if (label) {
+                        label.textContent = `Page ${page} of ${totalPages}`;
+                    }
+                };
+
+                pagination.addEventListener('click', event => {
+                    const button = event.target.closest('button[data-direction]');
+                    if (!button) {
+                        return;
+                    }
+
+                    const direction = button.getAttribute('data-direction');
+                    if (direction === 'prev') {
+                        currentPage = Math.max(1, currentPage - 1);
+                    } else if (direction === 'next') {
+                        currentPage = Math.min(totalPages, currentPage + 1);
+                    }
+                    renderPage(currentPage);
+                });
+
+                renderPage(currentPage);
+            };
+
+            setTimeout(initTimelinePagination, 0);
         });
     </script>
     <script>
