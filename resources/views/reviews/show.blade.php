@@ -248,32 +248,45 @@
                             <i class="fas fa-stream mr-2"></i> {{ __('Activity History') }}
                         </h3>
                     </div>
-                    <div class="card-body">
-                        @if ($timeline->isEmpty())
-                            <p class="text-muted mb-0">{{ __('No activity logged yet.') }}</p>
-                        @else
-                            <ul class="list-group list-group-flush">
-                                @foreach ($timeline as $entry)
-                                    <li class="list-group-item px-0">
-                                        <div class="d-flex align-items-start justify-content-between">
-                                            <div class="d-flex align-items-start">
-                                                <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mr-3" style="width: 34px; height: 34px;">
-                                                    <i class="{{ $entry['icon'] }}"></i>
-                                                </span>
-                                                <div>
-                                                    <div class="font-weight-bold">{{ $entry['title'] }}</div>
-                                                    <div class="text-muted small">{{ $entry['description'] }}</div>
-                                                </div>
+                            <div class="card-body">
+                                @if ($timeline->isEmpty())
+                                    <p class="text-muted mb-0">{{ __('No activity logged yet.') }}</p>
+                                @else
+                                    <div class="timeline-list">
+                                        <ul id="timelineEntries" class="list-group list-group-flush">
+                                            @foreach ($timeline as $entry)
+                                                <li class="list-group-item px-0 timeline-entry">
+                                                    <div class="d-flex align-items-start justify-content-between">
+                                                        <div class="d-flex align-items-start">
+                                                            <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mr-3" style="width: 34px; height: 34px;">
+                                                                <i class="{{ $entry['icon'] }}"></i>
+                                                            </span>
+                                                            <div>
+                                                                <div class="font-weight-bold">{{ $entry['title'] }}</div>
+                                                                <div class="text-muted small">{{ $entry['description'] }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-right text-muted small">
+                                                            {{ optional($entry['time'])->format('M d, Y H:i') }}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        @if ($timeline->count() > 5)
+                                            <div id="timelinePagination" class="timeline-pagination d-flex justify-content-between align-items-center mt-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-direction="prev">
+                                                    {{ __('Previous') }}
+                                                </button>
+                                                <span id="timelinePageLabel" class="text-muted small"></span>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-direction="next">
+                                                    {{ __('Next') }}
+                                                </button>
                                             </div>
-                                            <div class="text-right text-muted small">
-                                                {{ optional($entry['time'])->format('M d, Y H:i') }}
-                                            </div>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                 </div>
 
                 <div class="card admin-index-card mb-3">
@@ -620,6 +633,48 @@
                 content?.classList.remove('safety-blurred');
                 overlay?.classList.add('d-none');
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const entries = document.querySelectorAll('#timelineEntries .timeline-entry');
+            const pagination = document.getElementById('timelinePagination');
+            if (!entries.length || !pagination) {
+                return;
+            }
+
+            const pageSize = 5;
+            const totalPages = Math.ceil(entries.length / pageSize);
+            let currentPage = 1;
+            const label = document.getElementById('timelinePageLabel');
+
+            const renderPage = page => {
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize;
+                entries.forEach((entry, index) => {
+                    entry.style.display = index >= start && index < end ? '' : 'none';
+                });
+                if (label) {
+                    label.textContent = `Page ${page} of ${totalPages}`;
+                }
+            };
+
+            pagination.addEventListener('click', event => {
+                const button = event.target.closest('button[data-direction]');
+                if (!button) {
+                    return;
+                }
+
+                const direction = button.getAttribute('data-direction');
+                if (direction === 'prev') {
+                    currentPage = Math.max(1, currentPage - 1);
+                } else if (direction === 'next') {
+                    currentPage = Math.min(totalPages, currentPage + 1);
+                }
+                renderPage(currentPage);
+            });
+
+            renderPage(currentPage);
         });
     </script>
     <script>
