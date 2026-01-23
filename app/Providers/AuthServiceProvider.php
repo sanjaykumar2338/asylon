@@ -20,7 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('view-all', static fn ($user): bool => $user->isSuperAdmin());
+        Gate::define('view-all', static fn ($user): bool => $user->isSuperAdmin() || $user->isPlatformAdmin());
 
         Gate::define('manage-platform', static fn ($user): bool => $user->isSuperAdmin()
             || $user->isPlatformAdmin());
