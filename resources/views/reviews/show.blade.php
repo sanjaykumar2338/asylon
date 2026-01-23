@@ -636,7 +636,7 @@
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        const scheduleTimelinePagination = () => {
             const initTimelinePagination = () => {
                 const entries = document.querySelectorAll('#timelineEntries .timeline-entry');
                 const pagination = document.getElementById('timelinePagination');
@@ -679,7 +679,13 @@
             };
 
             setTimeout(initTimelinePagination, 2000);
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', scheduleTimelinePagination);
+        } else {
+            scheduleTimelinePagination();
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
