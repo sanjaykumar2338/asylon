@@ -188,83 +188,57 @@
 
             <div class="testimonials-slider">
                 <div class="testimonial-card">
-                    <p>Asylon helps our team catch concerns earlier and document every step we take to support our
-                        students.
-                    </p>
+                    <p>The platform helps centralize reports and improves internal communication around safety concerns.</p>
                     <div class="testimonial-author">
                         <div class="main-bx">
-
-                            <img src="{{ $assetBase }}/images/author.png.png" alt="Sara Mohamed">
                             <div class="author-info">
-                                <strong>Sara Mohamed</strong>
-                                <span>Jakatar</span>
+                                <strong>School Administrator</strong>
                             </div>
                         </div>
-                        <div class="author-rating"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i></div>
                     </div>
                 </div>
 
                 <div class="testimonial-card">
-                    <p>Asylon helps our team catch concerns earlier and document every step we take to support our
-                        students.
-                    </p>
+                    <p>Our multidisciplinary team now sees every incident in one secure hub, so follow-up is consistent.</p>
                     <div class="testimonial-author">
-
                         <div class="main-bx">
-
-
-                            <img src="{{ $assetBase }}/images/1author.png.png" alt="Sara Mohamed">
                             <div class="author-info">
-                                <strong>Sara Mohamed</strong>
-                                <span>Jakatar</span>
+                                <strong>Safety Coordinator</strong>
                             </div>
                         </div>
-                        <div class="author-rating"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i></div>
                     </div>
                 </div>
 
                 <div class="testimonial-card">
-                    <p>Asylon helps our team catch concerns earlier and document every step we take to support our
-                        students.
-                    </p>
+                    <p>Case notes are easier to share with leadership without restarting the story each time.</p>
                     <div class="testimonial-author">
-
                         <div class="main-bx">
-
-                            <img src="{{ $assetBase }}/images/2author.png.png" alt="Sara Mohamed">
                             <div class="author-info">
-                                <strong>Sara Mohamed</strong>
-                                <span>Jakatar</span>
+                                <strong>Operations Lead</strong>
                             </div>
                         </div>
-                        <div class="author-rating"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i></div>
                     </div>
                 </div>
+
                 <div class="testimonial-card">
-                    <p>Asylon helps our team catch concerns earlier and document every step we take to support our
-                        students.
-                    </p>
+                    <p>Internal reporting stays consistent because each comment stays tied to the case record.</p>
                     <div class="testimonial-author">
-
-
                         <div class="main-bx">
-                            <img src="{{ $assetBase }}/images/1author.png.png" alt="Sara Mohamed">
-
                             <div class="author-info">
-                                <strong>Sara Mohamed</strong>
-                                <span>Jakatar</span>
+                                <strong>Safety Administrator</strong>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="author-rating"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i></div>
+                <div class="testimonial-card">
+                    <p>We brief stakeholders faster thanks to the shared overview that pulls every report together.</p>
+                    <div class="testimonial-author">
+                        <div class="main-bx">
+                            <div class="author-info">
+                                <strong>Policy Advisor</strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -280,20 +254,19 @@
                 </div>
             </div>
 
-            <div class="marqu-slider">
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-03.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-6.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image7.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image7.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-02.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-02.png" alt=""></div>
-
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-03.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-6.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image7.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image7.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-02.png" alt=""></div>
-                <div class="logo-bx"><img src="{{ $assetBase }}/images/image-02.png" alt=""></div>
+            <div class="partners-placeholder">
+                <div class="partner-card">
+                    <span>School District Safety Team</span>
+                </div>
+                <div class="partner-card">
+                    <span>Church & Ministry Safety Council</span>
+                </div>
+                <div class="partner-card">
+                    <span>Higher Ed Operations Group</span>
+                </div>
+                <div class="partner-card">
+                    <span>Municipal Safety Leaders</span>
+                </div>
             </div>
         </div>
     </section>

@@ -87,7 +87,12 @@
     <div class="container">
         <div class="Randy-grid">
             <div class="image-bx">
-                <img src="{{ $assetBase }}/images/mGroup.png" alt="">
+                <img
+                    src="{{ asset('assets/images/founder.jpeg') }}"
+                    alt="Randy Mays, Asylon Founder"
+                    class="founder-photo"
+                    loading="lazy"
+                >
             </div>
             <div class="right-text-bx">
 

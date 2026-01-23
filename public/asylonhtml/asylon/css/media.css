@@ -370,6 +370,10 @@
             gap: 50px;
         }
 
+        .Randy-grid .image-bx .founder-photo {
+            max-height: 320px;
+        }
+
         .partners-section {
             padding-bottom: 128px;
         }
