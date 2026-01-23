@@ -678,7 +678,7 @@
                 renderPage(currentPage);
             };
 
-            setTimeout(initTimelinePagination, 0);
+            setTimeout(initTimelinePagination, 2000);
         });
     </script>
     <script>
