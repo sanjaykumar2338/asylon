@@ -13,6 +13,8 @@ class StoreReportRequest extends FormRequest
      */
     protected array $categoryMap = [];
 
+    private const ATTACHMENT_MAX_KILOBYTES = 10240;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -116,7 +118,7 @@ class StoreReportRequest extends FormRequest
             'attachments.*.file' => [
                 'nullable',
                 'file',
-                'max:51200',
+                'max:' . self::ATTACHMENT_MAX_KILOBYTES,
                 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,mp3,wav,aac,ogg,m4a,mp4,mov,avi,mpeg,mpg,webm,mkv',
             ],
             'attachments.*.comment' => ['nullable', 'string', 'max:500'],
@@ -159,6 +161,10 @@ class StoreReportRequest extends FormRequest
                 if ($hasComment && ! $file) {
                     $validator->errors()->add("attachments.$index.file", 'Please upload a file for this comment.');
                 }
+
+                if ($file instanceof UploadedFile && ! $file->isValid()) {
+                    $validator->errors()->add("attachments.$index.file", $this->attachmentUploadErrorMessage($file->getError()));
+                }
             }
 
             $voiceComment = $this->input('voice_comment');
@@ -189,6 +195,8 @@ class StoreReportRequest extends FormRequest
             'org_id.required_without' => 'Please select an organization or use a direct report link.',
             'org_code.required_without' => 'Please select an organization or use a direct report link.',
             'org_code.exists' => 'That organization link is no longer valid. Request a new link from your administrator.',
+            'attachments.*.file.max' => 'Each attachment must be 10 MB or smaller. Please remove larger files and try again.',
+            'attachments.*.file.file' => 'There was a problem uploading that file. Make sure it is 10 MB or smaller and try again.',
         ];
     }
 
@@ -202,5 +210,17 @@ class StoreReportRequest extends FormRequest
         }
 
         return in_array($category, $allowed, true);
+    }
+
+    private function attachmentUploadErrorMessage(int $errorCode): string
+    {
+        return match ($errorCode) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Your attachment exceeded the 10 MB limit. Please upload a smaller file.',
+            UPLOAD_ERR_PARTIAL => 'The upload was interrupted. Please try again.',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded. Please select a file before submitting.',
+            UPLOAD_ERR_CANT_WRITE => 'There was a server error while saving the file. Try again or choose a different file.',
+            UPLOAD_ERR_EXTENSION => 'A PHP extension blocked the file upload. Try a different file type.',
+            default => 'The file failed to upload. Please try again.',
+        };
     }
 }

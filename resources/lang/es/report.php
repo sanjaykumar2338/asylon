@@ -43,7 +43,7 @@ return [
     'contact_hint' => 'Opcional - déjalo en blanco para mantener el anonimato.',
     'urgent_label' => 'Marcar como urgente',
     'attachments_label' => 'Archivos de soporte (opcional)',
-    'attachments_help' => 'Adjunta fotos, documentos, audio o video. Agrega una nota corta para cada archivo si es necesario. Máx 25 MB por archivo.',
+    'attachments_help' => 'Adjunta fotos, documentos, audio o video. Agrega una nota corta para cada archivo si es necesario. Máx 10 MB por archivo.',
     'attachments_file_label' => 'Archivo',
     'attachments_comment_label' => 'Comentario (opcional)',
     'attachments_remove' => 'Eliminar archivo',

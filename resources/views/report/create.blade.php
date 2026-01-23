@@ -132,6 +132,14 @@
                 @endforeach
             </ul>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const alertBox = document.querySelector('.alert.alert-danger');
+                if (alertBox) {
+                    alertBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        </script>
     @endif
 
     @php
@@ -175,8 +183,7 @@
                 @if ($showTypeSelector)
                     <x-input-label for="type" :value="__('report.type_label')" />
                     <select id="type" name="type"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        required>
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach (($types ?? []) as $value => $label)
                             <option value="{{ $value }}" @selected(old('type', $forceType ?? 'safety') === $value)>
                                 {{ $label }}
@@ -204,7 +211,7 @@
             <x-input-label for="category" :value="__('report.category_label')" />
             <select id="category" name="category"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                {{ $hasCategories ? '' : 'disabled' }} required>
+                {{ $hasCategories ? '' : 'disabled' }}>
                 <option value="">{{ __('report.category_placeholder') }}</option>
                 @foreach ($categories as $categoryName => $subcategoryList)
                     <option value="{{ $categoryName }}" @selected($selectedCategory === $categoryName)>{{ $categoryName }}</option>
@@ -217,7 +224,7 @@
             <x-input-label for="subcategory" :value="__('report.subcategory_label')" />
             <select id="subcategory" name="subcategory"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                {{ $hasCategories && $selectedCategory ? '' : 'disabled' }} required>
+                {{ $hasCategories && $selectedCategory ? '' : 'disabled' }}>
                 <option value="">{{ __('report.subcategory_placeholder') }}</option>
                 @foreach ($initialSubcategories as $subcategory)
                     <option value="{{ $subcategory }}" @selected(old('subcategory') === $subcategory)>{{ $subcategory }}</option>
@@ -228,7 +235,7 @@
 
         <div>
             <x-input-label for="description" :value="__('report.description_label')" />
-            <textarea id="description" name="description" rows="6" required
+            <textarea id="description" name="description" rows="6"
                 placeholder="Please describe what happened or what you've noticed.&#10;(Share as much as you feel comfortable.)"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
             <small class="mt-2 block text-xs text-gray-500">
@@ -779,6 +786,7 @@
             const voiceInput = document.getElementById('voiceRecordingInput');
             const voiceCommentInput = document.getElementById('voice_comment');
             const trackedUrls = [];
+            const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
             if (!previewWrapper) {
                 return;
@@ -951,6 +959,13 @@
 
             attachmentsList?.addEventListener('change', event => {
                 if (event.target.classList.contains('attachment-file-input')) {
+                    const fileInput = event.target;
+                    const file = fileInput?.files?.[0];
+                    if (file && file.size > MAX_ATTACHMENT_BYTES) {
+                        alert('Attachments must be 10 MB or smaller. Please choose a smaller file.');
+                        const emptyTransfer = new DataTransfer();
+                        fileInput.files = emptyTransfer.files;
+                    }
                     refreshAttachmentPreview();
                 }
             });

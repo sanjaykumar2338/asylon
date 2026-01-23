@@ -5,9 +5,9 @@
 @endphp
 
 @if ($messages->isNotEmpty())
-    <ul {{ $attributes->merge(['class' => 'text-sm text-red-600 space-y-1']) }}>
+    <div {{ $attributes->merge(['class' => 'text-sm space-y-1']) }}>
         @foreach ($messages as $message)
-            <li>{{ $message }}</li>
+            <p class="m-0 text-danger" style="color: #dc3545;">{{ $message }}</p>
         @endforeach
-    </ul>
+    </div>
 @endif

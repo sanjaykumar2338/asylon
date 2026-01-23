@@ -21,7 +21,9 @@ use App\Services\Audit;
 use App\Services\AttachmentSafetyScanner;
 use App\Support\LocaleManager;
 use App\Support\ReportLinkGenerator;
+use Closure;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -30,6 +32,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class ReportController extends Controller
 {
@@ -177,17 +180,19 @@ class ReportController extends Controller
      */
     public function store(StoreReportRequest $request): RedirectResponse
     {
-        $report = $this->persistReport($request, [
-            'portal_source' => 'general',
-        ]);
+        return $this->handleReportSubmission($request, function () use ($request) {
+            $report = $this->persistReport($request, [
+                'portal_source' => 'general',
+            ]);
 
-        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
-        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report, $isUltraPrivate);
-        $this->notifyReviewersAboutReport($report);
-        AnalyzeReportRisk::dispatch($report);
+            $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
+            event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
+            $this->logPortalSubmission($report, $isUltraPrivate);
+            $this->notifyReviewersAboutReport($report);
+            AnalyzeReportRisk::dispatch($report);
 
-        return Redirect::route('report.thanks', $report->getKey());
+            return Redirect::route('report.thanks', $report->getKey());
+        });
     }
 
     /**
@@ -195,18 +200,20 @@ class ReportController extends Controller
      */
     public function storeStudent(StoreStudentReportRequest $request): RedirectResponse
     {
-        $report = $this->persistReport($request, [
-            'portal_source' => 'student',
-            'type' => 'safety',
-        ]);
+        return $this->handleReportSubmission($request, function () use ($request) {
+            $report = $this->persistReport($request, [
+                'portal_source' => 'student',
+                'type' => 'safety',
+            ]);
 
-        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
-        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report, $isUltraPrivate);
-        $this->notifyReviewersAboutReport($report);
-        AnalyzeReportRisk::dispatch($report);
+            $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
+            event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
+            $this->logPortalSubmission($report, $isUltraPrivate);
+            $this->notifyReviewersAboutReport($report);
+            AnalyzeReportRisk::dispatch($report);
 
-        return Redirect::route('report.thanks', $report->getKey());
+            return Redirect::route('report.thanks', $report->getKey());
+        });
     }
 
     /**
@@ -214,31 +221,45 @@ class ReportController extends Controller
      */
     public function storeEmployee(StoreEmployeeReportRequest $request): RedirectResponse
     {
-        $recipients = $this->resolveEmployeeRecipients(
-            (int) $request->input('org_id'),
-            $request->input('recipients', [])
-        );
+        return $this->handleReportSubmission($request, function () use ($request) {
+            $recipients = $this->resolveEmployeeRecipients(
+                (int) $request->input('org_id'),
+                $request->input('recipients', [])
+            );
 
-        if ($recipients->isEmpty()) {
-            throw ValidationException::withMessages([
-                'recipients' => __('report.errors.recipient_required'),
+            if ($recipients->isEmpty()) {
+                throw ValidationException::withMessages([
+                    'recipients' => __('report.errors.recipient_required'),
+                ]);
+            }
+
+            $report = $this->persistReport($request, [
+                'portal_source' => 'employee',
+                'meta' => [
+                    'recipients' => $recipients->pluck('id')->all(),
+                ],
             ]);
+
+            $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
+            event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
+            $this->logPortalSubmission($report, $isUltraPrivate);
+            $this->notifyReviewersAboutReport($report);
+            AnalyzeReportRisk::dispatch($report);
+
+            return Redirect::route('report.thanks', $report->getKey());
+        });
+    }
+
+    private function handleReportSubmission(Request $request, Closure $callback): RedirectResponse
+    {
+        try {
+            return $callback();
+        } catch (Throwable $exception) {
+            report($exception);
+            return Redirect::back()
+                ->withInput()
+                ->withErrors(['report' => __('report.errors.unexpected')]);
         }
-
-        $report = $this->persistReport($request, [
-            'portal_source' => 'employee',
-            'meta' => [
-                'recipients' => $recipients->pluck('id')->all(),
-            ],
-        ]);
-
-        $isUltraPrivate = $this->usesUltraPrivateMode($request, $report->org);
-        event(new ReportSubmitted($report, $this->dashboardBaseUrl($request)));
-        $this->logPortalSubmission($report, $isUltraPrivate);
-        $this->notifyReviewersAboutReport($report);
-        AnalyzeReportRisk::dispatch($report);
-
-        return Redirect::route('report.thanks', $report->getKey());
     }
 
     /**

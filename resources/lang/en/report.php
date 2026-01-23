@@ -15,6 +15,7 @@ return [
     'errors' => [
         'title' => 'We found a few problems:',
         'recipient_required' => 'Select at least one eligible recipient.',
+        'unexpected' => 'Something went wrong while processing your report. Please try again or contact support if the issue persists.',
     ],
     'no_categories' => 'No reporting categories are configured yet. Please contact your administrator to enable submissions.',
     'reporting_to' => 'Reporting to:',
@@ -43,7 +44,7 @@ return [
     'contact_hint' => 'Optional - leave blank to stay anonymous.',
     'urgent_label' => 'Mark as urgent',
     'attachments_label' => 'Supporting files (optional)',
-    'attachments_help' => 'Attach photos, documents, audio, or video. Add a short note for each attachment if needed. Max 25MB per file.',
+    'attachments_help' => 'Attach photos, documents, audio, or video. Add a short note for each attachment if needed. Max 10MB per file.',
     'attachments_file_label' => 'File',
     'attachments_comment_label' => 'Comment (optional)',
     'attachments_remove' => 'Remove attachment',

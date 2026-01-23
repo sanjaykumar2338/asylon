@@ -1,5 +1,7 @@
 <?php
 
+ini_set('memory_limit', '256M');
+
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\EnsureActiveSubscription;
 use App\Http\Middleware\EnsurePlatformAccess;
