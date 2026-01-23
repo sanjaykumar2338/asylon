@@ -201,33 +201,35 @@
 
         .steps-wrapper {
             grid-template-columns: 1fr;
-            gap: 110px;
-            --step-badge-size: 74px;
-            padding-top: 24px;
+            gap: 150px;
         }
 
         .steps-wrapper .step {
             min-height: auto;
             height: auto;
-            padding: calc(var(--step-badge-size) / 2 + 30px) 24px 42px;
+            padding: 55px 0px;
         }
 
         .steps-wrapper .step::before {
+            top: 132px;
+            left: 8px;
+            transform: rotate(90deg);
             display: none;
         }
 
         .steps-wrapper .step::after {
             position: absolute;
             content: '';
+            transform: rotate(90deg);
             background-image: url(../images/Arrow-2.png);
             display: block;
-            height: 80px;
-            width: 80px;
+            height: 100px;
+            width: 100px;
             background-size: contain;
             background-repeat: no-repeat;
+            transform: rotate(17deg);
             left: 50%;
-            top: calc(var(--step-badge-size) + 150px);
-            transform: translateX(-50%) rotate(90deg);
+            top: 172px;
         }
 
         .steps-wrapper .step:last-child::after {
@@ -673,21 +675,6 @@
 
         .steps-wrapper .step::after {
             top: 219px;
-        }
-
-        .steps-wrapper {
-            --step-badge-size: 70px;
-            gap: 80px;
-        }
-
-        .steps-wrapper .step {
-            padding: calc(var(--step-badge-size) / 2 + 26px) 18px 38px;
-        }
-
-        .steps-wrapper .step::after {
-            top: calc(var(--step-badge-size) + 135px);
-            left: 50%;
-            transform: translateX(-50%) rotate(90deg);
         }
 
         .how-it-works .action-btn {
