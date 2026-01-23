@@ -200,40 +200,19 @@
         }
 
         .steps-wrapper {
-            grid-template-columns: 1fr;
-            gap: 150px;
+            grid-template-columns: repeat(4, minmax(260px, 1fr));
+            gap: 32px;
+            overflow-x: auto;
+            justify-content: flex-start;
+            padding-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .steps-wrapper .step {
             min-height: auto;
             height: auto;
             padding: 55px 0px;
-        }
-
-        .steps-wrapper .step::before {
-            top: 132px;
-            left: 8px;
-            transform: rotate(90deg);
-            display: none;
-        }
-
-        .steps-wrapper .step::after {
-            position: absolute;
-            content: '';
-            transform: rotate(90deg);
-            background-image: url(../images/Arrow-2.png);
-            display: block;
-            height: 100px;
-            width: 100px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            transform: rotate(17deg);
-            left: 50%;
-            top: 172px;
-        }
-
-        .steps-wrapper .step:last-child::after {
-            display: none;
+            min-width: 260px;
         }
 
         .site-container {
@@ -483,9 +462,6 @@
             padding-top: 100px;
         }
 
-        .steps-wrapper .step:first-child:after {
-            top: 196px;
-        }
     }
 
     @media (max-width: 575.98px) {
@@ -650,31 +626,12 @@
             line-height: 46px;
         }
 
-        .steps-wrapper .step:first-child:after {
-            top: 220px;
-        }
-
-        .steps-wrapper .step::after {
-            top: 220px;
-        }
-
-
-        .steps-wrapper .step:nth-of-type(3):after {
-            top: 223px;
-        }
-
-
-
         .steps-wrapper .step {
             padding: 40px 30px;
         }
 
         .steps-wrapper .step-content h3 {
             font-size: 22px;
-        }
-
-        .steps-wrapper .step::after {
-            top: 219px;
         }
 
         .how-it-works .action-btn {
