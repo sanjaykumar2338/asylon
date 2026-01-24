@@ -86,6 +86,27 @@
         </div>
     </div>
 
+    @if ($org && auth()->user()?->hasRole(['org_admin', 'platform_admin']))
+        <div class="card card-lite shadow-sm mb-4">
+            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div>
+                    <h5 class="mb-1">{{ __('dashboard.your_organization') }}</h5>
+                    <p class="mb-0 text-muted">{{ $org->name }}</p>
+                    <small class="text-muted">{{ __('Slug') }}: <span class="font-monospace">{{ $org->slug }}</span></small>
+                    <div class="text-muted small">
+                        <span>{{ __('dashboard.public_report_link') }}</span>
+                        <a href="{{ route('report.by_code', $org->slug) }}" class="text-decoration-none" target="_blank" rel="noopener">
+                            {{ route('report.by_code', $org->slug) }}
+                        </a>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-copy-target="{{ $org->slug }}">
+                    {{ __('dashboard.copy_slug') }}
+                </button>
+            </div>
+        </div>
+    @endif
+
     <div class="row g-3 mb-4">
         @foreach ($stats as $stat)
             <div class="col-sm-6 col-xl-3">
@@ -180,3 +201,32 @@
         </div>
     </div>
 </x-admin-layout>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButton = document.querySelector('[data-copy-target]');
+            if (!copyButton) {
+                return;
+            }
+
+            copyButton.addEventListener('click', async () => {
+                const target = copyButton.getAttribute('data-copy-target');
+                if (!target || !navigator.clipboard) {
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(target);
+                    const original = copyButton.textContent.trim();
+                    copyButton.textContent = '{{ __("dashboard.copied") }}';
+                    setTimeout(() => {
+                        copyButton.textContent = original;
+                    }, 1500);
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        });
+    </script>
+@endpush

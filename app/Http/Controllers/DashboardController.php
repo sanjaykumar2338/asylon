@@ -39,6 +39,7 @@ class DashboardController extends Controller
                 'urgentReports' => $urgentReports,
                 'totalUsers' => $totalUsers,
             ],
+            'org' => $user->org,
         ]);
     }
 }
