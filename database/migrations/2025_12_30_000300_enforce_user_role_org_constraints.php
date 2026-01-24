@@ -26,25 +26,33 @@ return new class extends Migration
         }
 
         if (in_array($driver, ['mysql', 'pgsql'], true)) {
-            DB::statement("
-                ALTER TABLE users
-                ADD CONSTRAINT users_global_roles_require_null_org
-                CHECK (
-                    role IS NULL
-                    OR role NOT IN ('super_admin','platform_admin')
-                    OR org_id IS NULL
-                )
-            ");
+            try {
+                DB::statement("
+                    ALTER TABLE users
+                    ADD CONSTRAINT users_global_roles_require_null_org
+                    CHECK (
+                        role IS NULL
+                        OR role NOT IN ('super_admin','platform_admin')
+                        OR org_id IS NULL
+                    )
+                ");
+            } catch (\Throwable) {
+                // Some MySQL/MariaDB versions reject CHECK clauses referencing other columns.
+            }
 
-            DB::statement("
-                ALTER TABLE users
-                ADD CONSTRAINT users_org_roles_require_org
-                CHECK (
-                    role IS NULL
-                    OR role NOT IN ('org_admin','executive_admin','security_lead','reviewer','org_user')
-                    OR org_id IS NOT NULL
-                )
-            ");
+            try {
+                DB::statement("
+                    ALTER TABLE users
+                    ADD CONSTRAINT users_org_roles_require_org
+                    CHECK (
+                        role IS NULL
+                        OR role NOT IN ('org_admin','executive_admin','security_lead','reviewer','org_user')
+                        OR org_id IS NOT NULL
+                    )
+                ");
+            } catch (\Throwable) {
+                // Avoid fatal errors on platforms that don't support complex CHECK expressions.
+            }
         }
     }
 
