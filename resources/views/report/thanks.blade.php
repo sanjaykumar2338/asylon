@@ -1,83 +1,96 @@
-<x-guest-layout>
-    @php
-        $caseId = $report->public_reference ?? $report->id ?? $id ?? '';
-    @endphp
-    <section class="min-h-screen bg-[#eef2ff] py-12">
-        <div class="mx-auto max-w-5xl px-4">
-            <div class="bg-white shadow-[0_40px_80px_rgba(15,23,42,.08)] rounded-3xl overflow-hidden border border-gray-100">
-                <div class="grid md:grid-cols-[1.05fr,1fr]">
-                    <div class="bg-gradient-to-br from-[#0b1f3b] to-[#173f74] text-white p-10 flex flex-col justify-between gap-8">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.5em] text-white/60 mb-3">{{ __('Thank you') }}</p>
-                            <h1 class="text-4xl font-semibold leading-tight">{{ __('Your report is in good hands') }}</h1>
-                            <p class="mt-4 text-white/70 leading-relaxed text-sm md:text-base">
-                                {{ __('We logged your submission and will activate our response process. Hold onto your Case ID so we can reconnect if follow-up is needed.') }}
-                            </p>
-                        </div>
-                        <div class="rounded-3xl bg-white/10 p-4 flex flex-col gap-1">
-                            <span class="text-xs uppercase tracking-[0.5em] text-white/60">{{ __('Case ID') }}</span>
-                            <span class="font-mono text-2xl md:text-3xl">{{ $caseId }}</span>
-                        </div>
-                    </div>
-                    <div class="p-8 space-y-6">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eaecf8] text-[#0b1f3b]">
-                                <i class="fa-solid fa-shield-check"></i>
-                            </span>
-                            <div>
-                                <h2 class="text-lg font-semibold text-gray-900">{{ __('Submission complete') }}</h2>
-                                <p class="text-sm text-gray-600">{{ __('You may leave this page or submit again anytime.') }}</p>
-                            </div>
-                        </div>
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <button type="button"
-                                class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-900 transition hover:border-gray-400"
-                                onclick="downloadScreenshot()">
-                                <i class="fa-solid fa-camera"></i>
-                                {{ __('Capture confirmation card') }}
-                            </button>
-                            <button type="button"
-                                class="flex items-center justify-center gap-2 rounded-2xl bg-[#0b1f3b] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#09172d]"
-                                onclick="window.print()">
-                                <i class="fa-solid fa-print"></i>
-                                {{ __('Print or save PDF') }}
-                            </button>
-                        </div>
+@extends('marketing.layout')
+
+@section('title', 'Asylon | Report Submitted')
+
+@section('content')
+@php
+    $caseId = $report->public_reference ?? $report->id ?? $id ?? '';
+    $supportEmail = config('asylon.support_email', 'support@asylon.app');
+    $followupUrl = $followupUrl ?? null;
+@endphp
+
+<section class="inner-pages-header">
+    <div class="site-container">
+        <div class="page-header">
+            <div class="section-title">
+                <h2>Thank you</h2>
+                <p>Your submission is secure, and we will begin reviewing it right away.</p>
+            </div>
+            <div class="page-link">
+                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span>/</span>
+                <span><a href="{{ route('report.create') }}">Submit a Report</a></span>
+                <span>/</span>
+                <span>Thank You</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="contact-asylon block-left thank-you-section" data-case-id="{{ $caseId }}">
+    <div class="site-container">
+        <div class="contact-grid">
+            <div class="contact-bx">
+                <div class="section-title">
+                    <h2>Submission received</h2>
+                    <p>We logged everything you shared and assigned it a Case ID for quick reference. Expect an acknowledgement within one business day.</p>
+                </div>
+
+                <div class="thank-you-card">
+                    <h3>What happens next</h3>
+                    <ul>
+                        <li>We verify the details, triage severity, and loop in the right reviewers.</li>
+                        <li>Keep this page open or record the Case ID so we can reconnect if we need clarification.</li>
                         @if ($followupUrl)
-                            <div class="rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/70 p-4 text-sm text-indigo-700">
-                                {{ __('Check updates anytime with this follow-up link:') }}
-                                <div class="break-all font-mono text-xs text-indigo-900 mt-1">
-                                    <a href="{{ $followupUrl }}" target="_blank" rel="noopener">{{ $followupUrl }}</a>
-                                </div>
-                            </div>
+                            <li>Track progress via your personal follow-up link below.</li>
                         @endif
-                        <div class="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-sm text-gray-600">
-                            <p>{{ __('Need help immediately?') }}</p>
-                            <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}"
-                               class="font-semibold text-indigo-600 hover:underline">
-                                {{ config('asylon.support_email', 'support@asylon.app') }}
-                            </a>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                            <a href="{{ route('report.create') }}" class="font-semibold text-indigo-600 hover:underline">
-                                {{ __('Submit another report') }}
-                            </a>
-                            <span class="text-gray-300">•</span>
-                            <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:underline">
-                                {{ __('Reviewer login') }}
-                            </a>
-                        </div>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="site-btn-dark" onclick="downloadScreenshot()">
+                        Capture confirmation
+                    </button>
+                    <button type="button" class="site-btn-light" onclick="window.print()">
+                        Print / save PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="contact-bx contact-right">
+                <div class="case-id-card">
+                    <div class="case-label">Case ID</div>
+                    <div class="case-value">{{ $caseId ?: 'Pending' }}</div>
+                </div>
+                <div class="note">
+                    <p>Need help right away?<br>
+                        <a href="mailto:{{ $supportEmail }}" class="highlight-link">{{ $supportEmail }}</a>
+                    </p>
+                </div>
+
+                @if ($followupUrl)
+                    <div class="followup-link">
+                        <p class="label">Follow-up link</p>
+                        <a href="{{ $followupUrl }}" target="_blank" rel="noopener noreferrer" class="font-mono break-words">{{ $followupUrl }}</a>
                     </div>
+                @endif
+
+                <div class="quick-links">
+                    <a href="{{ route('report.create') }}" class="font-semibold text-indigo-600 hover:underline">Submit another report</a>
+                    <span class="separator">•</span>
+                    <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:underline">Reviewer login</a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
+@push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             window.downloadScreenshot = function () {
-                const target = document.querySelector('section');
+                const target = document.querySelector('.thank-you-section');
                 if (!target || typeof html2canvas !== 'function') {
                     return;
                 }
@@ -100,4 +113,5 @@
             };
         });
     </script>
-</x-guest-layout>
+@endpush
+@endsection
