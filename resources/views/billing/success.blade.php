@@ -12,7 +12,7 @@
             <a href="{{ route('dashboard') }}" class="btn btn-primary mr-2">
                 {{ __('Return to Dashboard') }}
             </a>
-            <a href="{{ route('billing.settings') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('billing.overview') }}" class="btn btn-outline-secondary">
                 {{ __('View Billing Settings') }}
             </a>
         </div>

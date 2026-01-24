@@ -362,14 +362,12 @@
                                         <span class="text">{{ __('Analytics') }}</span>
                                     </a>
                                 </li>
-                                @if ($isExec)
-                                    <li class="sidebar-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
-                                        <a href="{{ route('billing.settings') }}">
-                                            <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
-                                            <span class="text">{{ __('Billing') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
+                                <li class="sidebar-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
+                                    <a href="{{ route('billing.overview') }}">
+                                        <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
+                                        <span class="text">{{ __('Billing') }}</span>
+                                    </a>
+                                </li>
                                 <li class="sidebar-item {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
                                     <a href="{{ route('settings.organization.edit') }}">
                                         <span class="icon"><i class="fa-solid fa-building"></i></span>
@@ -531,9 +529,9 @@
                             </div>
                         @endif
                         @php
-                            $canManageBilling = auth()->user()?->hasRole(['platform_admin', 'executive_admin']);
+                            $canManageBilling = auth()->user()?->hasRole(['platform_admin', 'executive_admin', 'org_admin']);
                         @endphp
-                        @if ($layoutOrg && $layoutOrg->billing_status !== 'active' && $canManageBilling)
+                        @if ($layoutOrg && ! $layoutOrg->hasActiveSubscription() && $canManageBilling)
                             <div class="alert alert-warning d-flex justify-content-between align-items-center">
                                 <span>{{ __('Your organization does not have an active subscription yet. Please choose a plan to continue using Asylon.') }}</span>
                                 <a href="{{ route('billing.choose_plan') }}" class="btn btn-sm btn-primary">

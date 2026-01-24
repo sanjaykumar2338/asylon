@@ -7,15 +7,20 @@
 
     @php
         $preferred = $org?->preferred_plan;
-        $activePlanSlug = ($org?->billing_status === 'active') ? $org?->plan?->slug : null;
-        $hasPortal = $org?->stripe_customer_id && $org?->billing_status === 'active';
+        $activePlanSlug = $org?->hasActiveSubscription() ? $org?->plan?->slug : null;
+        $hasPortal = $org?->stripe_customer_id && $org?->hasActiveSubscription();
+        $statusBadge = match ($org?->billing_status) {
+            'active' => 'success',
+            'canceling' => 'warning',
+            default => 'warning',
+        };
     @endphp
 
     @if ($org)
         <div class="alert alert-secondary d-flex justify-content-between align-items-center mb-3">
             <div>
                 <strong>{{ __('Organization:') }}</strong> {{ $org->name }}
-                <span class="ml-2 badge badge-{{ $org->billing_status === 'active' ? 'success' : 'warning' }}">
+                <span class="ml-2 badge badge-{{ $statusBadge }}">
                     {{ __('Status:') }} {{ ucfirst($org->billing_status ?? 'pending') }}
                 </span>
                 @if ($activePlanSlug)

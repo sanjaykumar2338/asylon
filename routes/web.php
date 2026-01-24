@@ -77,6 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('settings.organization.update');
 
     Route::middleware('role:super_admin,executive_admin,org_admin')->group(function () {
+        Route::get('/billing', [BillingController::class, 'settings'])
+            ->name('billing.overview');
+
+        Route::get('/settings/billing', fn () => redirect()->route('billing.overview'));
+
         Route::get('/billing/choose-plan', [BillingController::class, 'choosePlan'])
             ->name('billing.choose_plan');
 
@@ -91,9 +96,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/billing/cancel', [BillingController::class, 'cancel'])
             ->name('billing.cancel');
-
-        Route::get('/settings/billing', [BillingController::class, 'settings'])
-            ->name('billing.settings');
 
         Route::post('/billing/portal', [BillingController::class, 'createPortalSession'])
             ->name('billing.portal');

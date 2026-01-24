@@ -22,7 +22,7 @@ class RequireActiveSubscription
 
         $org = $user->org;
 
-        if (! $org || $org->billing_status !== 'active') {
+        if (! $org || ! $org->hasActiveSubscription()) {
             return redirect()
                 ->route('billing.choose_plan')
                 ->with('error', __('Your organization does not have an active subscription. Please choose a plan to continue.'));

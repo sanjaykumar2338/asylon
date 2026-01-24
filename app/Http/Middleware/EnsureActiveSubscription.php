@@ -27,7 +27,7 @@ class EnsureActiveSubscription
 
         $org = $user->org;
 
-        if (! $org || $org->billing_status !== 'active') {
+        if (! $org || ! $org->hasActiveSubscription()) {
             return redirect()
                 ->route('billing.choose_plan')
                 ->with('warning', __('Your organization needs an active subscription to continue. Please choose a plan.'));

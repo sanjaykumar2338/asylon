@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
 use Stripe\StripeClient;
 
 class BillingController extends Controller
@@ -99,8 +98,11 @@ class BillingController extends Controller
     {
         $org = $request->user()->org;
         $plan = $org?->plan;
+        $latestSubscription = $org?->latestBillingSubscription;
+        $billingCycle = $latestSubscription?->interval ? ucfirst($latestSubscription->interval) : null;
+        $nextBillingDate = $latestSubscription?->current_period_end?->format('F j, Y');
 
-        return view('billing.settings', compact('org', 'plan'));
+        return view('billing.settings', compact('org', 'plan', 'latestSubscription', 'billingCycle', 'nextBillingDate'));
     }
 
     public function createPortalSession(Request $request): RedirectResponse
@@ -119,7 +121,7 @@ class BillingController extends Controller
 
         $session = $stripe->billingPortal->sessions->create([
             'customer' => $org->stripe_customer_id,
-            'return_url' => route('billing.settings'),
+            'return_url' => route('billing.overview'),
         ]);
 
         return redirect()->away($session->url);
@@ -146,11 +148,10 @@ class BillingController extends Controller
         }
 
         $org->update([
-            'billing_status' => 'suspended',
-            'stripe_subscription_id' => null,
+            'billing_status' => 'canceling',
         ]);
 
-        return redirect()->route('billing.settings')
+        return redirect()->route('billing.overview')
             ->with('status', __('Subscription canceled. Please reach out if you need further assistance.'));
     }
 }

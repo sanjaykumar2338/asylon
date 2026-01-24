@@ -131,6 +131,16 @@ class Org extends Model
         return $this->billing_status === 'active' ? $this->plan : null;
     }
 
+    public function hasActiveSubscription(): bool
+    {
+        return in_array($this->billing_status, ['active', 'canceling'], true);
+    }
+
+    public function isSubscriptionCanceling(): bool
+    {
+        return $this->billing_status === 'canceling';
+    }
+
     public function getReportsThisMonthLabelAttribute(): string
     {
         $activePlan = $this->activePlan();
