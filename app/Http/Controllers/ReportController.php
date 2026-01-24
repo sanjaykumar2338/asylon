@@ -68,7 +68,7 @@ class ReportController extends Controller
     /**
      * Show the report form for a specific organization code.
      */
-    public function createByCode(string $org_code): View
+    public function createByCode(string $org_code): View|Response
     {
         $org = Org::where('org_code', $org_code)->firstOrFail();
         if ($org->billing_status !== 'active') {
