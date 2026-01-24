@@ -31,6 +31,45 @@
     </div>
 </div>
 
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('name');
+            const slugInput = document.getElementById('slug');
+            if (!nameInput || !slugInput) {
+                return;
+            }
+
+            const slugify = value => value
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]/g, '')
+                .replace(/-+/g, '-');
+
+            const updateSlug = () => {
+                if (slugInput.dataset.manual === 'true') {
+                    return;
+                }
+                const generated = slugify(nameInput.value);
+                if (generated !== '') {
+                    slugInput.value = generated;
+                }
+            };
+
+            nameInput.addEventListener('input', updateSlug);
+
+            slugInput.addEventListener('input', () => {
+                slugInput.dataset.manual = slugInput.value !== slugify(nameInput.value);
+            });
+
+            if (!slugInput.value) {
+                updateSlug();
+            }
+        });
+    </script>
+@endpush
+
 <div class="form-group">
     <label for="status">{{ __('Status') }}</label>
     <select id="status" name="status" class="form-control" required>

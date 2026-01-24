@@ -50,7 +50,7 @@
                 @foreach ($roleOptions as $value => $label)
                     @continue(!$isPlatform && !$isSuper && $value === 'platform_admin')
                     @continue(!$isSuper && $value === 'super_admin')
-                    <option value="{{ $value }}" @selected(old('role', $user->role ?? '') === $value)>{{ $label }}</option>
+                    <option value="{{ $value }}" @selected((string)old('role', $user->role ?? 'org_admin') === $value)>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
