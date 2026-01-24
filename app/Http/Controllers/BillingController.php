@@ -124,4 +124,33 @@ class BillingController extends Controller
 
         return redirect()->away($session->url);
     }
+
+    public function cancelSubscription(Request $request): RedirectResponse
+    {
+        $org = $request->user()->org;
+
+        if (! $org || ! $org->stripe_subscription_id) {
+            return back()->with('error', __('No active subscription found to cancel.'));
+        }
+
+        if (! class_exists(StripeClient::class) || ! config('services.stripe.secret')) {
+            return back()->with('error', __('Stripe is not configured yet. Please set STRIPE_SECRET.'));
+        }
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+
+        try {
+            $stripe->subscriptions->cancel($org->stripe_subscription_id);
+        } catch (\Throwable $e) {
+            return back()->with('error', __('Unable to cancel subscription: :message', ['message' => $e->getMessage()]));
+        }
+
+        $org->update([
+            'billing_status' => 'suspended',
+            'stripe_subscription_id' => null,
+        ]);
+
+        return redirect()->route('billing.settings')
+            ->with('status', __('Subscription canceled. Please reach out if you need further assistance.'));
+    }
 }

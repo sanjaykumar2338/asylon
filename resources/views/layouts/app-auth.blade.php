@@ -236,27 +236,6 @@
                                         <span class="text">{{ __('Escalation Rules') }}</span>
                                     </a>
                                 </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.users.index') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol5.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Users') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.alerts.index') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol6.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Alert Contacts') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.notifications.templates.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.notifications.templates.edit') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol7.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Notification Templates') }}</span>
-                                    </a>
-                                </li>
                                 <li class="sidebar-item {{ request()->routeIs('admin.report-categories.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.report-categories.index') }}">
                                         <span class="icon"><img src="{{ asset('admin-theme/images/Symbol8.png') }}"
@@ -269,13 +248,6 @@
                                         <span class="icon"><img src="{{ asset('admin-theme/images/Symbol10.png') }}"
                                                 alt=""></span>
                                         <span class="text">{{ __('Risk keywords') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.analytics') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Analytics') }}</span>
                                     </a>
                                 </li>
                                 <li class="sidebar-item {{ request()->routeIs('admin.demo-requests.*') ? 'active' : '' }}">
@@ -296,26 +268,24 @@
                                         <span class="text">{{ __('Platform Orgs') }}</span>
                                     </a>
                                 </li>
-                                @if ($isSuper || $isPlatform)
-                                    <li class="sidebar-item {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
-                                        <a href="{{ route('platform.billing.revenue') }}">
-                                            <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
-                                            <span class="text">{{ __('Revenue Dashboard') }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item {{ request()->routeIs('platform.billing.subscriptions.*') ? 'active' : '' }}">
-                                        <a href="{{ route('platform.billing.subscriptions.index') }}">
-                                            <span class="icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-                                            <span class="text">{{ __('Subscriptions') }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
-                                        <a href="{{ route('platform.plans.index') }}">
-                                            <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
-                                            <span class="text">{{ __('Plans & Pricing') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
+                                <li class="sidebar-item {{ request()->routeIs('platform.billing.revenue') ? 'active' : '' }}">
+                                    <a href="{{ route('platform.billing.revenue') }}">
+                                        <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
+                                        <span class="text">{{ __('Revenue Dashboard') }}</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item {{ request()->routeIs('platform.billing.subscriptions.*') ? 'active' : '' }}">
+                                    <a href="{{ route('platform.billing.subscriptions.index') }}">
+                                        <span class="icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                                        <span class="text">{{ __('Subscriptions') }}</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item {{ request()->routeIs('platform.plans.*') ? 'active' : '' }}">
+                                    <a href="{{ route('platform.plans.index') }}">
+                                        <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
+                                        <span class="text">{{ __('Plans & Pricing') }}</span>
+                                    </a>
+                                </li>
                                 <li class="sidebar-item {{ request()->routeIs('admin.data_requests.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.data_requests.index') }}">
                                         <span class="icon"><i class="fa-solid fa-eraser"></i></span>
@@ -392,18 +362,6 @@
                                         <span class="text">{{ __('Analytics') }}</span>
                                     </a>
                                 </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.demo-requests.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.demo-requests.index') }}">
-                                        <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
-                                        <span class="text">{{ __('Demo Requests') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.contact-messages.index') }}">
-                                        <span class="icon"><i class="fa-solid fa-envelope"></i></span>
-                                        <span class="text">{{ __('Contact Messages') }}</span>
-                                    </a>
-                                </li>
                                 @if ($isExec)
                                     <li class="sidebar-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
                                         <a href="{{ route('billing.settings') }}">
@@ -416,18 +374,6 @@
                                     <a href="{{ route('settings.organization.edit') }}">
                                         <span class="icon"><i class="fa-solid fa-building"></i></span>
                                         <span class="text">{{ __('Org Settings') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.blog-posts.index') }}">
-                                        <span class="icon"><i class="fa-solid fa-blog"></i></span>
-                                        <span class="text">{{ __('Blog Posts') }}</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.blog-categories.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.blog-categories.index') }}">
-                                        <span class="icon"><i class="fa-solid fa-folder-open"></i></span>
-                                        <span class="text">{{ __('Blog Categories') }}</span>
                                     </a>
                                 </li>
                             @elseif ($isReviewer)

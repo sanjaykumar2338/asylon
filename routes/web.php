@@ -83,6 +83,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/billing/checkout', [BillingController::class, 'createCheckout'])
             ->name('billing.checkout');
 
+        Route::post('/billing/subscription/cancel', [BillingController::class, 'cancelSubscription'])
+            ->name('billing.subscription.cancel');
+
         Route::get('/billing/success', [BillingController::class, 'success'])
             ->name('billing.success');
 
@@ -203,60 +206,68 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('reports.files.preview');
 
         Route::middleware(['can:manage-org'])->prefix('admin')->name('admin.')->group(function () {
-            Route::resource('orgs', AdminOrgController::class);
             Route::resource('users', AdminUserController::class);
             Route::resource('alerts', AdminAlertController::class)
                 ->parameters(['alerts' => 'alert']);
-            Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
-                ->except(['create', 'edit', 'show']);
-            Route::resource('demo-requests', AdminDemoRequestController::class)->only(['index', 'show', 'destroy']);
-            Route::resource('contact-messages', AdminContactMessageController::class)->only(['index', 'show', 'destroy']);
-            Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
-                ->name('report-categories.toggle-visibility')
-                ->middleware('can:manage-categories');
-            Route::resource('report-categories', AdminReportCategoryController::class);
-            Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
-            Route::get('reports/export', [AdminExportController::class, 'reports'])
-                ->name('reports.export');
-            Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
-                ->middleware('role:super_admin')
-                ->name('audit-logs.index');
-            Route::middleware('can:manage-data-requests')->group(function () {
-                Route::get('data-requests', [AdminDataDeletionAdminController::class, 'index'])->name('data_requests.index');
-                Route::get('data-requests/{dataRequest}', [AdminDataDeletionAdminController::class, 'show'])->name('data_requests.show');
-                Route::post('data-requests/{dataRequest}/status', [AdminDataDeletionAdminController::class, 'updateStatus'])->name('data_requests.update_status');
-                Route::post('data-requests/from-case/{report}', [AdminDataDeletionAdminController::class, 'storeFromCase'])->name('data_requests.from_case');
-            });
-            Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
-                ->name('report-categories.subcategories.store');
-            Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
-                ->name('report-categories.subcategories.update');
-            Route::delete('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'destroy'])
-                ->name('report-categories.subcategories.destroy');
             Route::get('analytics', [AdminAnalyticsController::class, 'index'])
                 ->name('analytics');
             Route::get('notifications/templates', [AdminNotificationTemplateController::class, 'edit'])
                 ->name('notifications.templates.edit');
             Route::post('notifications/templates', [AdminNotificationTemplateController::class, 'update'])
                 ->name('notifications.templates.update');
-            Route::resource('pages', AdminPageController::class)->except(['show']);
-            Route::resource('menus', AdminMenuController::class)->except(['show']);
-            Route::post('menus/{menu}/items/reorder', [AdminMenuItemController::class, 'reorder'])
-                ->name('menus.items.reorder');
-            Route::post('menus/{menu}/items', [AdminMenuItemController::class, 'store'])
-                ->name('menus.items.store');
-            Route::put('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'update'])
-                ->name('menus.items.update');
-            Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
-                ->name('menus.items.destroy');
-            Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
-            Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
+            Route::get('reports/export', [AdminExportController::class, 'reports'])
+                ->name('reports.export');
 
-            Route::middleware('can:manage-platform')->group(function () {
-                Route::get('settings', [AdminSettingsController::class, 'edit'])
-                    ->name('settings.edit');
-                Route::post('settings', [AdminSettingsController::class, 'update'])
-                    ->name('settings.update');
+            Route::middleware('platform_access')->group(function () {
+                Route::resource('orgs', AdminOrgController::class);
+                Route::resource('escalation-rules', AdminEscalationRuleController::class)->except(['show']);
+                Route::resource('risk-keywords', \App\Http\Controllers\Admin\RiskKeywordController::class)
+                    ->except(['create', 'edit', 'show']);
+                Route::resource('demo-requests', AdminDemoRequestController::class)->only(['index', 'show', 'destroy']);
+                Route::resource('contact-messages', AdminContactMessageController::class)->only(['index', 'show', 'destroy']);
+                Route::post('report-categories/{report_category}/toggle-visibility', [AdminReportCategoryController::class, 'toggleVisibility'])
+                    ->name('report-categories.toggle-visibility')
+                    ->middleware('can:manage-categories');
+                Route::resource('report-categories', AdminReportCategoryController::class);
+
+                Route::middleware('can:manage-data-requests')->group(function () {
+                    Route::get('data-requests', [AdminDataDeletionAdminController::class, 'index'])->name('data_requests.index');
+                    Route::get('data-requests/{dataRequest}', [AdminDataDeletionAdminController::class, 'show'])->name('data_requests.show');
+                    Route::post('data-requests/{dataRequest}/status', [AdminDataDeletionAdminController::class, 'updateStatus'])->name('data_requests.update_status');
+                    Route::post('data-requests/from-case/{report}', [AdminDataDeletionAdminController::class, 'storeFromCase'])->name('data_requests.from_case');
+                });
+
+                Route::post('report-categories/{report_category}/subcategories', [AdminReportSubcategoryController::class, 'store'])
+                    ->name('report-categories.subcategories.store');
+                Route::put('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'update'])
+                    ->name('report-categories.subcategories.update');
+                Route::delete('report-categories/{report_category}/subcategories/{report_subcategory}', [AdminReportSubcategoryController::class, 'destroy'])
+                    ->name('report-categories.subcategories.destroy');
+
+                Route::get('audit-logs', [AdminAuditLogController::class, 'index'])
+                    ->middleware('role:super_admin')
+                    ->name('audit-logs.index');
+
+                Route::resource('pages', AdminPageController::class)->except(['show']);
+                Route::resource('menus', AdminMenuController::class)->except(['show']);
+                Route::post('menus/{menu}/items/reorder', [AdminMenuItemController::class, 'reorder'])
+                    ->name('menus.items.reorder');
+                Route::post('menus/{menu}/items', [AdminMenuItemController::class, 'store'])
+                    ->name('menus.items.store');
+                Route::put('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'update'])
+                    ->name('menus.items.update');
+                Route::delete('menus/{menu}/items/{menuItem}', [AdminMenuItemController::class, 'destroy'])
+                    ->name('menus.items.destroy');
+
+                Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'edit', 'show']);
+                Route::resource('blog-posts', AdminBlogPostController::class)->parameters(['blog-posts' => 'blog_post']);
+
+                Route::middleware('can:manage-platform')->group(function () {
+                    Route::get('settings', [AdminSettingsController::class, 'edit'])
+                        ->name('settings.edit');
+                    Route::post('settings', [AdminSettingsController::class, 'update'])
+                        ->name('settings.update');
+                });
             });
         });
 

@@ -30,6 +30,14 @@
                     </button>
                 </form>
             @endif
+            @if ($org?->stripe_subscription_id && $org?->billing_status === 'active')
+                <form method="POST" action="{{ route('billing.subscription.cancel') }}" class="ml-3">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-times mr-1"></i> {{ __('Cancel Subscription') }}
+                    </button>
+                </form>
+            @endif
         </div>
     @endif
 
