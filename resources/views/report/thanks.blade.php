@@ -2,87 +2,73 @@
     @php
         $caseId = $report->public_reference ?? $report->id ?? $id ?? '';
     @endphp
-    <section class="mx-auto max-w-4xl px-4 py-10">
-        <div class="bg-[#111f3c] text-white rounded-3xl px-6 py-10 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 class="text-3xl font-semibold">{{ __('Thank you for your report') }}</h1>
-                    <p class="mt-2 text-white/70 max-w-2xl">
-                        {{ __('We received your submission and will follow our security process. Use the case number below if you need to follow up later.') }}
-                    </p>
-                </div>
-                <span class="inline-flex items-center rounded-full bg-white/10 px-4 py-1 text-sm font-semibold tracking-wide">
-                    {{ __('Case ID') }}:
-                    <span class="ml-2 font-mono">{{ $caseId }}</span>
-                </span>
-            </div>
-        </div>
-
-        <div class="mt-8 grid gap-6 md:grid-cols-2">
-            <div class="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-semibold text-gray-900">{{ __('Next steps') }}</h2>
-                        <p class="text-sm text-gray-600">
-                            {{ __('Take a screenshot or copy the case link so you can reference it later.') }}
-                        </p>
+    <section class="min-h-screen bg-[#eef2ff] py-12">
+        <div class="mx-auto max-w-5xl px-4">
+            <div class="bg-white shadow-[0_40px_80px_rgba(15,23,42,.08)] rounded-3xl overflow-hidden border border-gray-100">
+                <div class="grid md:grid-cols-[1.05fr,1fr]">
+                    <div class="bg-gradient-to-br from-[#0b1f3b] to-[#173f74] text-white p-10 flex flex-col justify-between gap-8">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.5em] text-white/60 mb-3">{{ __('Thank you') }}</p>
+                            <h1 class="text-4xl font-semibold leading-tight">{{ __('Your report is in good hands') }}</h1>
+                            <p class="mt-4 text-white/70 leading-relaxed text-sm md:text-base">
+                                {{ __('We logged your submission and will activate our response process. Hold onto your Case ID so we can reconnect if follow-up is needed.') }}
+                            </p>
+                        </div>
+                        <div class="rounded-3xl bg-white/10 p-4 flex flex-col gap-1">
+                            <span class="text-xs uppercase tracking-[0.5em] text-white/60">{{ __('Case ID') }}</span>
+                            <span class="font-mono text-2xl md:text-3xl">{{ $caseId }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-4 flex flex-col gap-3">
-                    <button type="button"
-                        class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-900 transition hover:border-gray-400"
-                        onclick="downloadScreenshot()">
-                        <i class="fa-solid fa-camera"></i>
-                        {{ __('Capture confirmation card') }}
-                    </button>
-                    <button type="button"
-                        class="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                        onclick="window.print()">
-                        <i class="fa-solid fa-print"></i>
-                        {{ __('Print or save as PDF') }}
-                    </button>
-                </div>
-            </div>
-            <div class="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm">
-                <h2 class="text-base font-semibold text-gray-900">{{ __('Case details') }}</h2>
-                <dl class="mt-4 space-y-3 text-sm text-gray-600">
-                    <div>
-                        <dt class="font-medium text-gray-800">{{ __('Submitted at') }}</dt>
-                        <dd>{{ now()->format('M d, Y H:i') }}</dd>
-                    </div>
-                    <div>
-                        <dt class="font-medium text-gray-800">{{ __('Status') }}</dt>
-                        <dd>{{ __('Under review') }}</dd>
-                    </div>
-                    <div>
-                        <dt class="font-medium text-gray-800">{{ __('Follow-up link') }}</dt>
+                    <div class="p-8 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eaecf8] text-[#0b1f3b]">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900">{{ __('Submission complete') }}</h2>
+                                <p class="text-sm text-gray-600">{{ __('You may leave this page or submit again anytime.') }}</p>
+                            </div>
+                        </div>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <button type="button"
+                                class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-900 transition hover:border-gray-400"
+                                onclick="downloadScreenshot()">
+                                <i class="fa-solid fa-camera"></i>
+                                {{ __('Capture confirmation card') }}
+                            </button>
+                            <button type="button"
+                                class="flex items-center justify-center gap-2 rounded-2xl bg-[#0b1f3b] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#09172d]"
+                                onclick="window.print()">
+                                <i class="fa-solid fa-print"></i>
+                                {{ __('Print or save PDF') }}
+                            </button>
+                        </div>
                         @if ($followupUrl)
-                            <dd>
-                                <a href="{{ $followupUrl }}" class="text-indigo-600 underline">
-                                    {{ __('Open follow-up portal') }}
-                                </a>
-                            </dd>
-                        @else
-                            <dd>{{ __('Link will be available shortly.') }}</dd>
+                            <div class="rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/70 p-4 text-sm text-indigo-700">
+                                {{ __('Check updates anytime with this follow-up link:') }}
+                                <div class="break-all font-mono text-xs text-indigo-900 mt-1">
+                                    <a href="{{ $followupUrl }}" target="_blank" rel="noopener">{{ $followupUrl }}</a>
+                                </div>
+                            </div>
                         @endif
+                        <div class="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-sm text-gray-600">
+                            <p>{{ __('Need help immediately?') }}</p>
+                            <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}"
+                               class="font-semibold text-indigo-600 hover:underline">
+                                {{ config('asylon.support_email', 'support@asylon.app') }}
+                            </a>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                            <a href="{{ route('report.create') }}" class="font-semibold text-indigo-600 hover:underline">
+                                {{ __('Submit another report') }}
+                            </a>
+                            <span class="text-gray-300">•</span>
+                            <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:underline">
+                                {{ __('Reviewer login') }}
+                            </a>
+                        </div>
                     </div>
-                </dl>
-            </div>
-        </div>
-
-        <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Need help?') }}</h3>
-                    <p class="text-sm text-gray-600">
-                        {{ __('Our team is here 24/7. Email us with your case ID for faster support.') }}
-                    </p>
                 </div>
-                <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}"
-                    class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800">
-                    <i class="fa-solid fa-envelope"></i>
-                    {{ config('asylon.support_email', 'support@asylon.app') }}
-                </a>
             </div>
         </div>
     </section>
