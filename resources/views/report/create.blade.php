@@ -379,7 +379,7 @@
                 Recordings are limited to 3 minutes each, but you can upload as many separate recordings as you need.
             </p>
             <p class="mt-1 text-sm text-gray-600">
-                Your voice can be automatically disguised to protect your identity.
+                Your voice WILL be altered to protect your identity.
             </p>
             <div class="mt-4 voice-recorder-wrap">
                 <div class="voice-recorder-control">

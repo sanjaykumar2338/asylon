@@ -5,7 +5,7 @@
 
     @include('admin.partials.flash')
 
-    @php
+@php
         $preferred = $org?->preferred_plan;
         $activePlanSlug = $org?->hasActiveSubscription() ? $org?->plan?->slug : null;
         $hasPortal = $org?->stripe_customer_id && $org?->hasActiveSubscription();
@@ -15,6 +15,36 @@
             default => 'warning',
         };
     @endphp
+
+@push('styles')
+    <style>
+        .billing-frequency {
+            color: #101828;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .billing-frequency .label {
+            width: 90px;
+            text-align: center;
+            border-radius: 999px;
+            padding: 4px 10px;
+            background: #eef2ff;
+            color: #6366f1;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .billing-frequency small {
+            color: #475467;
+            font-weight: 500;
+        }
+    </style>
+@endpush
 
     @if ($org)
         <div class="alert alert-secondary d-flex justify-content-between align-items-center mb-3">
@@ -83,13 +113,15 @@
                         </ul>
 
                         <div class="mb-3">
-                            <div class="d-flex align-items-center mb-1">
-                                <span class="badge badge-light border mr-2">{{ __('Monthly') }}</span>
-                                <span class="text-muted small">{{ __('Billed monthly via Stripe') }}</span>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="badge badge-light border mr-2">{{ __('Yearly') }}</span>
-                                <span class="text-muted small">{{ __('Billed annually via Stripe') }}</span>
+                            <div>
+                                <div class="billing-frequency">
+                                    <span class="label">{{ __('Monthly') }}</span>
+                                    <small>{{ __('Billed monthly via Stripe') }}</small>
+                                </div>
+                                <div class="billing-frequency">
+                                    <span class="label">{{ __('Yearly') }}</span>
+                                    <small>{{ __('Billed annually via Stripe') }}</small>
+                                </div>
                             </div>
                         </div>
 
