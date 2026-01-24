@@ -179,7 +179,8 @@ class StoreReportRequest extends FormRequest
             }
             
             if ($validator->errors()->has('org_id') && $validator->errors()->has('org_code')) {
-                $validator->errors()->remove('org_code');
+                $messages = $validator->errors();
+                $messages->forget('org_code');
             }
         });
     }
