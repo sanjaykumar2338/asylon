@@ -25,7 +25,7 @@ return new class extends Migration
                 ->update(['org_id' => $firstOrgId]);
         }
 
-        if (in_array($driver, ['mysql', 'pgsql'], true)) {
+        if ($driver === 'pgsql') {
             try {
                 DB::statement("
                     ALTER TABLE users
@@ -60,7 +60,7 @@ return new class extends Migration
     {
         $driver = Schema::getConnection()->getDriverName();
 
-        if (in_array($driver, ['mysql', 'pgsql'], true)) {
+        if ($driver === 'pgsql') {
             try {
                 DB::statement('ALTER TABLE users DROP CHECK users_global_roles_require_null_org');
             } catch (\Throwable) {

@@ -29,6 +29,11 @@ class AuthServiceProvider extends ServiceProvider
             || $user->isPlatformAdmin()
             || $user->isOrgAdmin());
 
+        Gate::define('view-analytics', static fn ($user): bool => $user->isSuperAdmin()
+            || $user->isPlatformAdmin()
+            || $user->isOrgAdmin()
+            || in_array($user->role, ['reviewer', 'security_lead'], true));
+
         Gate::define('review-reports', static fn ($user): bool => $user->isSuperAdmin()
             || $user->isPlatformAdmin()
             || in_array($user->role, [

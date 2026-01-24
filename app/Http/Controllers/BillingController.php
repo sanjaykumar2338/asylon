@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Org;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +14,7 @@ class BillingController extends Controller
 {
     public function choosePlan(Request $request): View
     {
-        $org = $request->user()->org;
+        $org = $this->requireOrg($request);
         $plans = Plan::whereIn('slug', ['core', 'pro'])->with('prices')->get();
 
         return view('billing.choose-plan', compact('org', 'plans'));
@@ -21,11 +22,7 @@ class BillingController extends Controller
 
     public function createCheckout(Request $request): RedirectResponse
     {
-        $org = $request->user()->org;
-
-        if (! $org && ! $request->user()->hasRole('platform_admin') && ! $request->user()->isSuperAdmin()) {
-            return back()->with('error', __('No organization found for this user.'));
-        }
+        $org = $this->requireOrg($request);
 
         $data = $request->validate([
             'plan_slug' => ['required', Rule::exists('plans', 'slug')],
@@ -48,7 +45,7 @@ class BillingController extends Controller
         $stripe = new StripeClient(config('services.stripe.secret'));
 
         $metadata = [
-            'org_id' => $org?->id,
+            'org_id' => $org->id,
             'plan_slug' => $plan->slug,
             'interval' => $interval,
         ];
@@ -56,7 +53,7 @@ class BillingController extends Controller
         // Build params without empty customer.
         $params = [
             'mode' => 'subscription',
-            'client_reference_id' => $org?->id,
+            'client_reference_id' => $org->id,
             'metadata' => $metadata,
             'subscription_data' => [
                 'metadata' => $metadata,
@@ -71,7 +68,7 @@ class BillingController extends Controller
             'cancel_url' => route('billing.cancel'),
         ];
 
-        if ($org?->stripe_customer_id) {
+        if ($org->stripe_customer_id) {
             $params['customer'] = $org->stripe_customer_id;
         }
 
@@ -96,7 +93,7 @@ class BillingController extends Controller
 
     public function settings(Request $request): View
     {
-        $org = $request->user()->org;
+        $org = $this->requireOrg($request);
         $plan = $org?->plan;
         $latestSubscription = $org?->latestBillingSubscription;
         $billingCycle = $latestSubscription?->interval ? ucfirst($latestSubscription->interval) : null;
@@ -107,9 +104,9 @@ class BillingController extends Controller
 
     public function createPortalSession(Request $request): RedirectResponse
     {
-        $org = $request->user()->org;
+        $org = $this->requireOrg($request);
 
-        if (! $org?->stripe_customer_id) {
+        if (! $org->stripe_customer_id) {
             abort(400, 'No Stripe customer for this organization yet.');
         }
 
@@ -129,9 +126,9 @@ class BillingController extends Controller
 
     public function cancelSubscription(Request $request): RedirectResponse
     {
-        $org = $request->user()->org;
+        $org = $this->requireOrg($request);
 
-        if (! $org || ! $org->stripe_subscription_id) {
+        if (! $org->stripe_subscription_id) {
             return back()->with('error', __('No active subscription found to cancel.'));
         }
 
@@ -153,5 +150,16 @@ class BillingController extends Controller
 
         return redirect()->route('billing.overview')
             ->with('status', __('Subscription canceled. Please reach out if you need further assistance.'));
+    }
+
+    protected function requireOrg(Request $request): Org
+    {
+        $org = $request->user()->org;
+
+        if (! $org) {
+            abort(403, __('No organization found for your account.'));
+        }
+
+        return $org;
     }
 }

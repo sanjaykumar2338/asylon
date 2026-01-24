@@ -193,6 +193,7 @@
             $isExec = $navUser?->hasRole('executive_admin');
             $isOrgAdmin = $navUser?->isOrgAdmin();
             $isReviewer = $navUser?->hasRole('reviewer');
+            $canViewAnalytics = $navUser?->can('view-analytics');
         @endphp
         <main class="admin-root">
         <div class="admin-block-wrapper">
@@ -355,13 +356,15 @@
                                         <span class="text">{{ __('Notification Templates') }}</span>
                                     </a>
                                 </li>
-                                <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.analytics') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Analytics') }}</span>
-                                    </a>
-                                </li>
+                                @can('view-analytics')
+                                    <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                                        <a href="{{ route('admin.analytics') }}">
+                                            <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
+                                                    alt=""></span>
+                                            <span class="text">{{ __('Analytics') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
                                 <li class="sidebar-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
                                     <a href="{{ route('billing.overview') }}">
                                         <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
@@ -375,13 +378,15 @@
                                     </a>
                                 </li>
                             @elseif ($isReviewer)
-                                <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.analytics') }}">
-                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
-                                                alt=""></span>
-                                        <span class="text">{{ __('Analytics') }}</span>
-                                    </a>
-                                </li>
+                                @if ($canViewAnalytics)
+                                    <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                                        <a href="{{ route('admin.analytics') }}">
+                                            <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
+                                                    alt=""></span>
+                                            <span class="text">{{ __('Analytics') }}</span>
+                                        </a>
+                                    </li>
+                                @endif
                             @endif
 
                             <li class="sidebar-item mt-3">

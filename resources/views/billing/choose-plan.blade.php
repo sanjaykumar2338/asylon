@@ -40,8 +40,8 @@
         }
 
         .billing-frequency small {
-            color: #475467;
-            font-weight: 500;
+            color: #0f172a;
+            font-weight: 600;
         }
     </style>
 @endpush
