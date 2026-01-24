@@ -35,6 +35,7 @@ class ReviewController extends Controller
     {
         
         $user = $request->user();
+        $orgId = $user?->org_id ?? $user?->org?->id;
 
         $status = (string) $request->query('status', '');
         $urgent = (string) $request->query('urgent', '');
@@ -46,24 +47,15 @@ class ReviewController extends Controller
         $severity = (string) $request->query('severity', '');
         $riskLevel = (string) $request->query('risk_level', '');
         $sort = (string) $request->query('sort', 'submitted_desc');
-        $orgId = 0;
-        $platformUser = $request->user()?->hasRole('platform_admin');
-
-        if ($platformUser) {
-            $orgId = (int) $request->query('org_id', 0);
-        } else {
-            $orgId = $user->org_id ?? $user->org?->id ?? 0;
-        }
-
         $query = Report::query()
             ->with(['org', 'files', 'riskAnalysis', 'escalationEvents'])
             ->withCount('files');
 
         if (! $user->can('view-all')) {
-            if ($orgId > 0) {
+            if ($orgId) {
                 $query->where('org_id', $orgId);
             } else {
-                $query->whereNotNull('org_id');
+                abort(403);
             }
         } elseif ($orgId > 0) {
             $query->where('org_id', $orgId);
