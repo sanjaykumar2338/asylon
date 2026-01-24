@@ -2,67 +2,96 @@
     @php
         $caseId = $report->public_reference ?? $report->id ?? $id ?? '';
     @endphp
-    <div class="mx-auto max-w-lg text-center" id="thankyou-card" data-case-id="{{ $caseId }}">
-        <h1 class="text-2xl font-semibold text-gray-900">{{ __('Thank you for your report') }}</h1>
-        <p class="mt-4 text-sm text-gray-600">
-            {{ __('Your report has been submitted successfully. If follow-up is required, keep this Case ID for future communication.') }}
-        </p>
-        <p class="mt-3 text-sm font-medium text-indigo-700">
-            {{ config('asylon.privacy.confirm') }}
-        </p>
-
-        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded text-left">
-            <p class="font-semibold text-yellow-800">
-                {{ __('Important: Save your Case ID') }}
-            </p>
-            <p class="text-sm text-yellow-800 mt-1">
-                {{ __('Your Case ID') }}:
-                <strong class="font-mono text-base">{{ $caseId }}</strong><br>
-                {{ __('Please write this down or take a screenshot. You\'ll need it if you want to follow up on this case later.') }}
-            </p>
-            <div class="mt-3 grid gap-2 sm:grid-cols-2 sm:max-w-md">
-                <button type="button"
-                    class="w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-black shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onclick="downloadScreenshot()">
-                    {{ __('Take screenshot') }}
-                </button>
-                <button type="button"
-                    class="w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onclick="window.print()">
-                    {{ __('Download PDF') }}
-                </button>
+    <section class="mx-auto max-w-4xl px-4 py-10">
+        <div class="bg-[#111f3c] text-white rounded-3xl px-6 py-10 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-semibold">{{ __('Thank you for your report') }}</h1>
+                    <p class="mt-2 text-white/70 max-w-2xl">
+                        {{ __('We received your submission and will follow our security process. Use the case number below if you need to follow up later.') }}
+                    </p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-white/10 px-4 py-1 text-sm font-semibold tracking-wide">
+                    {{ __('Case ID') }}:
+                    <span class="ml-2 font-mono">{{ $caseId }}</span>
+                </span>
             </div>
         </div>
 
-        @if (!empty($followupUrl))
-            <p class="mt-4 text-sm">
-                {{ __('To check updates later, use this link:') }}
-                <a href="{{ $followupUrl }}" class="text-indigo-600 underline">{{ $followupUrl }}</a>
-            </p>
-            <div class="mt-4">
-                <a href="{{ $followupUrl }}"
-                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    {{ __('Open follow-up portal') }}
+        <div class="mt-8 grid gap-6 md:grid-cols-2">
+            <div class="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-semibold text-gray-900">{{ __('Next steps') }}</h2>
+                        <p class="text-sm text-gray-600">
+                            {{ __('Take a screenshot or copy the case link so you can reference it later.') }}
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4 flex flex-col gap-3">
+                    <button type="button"
+                        class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-900 transition hover:border-gray-400"
+                        onclick="downloadScreenshot()">
+                        <i class="fa-solid fa-camera"></i>
+                        {{ __('Capture confirmation card') }}
+                    </button>
+                    <button type="button"
+                        class="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                        onclick="window.print()">
+                        <i class="fa-solid fa-print"></i>
+                        {{ __('Print or save as PDF') }}
+                    </button>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm">
+                <h2 class="text-base font-semibold text-gray-900">{{ __('Case details') }}</h2>
+                <dl class="mt-4 space-y-3 text-sm text-gray-600">
+                    <div>
+                        <dt class="font-medium text-gray-800">{{ __('Submitted at') }}</dt>
+                        <dd>{{ now()->format('M d, Y H:i') }}</dd>
+                    </div>
+                    <div>
+                        <dt class="font-medium text-gray-800">{{ __('Status') }}</dt>
+                        <dd>{{ __('Under review') }}</dd>
+                    </div>
+                    <div>
+                        <dt class="font-medium text-gray-800">{{ __('Follow-up link') }}</dt>
+                        @if ($followupUrl)
+                            <dd>
+                                <a href="{{ $followupUrl }}" class="text-indigo-600 underline">
+                                    {{ __('Open follow-up portal') }}
+                                </a>
+                            </dd>
+                        @else
+                            <dd>{{ __('Link will be available shortly.') }}</dd>
+                        @endif
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Need help?') }}</h3>
+                    <p class="text-sm text-gray-600">
+                        {{ __('Our team is here 24/7. Email us with your case ID for faster support.') }}
+                    </p>
+                </div>
+                <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}"
+                    class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800">
+                    <i class="fa-solid fa-envelope"></i>
+                    {{ config('asylon.support_email', 'support@asylon.app') }}
                 </a>
             </div>
-        @endif
-
-        <div class="mt-6">
-            <a href="{{ route('report.create') }}" class="text-sm font-medium text-indigo-600 hover:underline">
-                {{ __('Submit another report') }}
-            </a>
-            <span class="mx-2 text-gray-400">|</span>
-            <a href="{{ route('login') }}" class="text-sm font-medium text-indigo-600 hover:underline">
-                {{ __('Reviewer login') }}
-            </a>
         </div>
-    </div>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             window.downloadScreenshot = function () {
-                const target = document.getElementById('thankyou-card');
+                const target = document.querySelector('section');
                 if (!target || typeof html2canvas !== 'function') {
                     return;
                 }
@@ -74,7 +103,7 @@
                         }
                         const link = document.createElement('a');
                         const caseId = target.dataset.caseId || 'case';
-                        link.download = caseId + '-thank-you.png';
+                        link.download = caseId + '-confirmation.png';
                         link.href = URL.createObjectURL(blob);
                         link.click();
                         URL.revokeObjectURL(link.href);
