@@ -177,6 +177,10 @@ class StoreReportRequest extends FormRequest
             if ($type && $category && ! $this->categoryAllowedForType($type, $category)) {
                 $validator->errors()->add('category', 'Please select a category that matches the chosen report type.');
             }
+            
+            if ($validator->errors()->has('org_id') && $validator->errors()->has('org_code')) {
+                $validator->errors()->remove('org_code');
+            }
         });
     }
 

@@ -59,6 +59,57 @@
         .voice-buttons { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
         .voice-recorder-control .recorder-button { margin: 0; }
         .voice-recorder-control .recorder-button .recorder-icon--record { margin-left: 2px; }
+        .toggle-switch-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #495057;
+        }
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .toggle-switch-track {
+            width: 44px;
+            height: 24px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            position: relative;
+            transition: background 0.15s ease;
+        }
+        .toggle-switch-thumb {
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.25);
+            transition: transform 0.15s ease;
+        }
+        .toggle-switch-input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .toggle-switch-input:focus-visible + .toggle-switch-track {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+        }
+        .toggle-switch-input:checked + .toggle-switch-track {
+            background: #2563eb;
+        }
+        .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-thumb {
+            transform: translateX(20px);
+        }
     </style>
     <section class="inner-pages-header">
         <div class="site-container">
@@ -276,11 +327,18 @@
                 <x-input-error class="mt-2" :messages="$errors->get('contact_phone')" />
             </div>
 
-            <div class="flex items-center gap-2 pt-6">
-                <input id="urgent" name="urgent" type="checkbox" value="1"
-                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    @checked(old('urgent')) />
-                <x-input-label for="urgent" :value="__('report.urgent_label')" />
+            <div class="pt-6">
+                <label for="urgent" class="toggle-switch-label">
+                    <span class="toggle-switch">
+                        <input id="urgent" name="urgent" type="checkbox" value="1"
+                            class="toggle-switch-input"
+                            @checked(old('urgent')) />
+                        <span class="toggle-switch-track">
+                            <span class="toggle-switch-thumb"></span>
+                        </span>
+                    </span>
+                    <span>{{ __('report.urgent_label') }}</span>
+                </label>
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('urgent')" />
         </div>
