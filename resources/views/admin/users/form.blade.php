@@ -34,6 +34,23 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
+            <label for="username">{{ __('Username (optional)') }}</label>
+            <input type="text" name="username" id="username" maxlength="64"
+                value="{{ old('username', $user->username ?? '') }}"
+                class="form-control">
+            @error('username')
+                <small class="text-danger">{{ $message }}</small>
+            @enderror
+            <small class="form-text text-muted">
+                {{ __('Usernames are optional and used for login. Allowed characters: letters, numbers, periods, hyphens, and underscores (3-64 characters).') }}
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
             <label for="phone">{{ __('Phone (E.164 preferred)') }}</label>
             <input type="text" name="phone" id="phone" maxlength="30"
                 value="{{ old('phone', $user->phone ?? '') }}"

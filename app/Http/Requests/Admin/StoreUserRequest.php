@@ -25,6 +25,7 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'username' => $this->usernameRules(),
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'phone' => ['nullable', 'string', 'max:30'],
@@ -32,6 +33,35 @@ class StoreUserRequest extends FormRequest
             'org_id' => ['nullable', 'exists:orgs,id'],
             'active' => ['sometimes', 'boolean'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $username = $this->input('username');
+
+        if (is_string($username)) {
+            $username = trim($username);
+        }
+
+        $this->merge([
+            'username' => $username === '' ? null : $username,
+        ]);
+    }
+
+    private function usernameRules(): array
+    {
+        $rules = [
+            'nullable',
+            'string',
+            'max:64',
+            'regex:/^[a-zA-Z0-9._-]{3,64}$/',
+        ];
+
+        if ($this->filled('username')) {
+            $rules[] = Rule::unique('users', 'username');
+        }
+
+        return $rules;
     }
 
     public function withValidator($validator): void

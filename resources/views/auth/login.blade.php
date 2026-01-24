@@ -123,16 +123,16 @@
                 @csrf
                 <div class="form-grid">
                     <div class="form-group full">
-                        <label for="email">{{ __('Work Email') }}</label>
-                        <input id="email"
-                               type="email"
-                               name="email"
-                               value="{{ old('email') }}"
-                               placeholder="{{ __('Enter your email') }}"
+                        <label for="login">{{ __('Email or Username') }}</label>
+                        <input id="login"
+                               type="text"
+                               name="login"
+                               value="{{ old('login') }}"
+                               placeholder="{{ __('Enter your email or username') }}"
                                required
                                autofocus
                                autocomplete="username">
-                        @error('email')
+                        @error('login')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -196,10 +196,6 @@
                     {{ __('Log in') }}
                 </button>
 
-                <div class="auth-form-footer">
-                    {{ __("Don't have an account?") }}
-                    <a href="{{ route('register') }}">{{ __('Create one') }}</a>
-                </div>
             </form>
         </div>
     </section>

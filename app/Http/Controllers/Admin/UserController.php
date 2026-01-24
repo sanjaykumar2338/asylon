@@ -38,7 +38,8 @@ class UserController extends AdminController
             $query->where(function ($builder) use ($search): void {
                 $builder
                     ->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
             });
         }
 
@@ -168,6 +169,8 @@ class UserController extends AdminController
         $authUser = $request->user();
         $role = $data['role'] ?? $existing?->role ?? null;
 
+        $data['username'] = $this->normalizeUsername($data['username'] ?? null);
+
         $data['active'] = $request->boolean('active', $existing?->active ?? true);
 
         if ($authUser && ! $authUser->isSuperAdmin()) {
@@ -199,5 +202,16 @@ class UserController extends AdminController
         }
 
         return $data;
+    }
+
+    protected function normalizeUsername(?string $username): ?string
+    {
+        if (! is_string($username)) {
+            return null;
+        }
+
+        $normalized = trim($username);
+
+        return $normalized === '' ? null : $normalized;
     }
 }

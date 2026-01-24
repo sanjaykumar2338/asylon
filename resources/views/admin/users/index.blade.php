@@ -24,7 +24,7 @@
                             <label class="sr-only" for="search-users">{{ __('Search users') }}</label>
                             <div class="input-group">
                                 <input type="search" name="q" id="search-users" value="{{ $search }}" class="form-control"
-                                    placeholder="{{ __('Search name or email') }}">
+                                    placeholder="{{ __('Search name, email, or username') }}">
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary" type="submit">
                                         <i class="fas fa-search mr-1"></i> {{ __('Search') }}
@@ -61,6 +61,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col">{{ __('Name') }}</th>
+                                <th scope="col">{{ __('Username') }}</th>
                                 <th scope="col">{{ __('Email') }}</th>
                                 <th scope="col">{{ __('Role') }}</th>
                                 <th scope="col">{{ __('Organization') }}</th>
@@ -72,6 +73,7 @@
                             @forelse ($users as $user)
                                 <tr>
                                     <td class="font-weight-bold">{{ $user->name }}</td>
+                                    <td>{{ $user->username ?? '—' }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td class="text-capitalize">{{ str_replace('_', ' ', $user->role) }}</td>
                                     <td>{{ $user->org?->name ?? __('Unassigned') }}</td>
@@ -104,7 +106,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
+                                    <td colspan="7" class="text-center text-muted py-4">
                                         {{ __('No users found.') }}
                                     </td>
                                 </tr>

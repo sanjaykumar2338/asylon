@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'phone',
         'password',
         'role',
@@ -68,6 +70,18 @@ class User extends Authenticatable
     public function reportNotes(): HasMany
     {
         return $this->hasMany(ReportNote::class);
+    }
+
+    protected function setUsernameAttribute(?string $value): void
+    {
+        if ($value === null) {
+            $this->attributes['username'] = null;
+            return;
+        }
+
+        $trimmed = trim($value);
+
+        $this->attributes['username'] = $trimmed === '' ? null : Str::lower($trimmed);
     }
 
     public function isSuperAdmin(): bool
