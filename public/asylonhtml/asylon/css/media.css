@@ -190,29 +190,29 @@
     .steps-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 120px; /* Consistent space for arrows */
-        padding-top: 80px; /* Extra room for the '01' circle */
+        grid-template-columns: 1fr;
+        gap: 160px; /* Increased to prevent arrow-circle overlap */
+        padding-top: 80px; /* Ensures '01' circle is not clipped at top */
         overflow: visible !important;
     }
 
     .how-it-works .action-btn {
-        margin-top: 60px; /* Space between card 04 and the button */
+        margin-top: 50px;
+        padding-bottom: 20px;
     }
 
     /* 2. CARD: Cleaned up padding and overflow */
     .steps-wrapper .step {
         position: relative;
         width: 100%;
-        max-width: 100%;
         min-height: auto;
-        padding: 60px 25px 40px; /* Balanced internal padding */
+        padding: 60px 25px 40px; 
         border-radius: 20px;
         overflow: visible !important;
-        margin-bottom: 0; /* Let the wrapper gap handle spacing */
+        margin-bottom: 0;
     }
 
-    /* 3. CIRCLES: Precise centering */
+    /* 3. CIRCLES: Higher Z-index to sit clearly above everything */
     .steps-wrapper .step-number {
         background: #4AB178 !important;
         color: #fff;
@@ -223,39 +223,38 @@
         justify-content: center;
         border-radius: 100px;
         position: absolute;
-        top: -32px; /* Half of circle height to sit on the border */
+        top: -32px; 
         left: 50%;
         transform: translateX(-50%);
-        z-index: 10;
+        z-index: 20; /* Higher than arrow */
         background-image: none !important;
-        font-weight: bold;
     }
 
-    /* 4. ARROWS: Improved anchoring */
+    /* 4. ARROWS: Positioned to point at the space ABOVE the circle */
     .steps-wrapper .step::after {
         position: absolute;
         content: '';
         background-image: url(../images/Arrow-2.png);
         display: block;
-        height: 90px;
-        width: 90px;
+        height: 100px;
+        width: 100px;
         background-size: contain;
         background-repeat: no-repeat;
         left: 50%;
         top: auto;
-        bottom: -105px; /* Fixed distance from card bottom */
+        bottom: -125px; /* Pulls arrow up slightly so it doesn't touch circle 02/03/04 */
         transform: translateX(-50%) rotate(15deg);
-        z-index: 1;
-        opacity: 0.8;
+        z-index: 10;
+        opacity: 0.9;
     }
 
-    /* 5. FIX: Remove arrow from ONLY the last card */
+    /* 5. LAST CHILD FIX: Removes the arrow and ensures button spacing */
     .steps-wrapper .step:last-child::after {
         display: none !important;
         content: none !important;
     }
 
-    /* Cleanup desktop lines */
+    /* Cleanup desktop-only elements */
     .steps-wrapper .step::before {
         display: none !important;
     }
