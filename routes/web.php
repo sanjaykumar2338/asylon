@@ -273,6 +273,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                             ->name('settings.edit');
                         Route::post('settings', [AdminSettingsController::class, 'update'])
                             ->name('settings.update');
+                        Route::post('settings/test-email', [AdminSettingsController::class, 'sendTestEmail'])
+                            ->name('settings.test_email');
                     });
                 });
             });

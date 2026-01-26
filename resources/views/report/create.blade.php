@@ -12,8 +12,8 @@
         $portalDescription = $portalDescription ?? __('report.submit_description');
         $recipientsEnabled = $recipientsEnabled ?? false;
         $recipientMap = $recipientMap ?? [];
-        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+        $supportEmail = config('asylon.support_email', 'support@asylon.app');
+        $infoEmail = config('asylon.info_email', 'info@asylon.app');
     @endphp
     <style>
         .report-form .grid { display: grid; gap: 1rem; }

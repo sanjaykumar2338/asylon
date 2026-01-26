@@ -33,9 +33,9 @@
                 <ul>
                     <li><a href="tel:0425600335"><img src="{{ $assetBase }}/images/callVector.png" alt="">0425600335</a></li>
 
-                    <li><a href="mailto:info@emergeacademy.com"><img src="{{ $assetBase }}/images/emailVector.png"
-                                alt="">info@emergeacademy.com</a></li>
-                    <li><a href="mailto:info@emergeacademy.com"><img src="{{ $assetBase }}/images/locationVector.png" alt="">125 / 18
+                    <li><a href="mailto:info@asylon.app"><img src="{{ $assetBase }}/images/emailVector.png"
+                                alt="">info@asylon.app</a></li>
+                    <li><a href="mailto:info@asylon.app"><img src="{{ $assetBase }}/images/locationVector.png" alt="">125 / 18
                             - 20 Edinburgh St, Oakleigh <br> South, Victoria, 3167, Australia</a></li>
 
 

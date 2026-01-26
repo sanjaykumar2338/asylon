@@ -4,8 +4,8 @@
 
 @section('content')
 @php
-    $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-    $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+    $supportEmail = config('asylon.support_email', 'support@asylon.app');
+    $infoEmail = config('asylon.info_email', 'info@asylon.app');
 @endphp
 
 <section class="inner-pages-header">

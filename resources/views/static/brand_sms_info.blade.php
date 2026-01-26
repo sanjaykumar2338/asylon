@@ -73,7 +73,7 @@
             <h2 class="text-xl font-semibold text-gray-900">Support</h2>
             <p>
                 For questions about SMS alerts or your data, please contact the Asylon support team at
-                <a href="mailto:{{ config('asylon.support_email', 'support@asylon.cc') }}" class="text-indigo-700 underline">{{ config('asylon.support_email', 'support@asylon.cc') }}</a>.
+                <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}" class="text-indigo-700 underline">{{ config('asylon.support_email', 'support@asylon.app') }}</a>.
             </p>
         </section>
     </div>

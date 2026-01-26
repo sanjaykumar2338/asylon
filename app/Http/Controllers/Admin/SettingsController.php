@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TestEmail;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class SettingsController extends Controller
@@ -59,6 +62,27 @@ class SettingsController extends Controller
         Setting::set('telnyx_alpha_sender', $alpha !== '' ? strtoupper($alpha) : null);
 
         return back()->with('ok', 'Settings updated.');
+    }
+
+    public function sendTestEmail(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'recipient_email' => ['required', 'email'],
+        ]);
+
+        try {
+            Mail::to($request->input('recipient_email'))->send(new TestEmail());
+        } catch (\Throwable $exception) {
+            Log::error('SMTP test email failed.', [
+                'user_id' => $request->user()?->id,
+                'email' => $request->input('recipient_email'),
+                'error' => $exception->getMessage(),
+            ]);
+
+            return back()->with('error', __('Unable to send the test message. Check the logs for details.'));
+        }
+
+        return back()->with('status', __('Test email sent to :email.', ['email' => $request->input('recipient_email')]));
     }
 
     protected function boolSetting(string $key, bool $default = false): bool

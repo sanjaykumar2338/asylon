@@ -68,7 +68,7 @@
             <p class="text-sm text-gray-700">
                 Questions about these terms, privacy, or data handling can be sent to
                 <a href="mailto:{{ $supportEmail }}" class="text-indigo-700 underline">{{ $supportEmail }}</a> or
-                <a href="mailto:{{ $infoEmail ?? 'info@asylon.cc' }}" class="text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.cc' }}</a>.
+                <a href="mailto:{{ $infoEmail ?? 'info@asylon.app' }}" class="text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.app' }}</a>.
             </p>
         </section>
     </div>

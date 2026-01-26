@@ -3,8 +3,8 @@
 @section('title', 'Asylon | Follow Up')
 
 @section('content')
-@php($supportEmail = config('asylon.support_email', 'support@asylon.cc'))
-@php($infoEmail = config('asylon.info_email', 'info@asylon.cc'))
+@php($supportEmail = config('asylon.support_email', 'support@asylon.app'))
+@php($infoEmail = config('asylon.info_email', 'info@asylon.app'))
 
 <section class="inner-pages-header">
     <div class="site-container">

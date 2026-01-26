@@ -42,8 +42,8 @@ class StaticPageController extends Controller
             ]);
         }
 
-        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+        $supportEmail = config('asylon.support_email', 'support@asylon.app');
+        $infoEmail = config('asylon.info_email', 'info@asylon.app');
 
         return view($fallbackView, [
             'supportEmail' => $supportEmail,

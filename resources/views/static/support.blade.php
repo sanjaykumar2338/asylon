@@ -10,7 +10,7 @@
         <div class="rounded-md border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 sm:max-w-xs space-y-3">
             <div>
                 <p class="font-semibold">General questions</p>
-                <a href="mailto:{{ $infoEmail ?? 'info@asylon.cc' }}" class="font-semibold text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.cc' }}</a>
+                <a href="mailto:{{ $infoEmail ?? 'info@asylon.app' }}" class="font-semibold text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.app' }}</a>
                 <p class="mt-1 text-xs text-indigo-800">
                     Outreach, partnerships, and non-technical inquiries.
                 </p>
@@ -29,7 +29,7 @@
         <section class="space-y-3">
             <h2 class="text-xl font-semibold text-gray-900">How to get help</h2>
             <p class="text-sm text-gray-700">
-                Email <a href="mailto:{{ $infoEmail ?? 'info@asylon.cc' }}" class="text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.cc' }}</a> for general questions, or <a href="mailto:{{ $supportEmail }}" class="text-indigo-700 underline">{{ $supportEmail }}</a> with a short summary of what you need. We route requests to the right Asylon specialist for your organization.
+                Email <a href="mailto:{{ $infoEmail ?? 'info@asylon.app' }}" class="text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.app' }}</a> for general questions, or <a href="mailto:{{ $supportEmail }}" class="text-indigo-700 underline">{{ $supportEmail }}</a> with a short summary of what you need. We route requests to the right Asylon specialist for your organization.
             </p>
             <ul class="list-disc space-y-2 pl-5 text-sm">
                 <li>Share your organization name, role, and the case or page you are working in.</li>
@@ -66,7 +66,7 @@
             <p class="font-semibold text-gray-900">Need something else?</p>
             <p class="mt-2">
                 We are here to support administrators and staff who keep your community safe. Email
-                <a href="mailto:{{ $infoEmail ?? 'info@asylon.cc' }}" class="font-semibold text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.cc' }}</a>
+                <a href="mailto:{{ $infoEmail ?? 'info@asylon.app' }}" class="font-semibold text-indigo-700 underline">{{ $infoEmail ?? 'info@asylon.app' }}</a>
                 or
                 <a href="mailto:{{ $supportEmail }}" class="font-semibold text-indigo-700 underline">{{ $supportEmail }}</a>
                 and we will follow up with next steps.

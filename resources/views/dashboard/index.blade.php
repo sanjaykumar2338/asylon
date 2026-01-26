@@ -177,8 +177,8 @@
                             <div>
                                 <strong>{{ __('Need help fast?') }}</strong>
                                 <div class="text-secondary small">
-                                    <a href="mailto:{{ config('asylon.support_email', 'support@asylon.cc') }}" class="text-decoration-none">
-                                        {{ config('asylon.support_email', 'support@asylon.cc') }}
+                                    <a href="mailto:{{ config('asylon.support_email', 'support@asylon.app') }}" class="text-decoration-none">
+                                        {{ config('asylon.support_email', 'support@asylon.app') }}
                                     </a>
                                 </div>
                             </div>

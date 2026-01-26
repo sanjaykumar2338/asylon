@@ -9,8 +9,8 @@ class StaticPagesSeeder extends Seeder
 {
     public function run(): void
     {
-        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
-        $infoEmail = config('asylon.info_email', 'info@asylon.cc');
+        $supportEmail = config('asylon.support_email', 'support@asylon.app');
+        $infoEmail = config('asylon.info_email', 'info@asylon.app');
 
         Page::updateOrCreate(
             ['slug' => 'support'],

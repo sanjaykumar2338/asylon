@@ -118,4 +118,44 @@
             </div>
         </div>
     </div>
+
+    <div class="card admin-index-card mt-4">
+        <div class="card-body">
+            <div class="card mb-0">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ __('SMTP test email') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        {{ __('This sends a single message using the SMTP settings configured in .env. Check the recipient inbox or spam folder and consult the logs if the test fails.') }}
+                    </p>
+                    <form method="POST" action="{{ route('admin.settings.test_email') }}">
+                        @csrf
+                        <div class="form-row align-items-center g-0">
+                            <div class="col">
+                                <input type="email"
+                                    name="recipient_email"
+                                    id="recipient_email"
+                                    class="form-control @error('recipient_email') is-invalid @enderror"
+                                    value="{{ old('recipient_email') }}"
+                                    placeholder="platform-admin@example.com"
+                                    required>
+                                @error('recipient_email')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-auto ml-2">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-paper-plane mr-1"></i> {{ __('Send test email') }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <small class="form-text text-muted mt-2">
+                        {{ __('Errors are logged with the current admin ID without exposing secrets in the UI.') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-admin-layout>

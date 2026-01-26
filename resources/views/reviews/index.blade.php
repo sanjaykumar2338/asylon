@@ -4,9 +4,22 @@
     </x-slot>
 
     @include('admin.partials.flash')
+    @push('styles')
+        <style>
+            .admin-index-card table.table th,
+            .admin-index-card table.table td {
+                color: #0f172a !important;
+            }
+
+            .admin-index-card table.table .badge-secondary,
+            .admin-index-card table.table .badge-light {
+                color: #0f172a !important;
+            }
+        </style>
+    @endpush
 
     @php
-        $columnCount = auth()->user()->can('view-all') ? 13 : 12;
+        $columnCount = auth()->user()->can('view-all') ? 7 : 6;
         $typeFilterOptions = [
             '' => __('All types'),
             'safety' => __('Safety & Threat'),
@@ -182,13 +195,7 @@
                                 <th scope="col">{{ __('Category / Subcategory') }}</th>
                                 <th scope="col">{{ __('Type') }}</th>
                                 <th scope="col">{{ __('Severity') }}</th>
-                                <th scope="col">{{ __('Risk') }}</th>
-                                <th scope="col">{{ __('Escalation') }}</th>
-                                <th scope="col">{{ __('Urgent') }}</th>
                                 <th scope="col">{{ __('Status') }}</th>
-                                <th scope="col">{{ __('Attachments') }}</th>
-                                <th scope="col">{{ __('Violation date') }}</th>
-                                <th scope="col">{{ __('Submitted') }}</th>
                                 <th scope="col" class="text-right text-nowrap">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
@@ -196,14 +203,6 @@
                             @forelse ($reports as $report)
                                 @php
                                     $modalId = 'attachmentsModal-' . \Illuminate\Support\Str::slug($report->getKey(), '-');
-                                    $riskLevel = $report->riskAnalysis->risk_level ?? null;
-                                    $riskScore = $report->riskAnalysis->risk_score ?? null;
-                                    $riskClass = match ($riskLevel) {
-                                        'high' => 'badge-danger',
-                                        'medium' => 'badge-warning text-dark',
-                                        'low' => 'badge-success',
-                                        default => 'badge-secondary',
-                                    };
                                 @endphp
                                 <tr class="align-middle">
                                     <td class="text-monospace text-muted">#{{ $report->id }}</td>
@@ -226,32 +225,6 @@
                                         <span class="badge {{ $severityClass }} text-capitalize">{{ $report->severity_label }}</span>
                                     </td>
                                     <td>
-                                        @if ($riskLevel)
-                                            <span class="badge {{ $riskClass }}">
-                                                {{ ucfirst($riskLevel) }}
-                                                @if ($riskScore !== null)
-                                                    <span class="ml-1">({{ $riskScore }})</span>
-                                                @endif
-                                            </span>
-                                        @else
-                                            <span class="text-muted">&mdash;</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($report->escalationEvents->isNotEmpty())
-                                            <span class="badge badge-danger">{{ __('Escalated') }}</span>
-                                        @else
-                                            <span class="text-muted">&mdash;</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($report->urgent)
-                                            <span class="badge badge-danger">{{ __('Yes') }}</span>
-                                        @else
-                                            <span class="badge badge-secondary">{{ __('No') }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <form method="POST" action="{{ route('reports.status', $report) }}" class="mb-0">
                                             @csrf
                                             @method('PATCH')
@@ -262,19 +235,6 @@
                                             </select>
                                         </form>
                                     </td>
-                                    <td>
-                                        <span class="badge badge-light">
-                                            <i class="fas fa-paperclip mr-1"></i> {{ $report->files_count }}
-                                        </span>
-                                    </td>
-                                    <td class="text-nowrap">
-                                        @if ($report->violation_date)
-                                            {{ $report->violation_date->format('M d, Y') }}
-                                        @else
-                                            <span class="text-muted">&mdash;</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-nowrap">{{ $report->created_at->format('M d, Y H:i') }}</td>
                                     <td class="text-right">
                                         <div class="d-flex flex-wrap justify-content-end align-items-center" style="gap: 0.35rem;">
                                             <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#{{ $modalId }}">

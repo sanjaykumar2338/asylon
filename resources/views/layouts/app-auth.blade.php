@@ -561,7 +561,7 @@
                     </div>
 
                     @php
-                        $supportEmail = config('asylon.support_email', 'support@asylon.cc');
+                        $supportEmail = config('asylon.support_email', 'support@asylon.app');
                     @endphp
                     <footer class="py-3 px-4 text-muted border-top">
                         <div class="d-flex flex-wrap justify-content-between gap-2">
