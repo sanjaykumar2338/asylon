@@ -150,7 +150,7 @@
     }
 }
 
-/* --- Tablets & iPads (up to 1024px) --- */
+/* --- Tablets & iPhones (up to 1024px) --- */
 @media (max-width: 1024.98px) {
     .hero-section .hero-grid {
         gap: 36px;
@@ -185,24 +185,21 @@
         min-height: auto;
     }
 
-    /* --- STEPS WORKFLOW FIXES --- */
+    /* --- STEPS WORKFLOW FINAL REFINEMENT --- */
     .steps-wrapper {
         display: flex;
         flex-direction: column;
-        grid-template-columns: 1fr;
-        gap: 140px; 
+        gap: 150px; /* Increased for breathing room between arrow and circle */
+        padding-top: 100px; /* Safe space for top green circle */
         overflow: visible !important;
-        padding-top: 80px; /* FIX: Prevents circle 01 from hitting the top bar */
     }
 
     .steps-wrapper .step {
         position: relative;
         width: 100%;
-        min-height: auto;
-        padding: 60px 25px 40px; 
+        padding: 65px 25px 45px; 
         border-radius: 20px;
         overflow: visible !important;
-        margin-bottom: 0;
     }
 
     .steps-wrapper .step-number {
@@ -215,11 +212,12 @@
         justify-content: center;
         border-radius: 100px;
         position: absolute;
-        top: -32px; 
+        top: -32px !important; 
         left: 50%;
-        transform: translateX(-50%); /* Perfect horizontal centering */
+        transform: translateX(-50%); /* Perfect centering */
         z-index: 20; 
         background-image: none !important;
+        font-weight: bold;
     }
 
     .steps-wrapper .step::after {
@@ -233,13 +231,13 @@
         background-repeat: no-repeat;
         left: 50%;
         top: auto;
-        bottom: -115px; 
-        transform: translateX(-50%) rotate(15deg); /* Centers the arrow tip */
+        bottom: -120px; /* Aligned vertically in the gap */
+        transform: translateX(-50%) rotate(15deg); 
         z-index: 10;
         opacity: 0.9;
     }
 
-    /* FIX: Removes the dotted line from the very last step */
+    /* FIX: Remove arrow after step 04 so it doesn't touch the button */
     .steps-wrapper .step:last-child::after {
         display: none !important;
         content: none !important;
@@ -250,19 +248,16 @@
     }
 
     .how-it-works .action-btn {
-        margin-top: 50px;
+        margin-top: 60px;
         padding-bottom: 20px;
     }
     /* --- END WORKFLOW FIXES --- */
 
     .how-it-works { padding-bottom: 140px; }
-    .why-asylon .asylon-grid { gap: 50px; grid-template-columns: 1fr; }
-    .why-asylon .column img { width: 100%; }
     .why-asylon, .testimonials-block, .asylon-works { padding-bottom: 140px; }
 
     .footer-grid { grid-template-columns: 1fr; padding: 56px 0px; }
     .footer-right { gap: 72px; justify-content: start; margin-top: 50px; }
-    .footer-bx p { max-width: 739px; }
 
     .example-grid { grid-template-columns: 1fr 1fr; }
     .example-grid .example-card:last-child { grid-column: 1/3; }
@@ -272,32 +267,19 @@
     .Feature-Card { min-height: auto; max-width: 100%; height: auto; }
     .root-btn a { width: 100%; text-align: center; }
 
-    .about-grid { grid-template-columns: 1fr; gap: 50px; }
-    .story-block { padding-top: 95px; padding-bottom: 140px; }
-    .Mission-Block::before { display: none; }
-    .Mission-Block::after { top: 0; left: 0px; transform: unset; }
-
     .Randy-grid { grid-template-columns: 1fr; gap: 50px; }
-    .Randy-grid .image-bx .founder-photo { max-height: 320px; }
-
     .contact-asylon .contact-grid { grid-template-columns: 1fr; gap: 56px; }
     .contact-right form { display: flex; padding: 20px; flex-wrap: wrap; }
     .contact-right form .input-root { width: calc(100% - 57%); }
-    .full-width { width: 100% !important; }
-
-    .policy-section .site-container { grid-template-columns: 1fr; gap: 30px; }
-    .policy-content { order: 1; }
 }
 
 /* --- Mobile Smartphones (up to 575px) --- */
 @media (max-width: 575.98px) {
     .hero-title h2 { font-size: 33px; }
     .hero-section { padding-top: 125px; padding-bottom: 55px; }
-    .hero-actions { flex-direction: column; width: 100%; }
-    .hero-actions a { width: 100%; text-align: center; }
 
-    .steps-wrapper { gap: 140px; } /* Consistent gap for mobile */
-    .steps-wrapper .step { padding: 40px 30px; }
+    .steps-wrapper { gap: 150px; } 
+    .steps-wrapper .step { padding: 60px 20px 40px; }
 
     .asylon-card::after {
         position: absolute;
@@ -312,12 +294,11 @@
         transform: translateX(-50%);
     }
 
-    .asylon-grid { gap: 62px; }
     .footer-grid { padding: 69px 0px; }
-    
     .contact-right form { padding: 35px; flex-direction: column; }
     .contact-right form .input-root { width: 100%; }
 
+    /* Cleanup extra background elements for mobile */
     .demo-form-section::after,
     .block-left2::before,
     .block-left::before,
