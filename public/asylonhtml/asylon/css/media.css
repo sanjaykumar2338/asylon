@@ -186,57 +186,76 @@
     }
 
     /* --- STEPS WORKFLOW FIXES --- */
+    /* 1. WRAPPER: Fixed vertical rhythm */
     .steps-wrapper {
         display: flex;
         flex-direction: column;
-        grid-template-columns: 1fr;
-        gap: 140px; 
+        align-items: center;
+        gap: 120px; /* Consistent space for arrows */
+        padding-top: 80px; /* Extra room for the '01' circle */
         overflow: visible !important;
-        padding-top: 60px; /* FIX: Prevents top circle 01 from being cut off */
     }
 
+    .how-it-works .action-btn {
+        margin-top: 60px; /* Space between card 04 and the button */
+    }
+
+    /* 2. CARD: Cleaned up padding and overflow */
     .steps-wrapper .step {
         position: relative;
+        width: 100%;
+        max-width: 100%;
         min-height: auto;
-        height: auto;
-        padding: 55px 20px;
-        min-width: 100%;
+        padding: 60px 25px 40px; /* Balanced internal padding */
+        border-radius: 20px;
         overflow: visible !important;
+        margin-bottom: 0; /* Let the wrapper gap handle spacing */
     }
 
+    /* 3. CIRCLES: Precise centering */
     .steps-wrapper .step-number {
         background: #4AB178 !important;
+        color: #fff;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 100px;
         position: absolute;
-        top: -30px; 
+        top: -32px; /* Half of circle height to sit on the border */
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
         background-image: none !important;
+        font-weight: bold;
     }
 
+    /* 4. ARROWS: Improved anchoring */
     .steps-wrapper .step::after {
         position: absolute;
         content: '';
         background-image: url(../images/Arrow-2.png);
         display: block;
-        height: 100px;
-        width: 100px;
+        height: 90px;
+        width: 90px;
         background-size: contain;
         background-repeat: no-repeat;
         left: 50%;
-        top: 100%; /* Starts below the card */
-        margin-top: 15px;
+        top: auto;
+        bottom: -105px; /* Fixed distance from card bottom */
         transform: translateX(-50%) rotate(15deg);
         z-index: 1;
+        opacity: 0.8;
     }
 
-    /* FIX: Remove arrow from the final step so it doesn't touch the button */
+    /* 5. FIX: Remove arrow from ONLY the last card */
     .steps-wrapper .step:last-child::after {
         display: none !important;
         content: none !important;
     }
 
+    /* Cleanup desktop lines */
     .steps-wrapper .step::before {
         display: none !important;
     }
