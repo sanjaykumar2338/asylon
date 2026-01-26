@@ -72,6 +72,11 @@
                         <input type="text" placeholder="Last Name" name="last_name" value="{{ old('last_name') }}" required>
                     </div>
 
+                    <div class="input-root">
+                        <label for="">Email</label>
+                        <input type="email" placeholder="Email address" name="email" value="{{ old('email') }}" required>
+                    </div>
+
                     <div class="input-root full-width">
                         <label for="">Message</label>
                         <textarea name="message" placeholder="Type here" id="" required>{{ old('message') }}</textarea>
