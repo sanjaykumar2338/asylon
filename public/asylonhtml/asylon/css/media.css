@@ -186,22 +186,15 @@
     }
 
     /* --- STEPS WORKFLOW FIXES --- */
-    /* 1. WRAPPER: Fixed vertical rhythm */
     .steps-wrapper {
         display: flex;
         flex-direction: column;
         grid-template-columns: 1fr;
-        gap: 160px; /* Increased to prevent arrow-circle overlap */
-        padding-top: 80px; /* Ensures '01' circle is not clipped at top */
+        gap: 140px; 
         overflow: visible !important;
+        padding-top: 80px; /* FIX: Prevents circle 01 from hitting the top bar */
     }
 
-    .how-it-works .action-btn {
-        margin-top: 50px;
-        padding-bottom: 20px;
-    }
-
-    /* 2. CARD: Cleaned up padding and overflow */
     .steps-wrapper .step {
         position: relative;
         width: 100%;
@@ -212,7 +205,6 @@
         margin-bottom: 0;
     }
 
-    /* 3. CIRCLES: Higher Z-index to sit clearly above everything */
     .steps-wrapper .step-number {
         background: #4AB178 !important;
         color: #fff;
@@ -225,12 +217,11 @@
         position: absolute;
         top: -32px; 
         left: 50%;
-        transform: translateX(-50%);
-        z-index: 20; /* Higher than arrow */
+        transform: translateX(-50%); /* Perfect horizontal centering */
+        z-index: 20; 
         background-image: none !important;
     }
 
-    /* 4. ARROWS: Positioned to point at the space ABOVE the circle */
     .steps-wrapper .step::after {
         position: absolute;
         content: '';
@@ -242,23 +233,26 @@
         background-repeat: no-repeat;
         left: 50%;
         top: auto;
-        bottom: -125px; /* Pulls arrow up slightly so it doesn't touch circle 02/03/04 */
-        transform: translateX(-50%) rotate(15deg);
+        bottom: -115px; 
+        transform: translateX(-50%) rotate(15deg); /* Centers the arrow tip */
         z-index: 10;
         opacity: 0.9;
     }
 
-    /* 5. LAST CHILD FIX: Removes the arrow and ensures button spacing */
+    /* FIX: Removes the dotted line from the very last step */
     .steps-wrapper .step:last-child::after {
         display: none !important;
         content: none !important;
     }
 
-    /* Cleanup desktop-only elements */
     .steps-wrapper .step::before {
         display: none !important;
     }
 
+    .how-it-works .action-btn {
+        margin-top: 50px;
+        padding-bottom: 20px;
+    }
     /* --- END WORKFLOW FIXES --- */
 
     .how-it-works { padding-bottom: 140px; }
@@ -302,7 +296,7 @@
     .hero-actions { flex-direction: column; width: 100%; }
     .hero-actions a { width: 100%; text-align: center; }
 
-    .steps-wrapper { gap: 110px; }
+    .steps-wrapper { gap: 140px; } /* Consistent gap for mobile */
     .steps-wrapper .step { padding: 40px 30px; }
 
     .asylon-card::after {
@@ -324,7 +318,6 @@
     .contact-right form { padding: 35px; flex-direction: column; }
     .contact-right form .input-root { width: 100%; }
 
-    /* Cleanup extra background elements for mobile */
     .demo-form-section::after,
     .block-left2::before,
     .block-left::before,
