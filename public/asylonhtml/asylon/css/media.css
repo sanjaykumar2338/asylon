@@ -215,6 +215,49 @@
             min-width: 260px;
         }
 
+        .steps-wrapper .step::before {
+            display: none;
+        }
+
+        .steps-wrapper .step-number {
+            background-image: url();
+            background: #4AB178;
+            border-radius: 100px;
+        }
+
+        .steps-wrapper {
+            grid-template-columns: 1fr;
+            overflow: unset;
+            gap: 150px;
+        }
+
+        .steps-wrapper .step::after {
+            position: absolute;
+            content: '';
+            transform: rotate(90deg);
+            background-image: url(../images/Arrow-2.png);
+            display: block;
+            height: 100px;
+            width: 100px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: rotate(17deg);
+            left: 50%;
+            top: 172px;
+        }
+
+        .steps-wrapper .step:nth-of-type(3):after {
+            top: 223px;
+        }
+
+        .steps-wrapper .step::after {
+            top: 219px;
+        }
+
+        .steps-wrapper .step:first-child:after {
+            top: 220px;
+        }
+
         .site-container {
             padding: 0px 15px;
         }
