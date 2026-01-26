@@ -786,56 +786,45 @@
     }
 
 
-    @media (width <=1024.98px) {
-
-    .steps-wrapper .step::before {
-        display: none;
-    }
-
-
-    .steps-wrapper .step-number {
-
-        background-image: url();
-        background: #4AB178;
-        border-radius: 100px;
-    }
-
-
+@media (width <= 1024.98px) {
+    /* 1. Add padding to the top of the wrapper so the first circle isn't cut */
     .steps-wrapper {
         grid-template-columns: 1fr;
-        overflow: unset;
+        overflow: visible; /* Ensure it's visible to prevent clipping */
         gap: 150px;
+        padding-top: 40px; /* Adjust this value based on how much is cut off */
     }
 
+    .steps-wrapper .step-number {
+        background: #4AB178;
+        border-radius: 100px;
+        /* Ensure the circle stays on top */
+        position: relative; 
+        z-index: 2;
+    }
 
-
-
+    /* 2. Positioning for the arrows */
     .steps-wrapper .step::after {
         position: absolute;
         content: '';
-        transform: rotate(90deg);
         background-image: url(../images/Arrow-2.png);
         display: block;
         height: 100px;
         width: 100px;
         background-size: contain;
         background-repeat: no-repeat;
-        transform: rotate(17deg);
+        transform: rotate(17deg); /* Your original rotation */
         left: 50%;
-        top: 172px;
+        top: 220px;
     }
 
+    /* 3. FIX: Remove the arrow/dotted line from the very last step */
+    .steps-wrapper .step:last-child::after {
+        display: none;
+    }
+
+    /* Specific overrides you had for step 3 */
     .steps-wrapper .step:nth-of-type(3):after {
         top: 223px;
-    }
-
-
-
-    .steps-wrapper .step::after {
-        top: 219px;
-    }
-
-    .steps-wrapper .step:first-child:after {
-        top: 220px;
     }
 }
