@@ -8,6 +8,7 @@ use App\Models\Report;
 use App\Models\ReportRiskAnalysis;
 use App\Models\User;
 use App\Notifications\ReportAlertNotification;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
 
@@ -113,7 +114,7 @@ class EscalationService
             new ReportAlertNotification(
                 title: __('Report escalated'),
                 message: __('Report #:id has triggered an escalation rule.', ['id' => $report->getKey()]),
-                url: route('reports.show', $report),
+                url: ReportLinkGenerator::dashboard($report),
             )
         );
     }

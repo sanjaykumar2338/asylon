@@ -39,7 +39,7 @@ class ReportLinkGenerator
      */
     protected static function normalizeBaseUrl(?string $baseUrl): string
     {
-        $value = trim((string) ($baseUrl ?? ''));
+        $value = trim((string) ($baseUrl ?? config('asylon.dashboard_url', '')));
 
         if ($value === '') {
             $value = rtrim((string) url()->to('/'), '/');

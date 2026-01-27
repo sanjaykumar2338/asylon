@@ -80,6 +80,7 @@ return [
     'notifications' => [
         'first_response_org_admin' => env('FIRST_RESPONSE_NOTIFY_ORG_ADMIN', true),
     ],
+    'dashboard_url' => env('ASYLON_DASHBOARD_URL', ''),
     'audio_transcription' => [
         'python_path' => env('TRANSCRIBE_PYTHON_PATH', '/usr/bin/python3'),
         'script_path' => env('TRANSCRIBE_SCRIPT_PATH', '/var/www/scripts/transcribe_server.py'),

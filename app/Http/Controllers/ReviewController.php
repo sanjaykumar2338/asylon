@@ -16,6 +16,7 @@ use App\Notifications\FirstResponseNotification;
 use App\Notifications\ReportAlertNotification;
 use App\Services\Audit;
 use App\Support\AuditLogger;
+use App\Support\ReportLinkGenerator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -484,7 +485,7 @@ class ReviewController extends Controller
             new ReportAlertNotification(
                 title: $title,
                 message: $message,
-                url: route('reports.show', $report),
+                url: ReportLinkGenerator::dashboard($report),
             )
         );
     }

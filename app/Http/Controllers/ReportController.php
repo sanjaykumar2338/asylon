@@ -740,7 +740,7 @@ class ReportController extends Controller
                     'type' => ucfirst($report->type ?? 'general'),
                     'org' => $orgName,
                 ]),
-                url: route('reports.show', $report),
+                url: ReportLinkGenerator::dashboard($report),
             )
         );
     }
