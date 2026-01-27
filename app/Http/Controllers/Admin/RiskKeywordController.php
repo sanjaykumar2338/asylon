@@ -19,6 +19,8 @@ class RiskKeywordController extends Controller
     {
         $user = $request->user();
         $orgFilter = $user->hasRole('platform_admin') ? (int) $request->query('org_id', 0) : 0;
+        $phraseFilter = trim((string) $request->query('phrase', ''));
+        $weightFilter = $request->query('weight', '');
 
         $query = RiskKeyword::query()->orderBy('phrase');
 
@@ -26,6 +28,14 @@ class RiskKeywordController extends Controller
             $query->where('org_id', $user->org_id);
         } elseif ($orgFilter > 0) {
             $query->where('org_id', $orgFilter);
+        }
+
+        if ($phraseFilter !== '') {
+            $query->where('phrase', 'like', "%{$phraseFilter}%");
+        }
+
+        if ($weightFilter !== null && $weightFilter !== '') {
+            $query->where('weight', (int) $weightFilter);
         }
 
         $keywords = $query->with('org')->paginate(20)->withQueryString();
@@ -40,6 +50,8 @@ class RiskKeywordController extends Controller
             'orgs' => $orgs,
             'userOrgId' => $user->org_id,
             'orgFilter' => $orgFilter,
+            'phraseFilter' => $phraseFilter,
+            'weightFilter' => $weightFilter,
         ]);
     }
 

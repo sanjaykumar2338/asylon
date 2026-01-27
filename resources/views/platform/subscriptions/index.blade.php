@@ -14,7 +14,7 @@
             <span class="badge badge-info badge-pill px-3 py-2">{{ $orgs->total() }} {{ __('total') }}</span>
         </div>
 
-        <div class="card admin-index-card card-outline card-primary mb-4">
+        <div class="card admin-index-card card-outline card-primary mb-4 text-dark">
             <div class="card-body">
                 <form method="GET" class="admin-filter-bar mb-0">
                     <div class="row g-3 align-items-end">
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <div class="card card-outline card-primary">
+        <div class="card card-outline card-primary text-dark">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h3 class="card-title mb-0"><i class="fas fa-stream mr-2"></i>{{ __('Subscriptions') }}</h3>
@@ -109,7 +109,7 @@
                                     </div>
                                 </td>
                                 <td class="text-uppercase">
-                                    <span class="badge badge-light border">{{ $planSlug }}</span>
+                                    <span class="badge badge-light border text-dark">{{ $planSlug }}</span>
                                 </td>
                                 <td>
                                     <span class="badge badge-{{ $statusClass }}">{{ ucfirst($status) }}</span>

@@ -72,11 +72,45 @@
             </div>
         </div>
 
+        <div class="card admin-index-card mb-3">
+            <div class="card-body">
+                <h2 class="h6 mb-3 text-uppercase text-muted">{{ __('Search keywords') }}</h2>
+                <form method="GET" action="{{ route('admin.risk-keywords.index') }}" class="admin-filter-bar mb-0">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6 col-lg-4">
+                            <label for="filter_phrase">{{ __('Keyword name') }}</label>
+                            <input id="filter_phrase" name="phrase" type="text" class="form-control"
+                                value="{{ $phraseFilter }}" placeholder="{{ __('Search by phrase') }}">
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <label for="filter_weight">{{ __('Score') }}</label>
+                            <input id="filter_weight" name="weight" type="number" min="1" max="200"
+                                class="form-control" value="{{ $weightFilter }}"
+                                placeholder="{{ __('Exact score') }}">
+                        </div>
+                        @if ($user->hasRole('platform_admin'))
+                            <input type="hidden" name="org_id" value="{{ $orgFilter }}">
+                        @endif
+                        <div class="col-md-4 text-md-end">
+                            <button type="submit" class="btn btn-outline-primary me-1">
+                                <i class="fas fa-filter mr-1"></i> {{ __('Apply') }}
+                            </button>
+                            <a href="{{ route('admin.risk-keywords.index') }}" class="btn btn-light">
+                                {{ __('Clear') }}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         @if ($user->hasRole('platform_admin') && ($orgs ?? collect())->isNotEmpty())
             <div class="card admin-index-card mb-3">
                 <div class="card-body">
                     <h2 class="h6 mb-3 text-uppercase text-muted">{{ __('Filter by organization') }}</h2>
                     <form method="GET" action="{{ route('admin.risk-keywords.index') }}" class="admin-filter-bar mb-0">
+                        <input type="hidden" name="phrase" value="{{ $phraseFilter }}">
+                        <input type="hidden" name="weight" value="{{ $weightFilter }}">
                         <div class="row g-2 align-items-end">
                             <div class="col-md-6 col-lg-4">
                                 <label for="org_id" class="sr-only">{{ __('Organization') }}</label>
