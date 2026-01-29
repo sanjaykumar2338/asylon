@@ -29,6 +29,11 @@ class RevenueReporter
      */
     protected array $customerToOrg = [];
 
+    /**
+     * @var array<int, bool>
+     */
+    protected array $orgIdExists = [];
+
     public function __construct()
     {
         $this->stripeEnabled = class_exists(StripeClient::class) && (bool) config('services.stripe.secret');
@@ -500,7 +505,7 @@ class RevenueReporter
     protected function resolveOrgIdFromRefund(array $refund, array $metadata): ?int
     {
         if (isset($metadata['org_id'])) {
-            return (int) $metadata['org_id'];
+            return $this->ensureOrgIdExists((int) $metadata['org_id']);
         }
 
         $paymentIntent = $refund['payment_intent'] ?? null;
@@ -508,16 +513,12 @@ class RevenueReporter
 
         if ($paymentIntent) {
             $orgId = BillingPayment::where('stripe_payment_id', $paymentIntent)->value('org_id');
-            if ($orgId) {
-                return (int) $orgId;
-            }
+            return $this->ensureOrgIdExists((int) $orgId);
         }
 
         if ($chargeId) {
             $orgId = BillingPayment::where('stripe_charge_id', $chargeId)->value('org_id');
-            if ($orgId) {
-                return (int) $orgId;
-            }
+            return $this->ensureOrgIdExists((int) $orgId);
         }
 
         return null;
@@ -528,7 +529,7 @@ class RevenueReporter
         $orgId = $metadata['org_id'] ?? null;
 
         if ($orgId) {
-            return (int) $orgId;
+            return $this->ensureOrgIdExists((int) $orgId);
         }
 
         if ($customerId && is_array($customerId)) {
@@ -542,10 +543,25 @@ class RevenueReporter
         }
 
         if (! array_key_exists($customerId, $this->customerToOrg)) {
-            $this->customerToOrg[$customerId] = Org::where('stripe_customer_id', $customerId)->value('id');
+            $this->customerToOrg[$customerId] = Org::withTrashed()
+                ->where('stripe_customer_id', $customerId)
+                ->value('id');
         }
 
-        return $this->customerToOrg[$customerId];
+        return $this->ensureOrgIdExists($this->customerToOrg[$customerId]);
+    }
+
+    protected function ensureOrgIdExists(?int $orgId): ?int
+    {
+        if (! $orgId) {
+            return null;
+        }
+
+        if (! array_key_exists($orgId, $this->orgIdExists)) {
+            $this->orgIdExists[$orgId] = Org::withTrashed()->whereKey($orgId)->exists();
+        }
+
+        return $this->orgIdExists[$orgId] ? $orgId : null;
     }
 
     protected function toDate($timestamp): ?Carbon
