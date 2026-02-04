@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | How It Works')
+@section('title', __('marketing.titles.how_it_works'))
 
 @section('content')
 @php($assetBase = asset('asylonhtml/asylon'))
@@ -8,12 +8,12 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>How It Works</h2>
+                <h2>{{ __('frontend.nav.how_it_works') }}</h2>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.how') }}">How It Works </a></span>
+                <span><a href="{{ route('marketing.how') }}">{{ __('frontend.nav.how_it_works') }} </a></span>
 
             </div>
 
@@ -24,10 +24,9 @@
     <div class="site-container">
         <div class="section-header text-center">
             <div class="section-title">
-                <h2>Asylon Works</h2>
+                <h2>{{ __('marketing.how_it_works.hero_title') }}</h2>
             </div>
-            <p>Asylon brings every report, action, and outcome into one place so your team can move from scattered
-                emails and hallway conversations to a clear, repeatable process.</p>
+            <p>{{ __('marketing.how_it_works.hero_body') }}</p>
         </div>
 
         <div class="asylon-grid">
@@ -36,7 +35,7 @@
                     <img src="{{ $assetBase }}/images/img-1.png" alt="">
                 </div>
                 <div class="card-text-block">
-                    <h2>Reporter</h2>
+                    <h2>{{ __('marketing.how_it_works.flow.reporter') }}</h2>
                 </div>
             </div>
             <div class="asylon-card">
@@ -44,7 +43,7 @@
                     <img src="{{ $assetBase }}/images/img-2.png" alt="">
                 </div>
                 <div class="card-text-block">
-                    <h2>Asylon <br> Platform</h2>
+                    <h2>{!! __('marketing.how_it_works.flow.platform') !!}</h2>
                 </div>
             </div>
             <div class="asylon-card">
@@ -52,7 +51,7 @@
                     <img src="{{ $assetBase }}/images/img-3.png" alt="">
                 </div>
                 <div class="card-text-block">
-                    <h2>Multidiciplinary <br> Team</h2>
+                    <h2>{!! __('marketing.how_it_works.flow.team') !!}</h2>
                 </div>
             </div>
             <div class="asylon-card">
@@ -60,7 +59,7 @@
                     <img src="{{ $assetBase }}/images/img-4.png" alt="">
                 </div>
                 <div class="card-text-block">
-                    <h2>Action Plan</h2>
+                    <h2>{{ __('marketing.how_it_works.flow.action_plan') }}</h2>
                 </div>
             </div>
             <div class="asylon-card">
@@ -68,13 +67,13 @@
                     <img src="{{ $assetBase }}/images/img-5.png" alt="">
                 </div>
                 <div class="card-text-block">
-                    <h2>Follow-Up & <br> Pattern</h2>
+                    <h2>{!! __('marketing.how_it_works.flow.follow_up') !!}</h2>
                 </div>
             </div>
 
         </div>
         <div class="action-btn text-center">
-            <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Book a Live Walkthrough</a>
+            <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.book_live_walkthrough') }}</a>
         </div>
     </div>
 </section>
@@ -88,27 +87,24 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Report Submission</span>
+                        <span>{{ __('marketing.how_it_works.sections.report_submission.label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>A Concern Is Reported</h2>
+                        <h2>{{ __('marketing.how_it_works.sections.report_submission.title') }}</h2>
                     </div>
 
 
 
-                    <p>Students, staff, members, and employees can share concerns from any device anonymously
-                        or by
-                        name
-                        using a secure web form branded for your organization.</p>
+                    <p>{{ __('marketing.how_it_works.sections.report_submission.body') }}</p>
 
 
 
                     <ul class="site-list">
-                        <li> Web portal and mobile-friendly forms</li>
-                        <li>QR codes posted on campus, hallways, or around your <br> facility</li>
-                        <li>Optional file uploads: screenshots, documents, photos</li>
-                        <li>Support for short text or longer narrative reports</li>
+                        <li>{{ __('marketing.how_it_works.sections.report_submission.item_1') }}</li>
+                        <li>{!! __('marketing.how_it_works.sections.report_submission.item_2') !!}</li>
+                        <li>{{ __('marketing.how_it_works.sections.report_submission.item_3') }}</li>
+                        <li>{{ __('marketing.how_it_works.sections.report_submission.item_4') }}</li>
                     </ul>
 
                 </div>
@@ -139,22 +135,19 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Routing & Notifications</span>
+                        <span>{{ __('marketing.how_it_works.sections.routing.label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>The Right People Are Notified</h2>
+                        <h2>{{ __('marketing.how_it_works.sections.routing.title') }}</h2>
                     </div>
-                    <p>Asylon routes new reports to the right roles with clear permissions <br> and escalation
-                        rules.</p>
+                    <p>{!! __('marketing.how_it_works.sections.routing.body') !!}</p>
 
 
                     <ul class="site-list">
-                        <li>Role-based routing to platform admins, principals, <br> pastors, HR, and safety teams
-                        </li>
-                        <li>Custom escalation rules for weapons, self-harm, <br> bullying, and more</li>
-                        <li>Email (and optionally SMS / in-app) notifications when high-risk <br> reports arrive
-                        </li>
+                        <li>{!! __('marketing.how_it_works.sections.routing.item_1') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.routing.item_2') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.routing.item_3') !!}</li>
                     </ul>
 
                 </div>
@@ -174,18 +167,18 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Review & Investigation</span>
+                        <span>{{ __('marketing.how_it_works.sections.review.label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>Your Team Reviews and Responds</h2>
+                        <h2>{{ __('marketing.how_it_works.sections.review.title') }}</h2>
                     </div>
-                    <p>Each report becomes a case with its own timeline, assignments, and <br> documentation</p>
+                    <p>{!! __('marketing.how_it_works.sections.review.body') !!}</p>
 
                     <ul class="site-list">
-                        <li>Auto-numbered cases with status (New, In Review, <br> Active, Closed)</li>
-                        <li>Assign reviewers and add internal notes and follow-up <br> tasks</li>
-                        <li>Log communication with students, families, staff, and law <br> enforcement</li>
+                        <li>{!! __('marketing.how_it_works.sections.review.item_1') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.review.item_2') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.review.item_3') !!}</li>
                     </ul>
 
                 </div>
@@ -216,20 +209,18 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Documentation & Reporting</span>
+                        <span>{{ __('marketing.how_it_works.sections.documentation.label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>You Document Every Step</h2>
+                        <h2>{{ __('marketing.how_it_works.sections.documentation.title') }}</h2>
                     </div>
-                    <p>Asylon creates a complete record that you can search, export, and <br> share when needed.</p>
+                    <p>{!! __('marketing.how_it_works.sections.documentation.body') !!}</p>
 
                     <ul class="site-list">
-                        <li>Search case history by category (bullying, weapons, self- <br> harm, social media, etc.
-                        </li>
-                        <li>Export summaries for board briefings, audits, or law <br> enforcement packets (PDF/CSV)
-                        </li>
-                        <li>Trend charts by category, location, and timeframe</li>
+                        <li>{!! __('marketing.how_it_works.sections.documentation.item_1') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.documentation.item_2') !!}</li>
+                        <li>{{ __('marketing.how_it_works.sections.documentation.item_3') }}</li>
                     </ul>
 
                 </div>
@@ -249,24 +240,23 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Privacy & Anonymity</span>
+                        <span>{{ __('marketing.how_it_works.sections.privacy.label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>Privacy, Anonymity, and <br> Data Security</h2>
+                        <h2>{!! __('marketing.how_it_works.sections.privacy.title') !!}</h2>
                     </div>
 
                     <ul class="site-list">
-                        <li>Anonymous reporting options so people can speak up <br> without fear.</li>
-                        <li>Role-based access so only the right leaders can view <br> sensitive details.</li>
-                        <li>Data encrypted in transit and at rest, with secure hosting and <br> regular backups.
-                        </li>
+                        <li>{!! __('marketing.how_it_works.sections.privacy.item_1') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.privacy.item_2') !!}</li>
+                        <li>{!! __('marketing.how_it_works.sections.privacy.item_3') !!}</li>
                     </ul>
 
 
 
                     <div class="action-btn2">
-                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Walk Through a Live Case Flow</a>
+                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.walk_through_case') }}</a>
                     </div>
 
                 </div>
@@ -284,12 +274,12 @@
 
 <section class="cta-section inner-pages cta-w1">
     <div class="site-container">
-        <img src="{{ $assetBase }}/images/Vectore.png" alt="Bird Icon" class="cta-icon">
+        <img src="{{ $assetBase }}/images/Vectore.png" alt="{{ __('frontend.home.cta_icon_alt') }}" class="cta-icon">
         <div class="section-title">
-            <h2>Ready to see how Asylon works with your <span> team's real-world scenarios? </span></h2>
+            <h2>{!! __('marketing.how_it_works.cta_title') !!}</h2>
         </div>
         <div class="action-btn text-center">
-            <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Book a Demo</a>
+            <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.book_demo') }}</a>
         </div>
     </div>
 </section>

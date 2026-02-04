@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | Report Submitted')
+@section('title', __('report.thanks_page.page_title'))
 
 @section('content')
 @php
@@ -13,15 +13,15 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>Thank you</h2>
-                <p>Your submission is secure, and we will begin reviewing it right away.</p>
+                <h2>{{ __('report.thanks_page.header_title') }}</h2>
+                <p>{{ __('report.thanks_page.header_subtitle') }}</p>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home</a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }}</a></span>
                 <span>/</span>
-                <span><a href="{{ route('report.create') }}">Submit a Report</a></span>
+                <span><a href="{{ route('report.create') }}">{{ __('report.breadcrumb.submit') }}</a></span>
                 <span>/</span>
-                <span>Thank You</span>
+                <span>{{ __('report.thanks_page.breadcrumb') }}</span>
             </div>
         </div>
     </div>
@@ -32,53 +32,53 @@
         <div class="contact-grid">
             <div class="contact-bx">
                 <div class="section-title">
-                    <h2>Submission received</h2>
-                    <p>We logged everything you shared and assigned it a Case ID for quick reference. Expect an acknowledgement within one business day.</p>
+                    <h2>{{ __('report.thanks_page.section_title') }}</h2>
+                    <p>{{ __('report.thanks_page.section_body') }}</p>
                 </div>
 
                 <div class="thank-you-card">
-                    <h3>What happens next</h3>
+                    <h3>{{ __('report.thanks_page.next_title') }}</h3>
                     <ul>
-                        <li>We verify the details, triage severity, and loop in the right reviewers.</li>
-                        <li>Keep this page open or record the Case ID so we can reconnect if we need clarification.</li>
+                        <li>{{ __('report.thanks_page.next_item_one') }}</li>
+                        <li>{{ __('report.thanks_page.next_item_two') }}</li>
                         @if ($followupUrl)
-                            <li>Track progress via your personal follow-up link below.</li>
+                            <li>{{ __('report.thanks_page.next_item_three') }}</li>
                         @endif
                     </ul>
                 </div>
 
                 <div class="action-buttons">
                     <button type="button" class="site-btn-dark" onclick="downloadScreenshot()">
-                        Capture confirmation
+                        {{ __('report.thanks_page.cta_capture') }}
                     </button>
                     <button type="button" class="site-btn-light" onclick="window.print()">
-                        Print / save PDF
+                        {{ __('report.thanks_page.cta_print') }}
                     </button>
                 </div>
             </div>
 
             <div class="contact-bx contact-right">
                 <div class="case-id-card">
-                    <div class="case-label">Case ID</div>
-                    <div class="case-value">{{ $caseId ?: 'Pending' }}</div>
+                    <div class="case-label">{{ __('report.thanks_page.case_id_label') }}</div>
+                    <div class="case-value">{{ $caseId ?: __('report.thanks_page.case_id_pending') }}</div>
                 </div>
                 <div class="note">
-                    <p>Need help right away?<br>
+                    <p>{{ __('report.thanks_page.need_help') }}<br>
                         <a href="mailto:{{ $supportEmail }}" class="highlight-link">{{ $supportEmail }}</a>
                     </p>
                 </div>
 
                 @if ($followupUrl)
                     <div class="followup-link">
-                        <p class="label">Follow-up link</p>
+                        <p class="label">{{ __('report.thanks_page.followup_label') }}</p>
                         <a href="{{ $followupUrl }}" target="_blank" rel="noopener noreferrer" class="font-mono break-words">{{ $followupUrl }}</a>
                     </div>
                 @endif
 
                 <div class="quick-links">
-                    <a href="{{ route('report.create') }}" class="font-semibold text-indigo-600 hover:underline">Submit another report</a>
+                    <a href="{{ route('report.create') }}" class="font-semibold text-indigo-600 hover:underline">{{ __('report.thanks_page.submit_another') }}</a>
                     <span class="separator">•</span>
-                    <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:underline">Reviewer login</a>
+                    <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:underline">{{ __('report.thanks_page.reviewer_login') }}</a>
                 </div>
             </div>
         </div>

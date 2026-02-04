@@ -12,40 +12,69 @@ use Illuminate\Support\Str;
 
 class BlogCategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $formLocale = $this->resolveLocale($request);
         $categories = BlogCategory::orderBy('name')->get();
 
-        return view('admin.blog.categories.index', compact('categories'));
+        return view('admin.blog.categories.index', compact('categories', 'formLocale'));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $request->merge([
-            'slug' => $request->filled('slug')
-                ? Str::slug($request->input('slug'))
-                : Str::slug($request->input('name')),
-        ]);
-
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
         $data = $request->validate([
+            'locale' => ['required', 'string', Rule::in($languages)],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'alpha_dash', 'unique:blog_categories,slug'],
         ]);
 
-        BlogCategory::create($data);
+        $locale = $data['locale'];
+        unset($data['locale']);
+
+        if (blank($data['slug'] ?? null)) {
+            $data['slug'] = Str::slug($data['name']);
+        } else {
+            $data['slug'] = Str::slug($data['slug']);
+        }
+
+        $category = BlogCategory::create($data);
+
+        $category->setTranslation('name', $locale, $data['name']);
+
+        if ($locale === $defaultLocale) {
+            foreach ($languages as $language) {
+                if (! filled($category->getTranslationValue('name', $language))) {
+                    $category->setTranslation('name', $language, $data['name']);
+                }
+            }
+        } else {
+            if (! filled($category->getTranslationValue('name', $defaultLocale))) {
+                $category->setTranslation('name', $defaultLocale, $data['name']);
+            }
+        }
+
+        $category->save();
 
         return back()->with('ok', 'Category created.');
     }
 
     public function update(Request $request, BlogCategory $category): RedirectResponse
     {
-        $request->merge([
-            'slug' => $request->filled('slug')
-                ? Str::slug($request->input('slug'))
-                : Str::slug($request->input('name')),
-        ]);
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $locale = $request->input('locale', $defaultLocale);
 
-        $slug = $request->input('slug');
+        $rawSlug = $request->input('slug');
+        $rawName = $request->input('name');
+        $slug = filled($rawSlug) ? Str::slug($rawSlug) : null;
+
+        if (blank($slug) && $locale === $defaultLocale && filled($rawName)) {
+            $slug = Str::slug($rawName);
+        }
+
+        $slug = $slug ?: $category->slug;
 
         $slugRule = [
             'nullable',
@@ -60,11 +89,39 @@ class BlogCategoryController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'locale' => ['required', 'string', Rule::in($languages)],
+            'name' => [$locale === $defaultLocale ? 'required' : 'nullable', 'string', 'max:255'],
             'slug' => $slugRule,
         ]);
 
-        $category->update($data);
+        $locale = $data['locale'];
+        unset($data['locale']);
+
+        $data['slug'] = $slug;
+
+        if ($locale === $defaultLocale) {
+            $category->fill($data);
+        } else {
+            $category->fill(['slug' => $data['slug']]);
+        }
+
+        $category->save();
+
+        if (array_key_exists('name', $data)) {
+            $category->setTranslation('name', $locale, $data['name']);
+        }
+
+        if ($locale === $defaultLocale) {
+            $category->setTranslation('name', $defaultLocale, $data['name']);
+
+            foreach ($languages as $language) {
+                if (! filled($category->getTranslationValue('name', $language))) {
+                    $category->setTranslation('name', $language, $data['name']);
+                }
+            }
+        }
+
+        $category->save();
 
         return back()->with('ok', 'Category updated.');
     }
@@ -74,5 +131,20 @@ class BlogCategoryController extends Controller
         $category->delete();
 
         return back()->with('ok', 'Category deleted.');
+    }
+
+    protected function resolveLocale(Request $request): string
+    {
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $locale = $request->query('lang', $defaultLocale);
+
+        if (! in_array($locale, $languages, true)) {
+            $locale = $defaultLocale;
+        }
+
+        app()->setLocale($locale);
+
+        return $locale;
     }
 }

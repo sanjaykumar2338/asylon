@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | About')
+@section('title', __('marketing.titles.about'))
 
 @section('content')
 @php($assetBase = asset('asylonhtml/asylon'))
@@ -8,12 +8,12 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>About</h2>
+                <h2>{{ __('frontend.nav.about') }}</h2>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.about') }}">About</a></span>
+                <span><a href="{{ route('marketing.about') }}">{{ __('frontend.nav.about') }}</a></span>
 
             </div>
 
@@ -26,16 +26,13 @@
         <div class="about-grid">
             <div class="about-bx">
                 <div class="section-subtitle">
-                    <span>Our Story</span>
+                    <span>{{ __('marketing.about.story_label') }}</span>
                 </div>
                 <div class="section-title">
-                    <h2>Why We Built Asylon</h2>
+                    <h2>{{ __('marketing.about.story_title') }}</h2>
                 </div>
                 <div class="text-bx">
-                    <p>After years in law enforcement and seeing the aftermath of school and church incidents, we
-                        kept seeing the same pattern: warning signs were there, but they were scattered,
-                        undocumented, or never shared at all. Asylon was created to give people a safe way to speak
-                        up and to give leaders a clear way to respond before a crisis.</p>
+                    <p>{{ __('marketing.about.story_body') }}</p>
                 </div>
             </div>
             <div class="about-bx">
@@ -55,10 +52,8 @@
                     <img src="{{ $assetBase }}/images/gGroup.png" alt="">
                 </div>
                 <div class="card-text-root">
-                    <h4>Our Mission</h4>
-                    <p>Our mission is to help schools, churches, <br> and organizations catch warning signs <br>
-                        earlier and
-                        respond with care, clarity, <br> and accountability.</p>
+                    <h4>{{ __('marketing.about.mission_title') }}</h4>
+                    <p>{!! __('marketing.about.mission_body') !!}</p>
                 </div>
             </div>
             <div class="mission-card">
@@ -66,10 +61,8 @@
                     <img src="{{ $assetBase }}/images/rGroup.png" alt="">
                 </div>
                 <div class="card-text-root">
-                    <h4>Our Vision</h4>
-                    <p>We envision communities where <br> safety isn't built on fear or rumor, but <br> on trusted
-                        channels,
-                        trained teams, <br> and documented action.</p>
+                    <h4>{{ __('marketing.about.vision_title') }}</h4>
+                    <p>{!! __('marketing.about.vision_body') !!}</p>
 
                 </div>
             </div>
@@ -89,7 +82,7 @@
             <div class="image-bx">
                 <img
                     src="{{ asset('assets/images/founder.jpeg') }}"
-                    alt="Randy Mays, Asylon Founder"
+                    alt="{{ __('marketing.about.founder_photo_alt') }}"
                     class="founder-photo"
                     loading="lazy"
                 >
@@ -97,11 +90,10 @@
             <div class="right-text-bx">
 
                 <div class="section-title">
-                    <h2>Randy Mays</h2>
-                    <span>Veteran law enforcement officer</span>
+                    <h2>{{ __('marketing.about.founder_name') }}</h2>
+                    <span>{{ __('marketing.about.founder_role') }}</span>
                 </div>
-                <p>"Randy Mays is a veteran law enforcement officer and safety practitioner who has spent years
-                    responding to critical incidents and working with schools and churches to improve prevention."</p>
+                <p>{{ __('marketing.about.founder_quote') }}</p>
             </div>
         </div>
     </div>
@@ -111,7 +103,7 @@
     <div class="site-container2 ">
         <div class="section-header text-center">
             <div class="section-title">
-                <h2>Our partners</h2>
+                <h2>{{ __('frontend.home.partners_title') }}</h2>
             </div>
         </div>
 

@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | Solutions - School')
+@section('title', __('marketing.titles.solutions_school'))
 
 @section('content')
 @php($assetBase = asset('asylonhtml/asylon'))
@@ -8,14 +8,14 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>Solutions</h2>
+                <h2>{{ __('frontend.nav.solutions') }}</h2>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.schools') }}">Solutions </a></span>
+                <span><a href="{{ route('marketing.solutions.schools') }}">{{ __('frontend.nav.solutions') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.schools') }}">Schools </a></span>
+                <span><a href="{{ route('marketing.solutions.schools') }}">{{ __('frontend.nav.solutions_schools') }} </a></span>
 
             </div>
 
@@ -32,23 +32,19 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>School</span>
+                        <span>{{ __('marketing.solutions.school.hero_label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>A Reporting and Threat- <br> Assessment Platform Built <br> for K-12 Safety </h2>
+                        <h2>{!! __('marketing.solutions.school.hero_title') !!}</h2>
                     </div>
 
 
-                    <p>Students and staff often see early warning signs long before an <br> incident occurs. Asylon
-                        gives
-                        them a safe place to speak up - and <br> gives your safety team a clear way to review,
-                        track, and
-                        act on <br> concerns.</p>
+                    <p>{!! __('marketing.solutions.school.hero_body') !!}</p>
 
 
                     <div class="action-btn">
-                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Schedule a School Safety Consultation</a>
+                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.schedule_school_consultation') }}</a>
                     </div>
                 </div>
             </div>
@@ -78,20 +74,20 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>THE PROBLEM</span>
+                        <span>{{ __('marketing.solutions.school.problem_label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>The Safety Challenges <br> Schools Deal With Every Day</h2>
+                        <h2>{!! __('marketing.solutions.school.problem_title') !!}</h2>
                     </div>
 
                     <ul class="site-list">
 
-                        <li>Violence and weapons talk that students are afraid to report</li>
-                        <li> Bullying, cyberbullying, and social media threats</li>
-                        <li> Students talking about self-harm or not wanting to live</li>
-                        <li> Fentanyl, vaping, and drug activity on and off campus</li>
-                        <li> Teachers unsure where to document repeated behavior <br> concerns</li>
+                        <li>{{ __('marketing.solutions.school.problem_item_1') }}</li>
+                        <li>{{ __('marketing.solutions.school.problem_item_2') }}</li>
+                        <li>{{ __('marketing.solutions.school.problem_item_3') }}</li>
+                        <li>{{ __('marketing.solutions.school.problem_item_4') }}</li>
+                        <li>{!! __('marketing.solutions.school.problem_item_5') !!}</li>
                     </ul>
 
                 </div>
@@ -106,10 +102,10 @@
     <div class="site-container">
         <div class="section-header text-center">
             <div class="section-subtitle">
-                <span>Why</span>
+                <span>{{ __('marketing.solutions.school.why_label') }}</span>
             </div>
             <div class="section-title">
-                <h2>Schools Need Asylon</h2>
+                <h2>{{ __('marketing.solutions.school.why_title') }}</h2>
             </div>
         </div>
         <div class="why-grid">
@@ -118,7 +114,7 @@
                     <img src="{{ $assetBase }}/images/userVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Gives students and staff a safe, confidential place to speak up.</p>
+                    <p>{{ __('marketing.solutions.school.why_item_1') }}</p>
                 </div>
             </div>
 
@@ -129,7 +125,7 @@
                     <img src="{{ $assetBase }}/images/eyVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Gives principals, counselors, and safety teams a clear workflow to review concerns.</p>
+                    <p>{{ __('marketing.solutions.school.why_item_2') }}</p>
                 </div>
             </div>
 
@@ -138,7 +134,7 @@
                     <img src="{{ $assetBase }}/images/bxVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Connects scattered information into a single, documented case record.</p>
+                    <p>{{ __('marketing.solutions.school.why_item_3') }}</p>
                 </div>
             </div>
 
@@ -147,7 +143,7 @@
                     <img src="{{ $assetBase }}/images/haVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Helps districts spot trends across campuses.</p>
+                    <p>{{ __('marketing.solutions.school.why_item_4') }}</p>
                 </div>
             </div>
 
@@ -165,19 +161,19 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>How It</span>
+                        <span>{{ __('marketing.solutions.school.process_label') }}</span>
                     </div>
 
                     <div class="section-title">
 
-                        <h2>Fits School Processes</h2>
+                        <h2>{{ __('marketing.solutions.school.process_title') }}</h2>
                     </div>
 
                     <ul class="site-list">
-                        <li>Works with existing threat-assessment teams.</li>
-                        <li>Supports counselor documentation and follow-up tasks</li>
-                        <li>Provides clear routing to principals, SROs, district safety officers.</li>
-                        <li>Built for FERPA-aware environments.</li>
+                        <li>{{ __('marketing.solutions.school.process_item_1') }}</li>
+                        <li>{{ __('marketing.solutions.school.process_item_2') }}</li>
+                        <li>{{ __('marketing.solutions.school.process_item_3') }}</li>
+                        <li>{{ __('marketing.solutions.school.process_item_4') }}</li>
                     </ul>
 
                 </div>
@@ -198,7 +194,7 @@
     <div class="site-container">
         <div class="section-header text-center">
             <div class="section-title">
-                <h2>Example Scenarios</h2>
+                <h2>{{ __('marketing.solutions.school.examples_title') }}</h2>
             </div>
         </div>
         <div class="example-grid">
@@ -207,8 +203,8 @@
                     01
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 1</h2>
-                    <p>Student reports a classmate talking about not wanting to live.</p>
+                    <h2>{{ __('marketing.solutions.school.example_1_title') }}</h2>
+                    <p>{{ __('marketing.solutions.school.example_1_body') }}</p>
                 </div>
             </div>
 
@@ -217,8 +213,8 @@
                     02
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 2</h2>
-                    <p>Screenshot of a social media threat is shared with a counselor.</p>
+                    <h2>{{ __('marketing.solutions.school.example_2_title') }}</h2>
+                    <p>{{ __('marketing.solutions.school.example_2_body') }}</p>
                 </div>
             </div>
 
@@ -227,8 +223,8 @@
                     03
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 3</h2>
-                    <p>Teacher notices escalating behavior but doesn't know whom to tell.</p>
+                    <h2>{{ __('marketing.solutions.school.example_3_title') }}</h2>
+                    <p>{{ __('marketing.solutions.school.example_3_body') }}</p>
                 </div>
             </div>
 
@@ -250,23 +246,23 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>THE Outcome</span>
+                        <span>{{ __('marketing.solutions.school.outcome_label') }}</span>
                     </div>
 
                     <div class="section-title">
 
-                        <h2>Outcomes / Benefits</h2>
+                        <h2>{{ __('marketing.solutions.school.outcome_title') }}</h2>
                     </div>
 
                     <ul class="site-list">
-                        <li>Earlier intervention for at-risk students</li>
-                        <li>Better communication between staff and safety teams</li>
-                        <li>Unified threat-assessment documentation</li>
-                        <li>Reporting consistency across campuses</li>
-                        <li>Stronger prevention planning through pattern analysis</li>
+                        <li>{{ __('marketing.solutions.school.outcome_item_1') }}</li>
+                        <li>{{ __('marketing.solutions.school.outcome_item_2') }}</li>
+                        <li>{{ __('marketing.solutions.school.outcome_item_3') }}</li>
+                        <li>{{ __('marketing.solutions.school.outcome_item_4') }}</li>
+                        <li>{{ __('marketing.solutions.school.outcome_item_5') }}</li>
                     </ul>
                     <div class="action-btn" style="margin-top: 10px;">
-                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Get Consultation for Your School</a>
+                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.get_school_consultation') }}</a>
                     </div>
 
                 </div>

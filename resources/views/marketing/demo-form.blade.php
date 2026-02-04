@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | Demo Form')
+@section('title', __('marketing.titles.demo'))
 
 @section('content')
 @php($assetBase = asset('asylonhtml/asylon'))
@@ -8,12 +8,12 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>Demo Form</h2>
+                <h2>{{ __('marketing.demo.page_heading') }}</h2>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.demo') }}">Demo Form </a></span>
+                <span><a href="{{ route('marketing.demo') }}">{{ __('marketing.demo.page_heading') }} </a></span>
             </div>
         </div>
     </div>
@@ -22,7 +22,7 @@
 <section class="demo-form-section block-left">
     <div class="site-container">
         <div class="section-title text-center">
-            <h2>Book a Demo Form</h2>
+            <h2>{{ __('marketing.demo.section_title') }}</h2>
         </div>
 
         @if (session('success'))
@@ -45,83 +45,83 @@
             @csrf
             <div class="form-grid">
                 <div class="form-group">
-                    <label>First Name</label>
-                    <input type="text" placeholder="Enter your first name" name="first_name" value="{{ old('first_name') }}" required>
+                    <label for="demo-first-name">{{ __('marketing.demo.form.first_name') }}</label>
+                    <input id="demo-first-name" type="text" placeholder="{{ __('marketing.demo.form.first_name_placeholder') }}" name="first_name" value="{{ old('first_name') }}" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Last Name</label>
-                    <input type="text" placeholder="Last Name" name="last_name" value="{{ old('last_name') }}" required>
+                    <label for="demo-last-name">{{ __('marketing.demo.form.last_name') }}</label>
+                    <input id="demo-last-name" type="text" placeholder="{{ __('marketing.demo.form.last_name_placeholder') }}" name="last_name" value="{{ old('last_name') }}" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Organization Name</label>
-                    <input type="text" placeholder="Enter organization name" name="organization" value="{{ old('organization') }}" required>
+                    <label for="demo-organization">{{ __('marketing.demo.form.organization') }}</label>
+                    <input id="demo-organization" type="text" placeholder="{{ __('marketing.demo.form.organization_placeholder') }}" name="organization" value="{{ old('organization') }}" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Type</label>
-                    <select name="organization_type" required>
-                        <option value="" disabled {{ old('organization_type') ? '' : 'selected' }}>Select Organization Type</option>
-                        <option value="School" @selected(old('organization_type') === 'School')>School</option>
-                        <option value="Church" @selected(old('organization_type') === 'Church')>Church</option>
-                        <option value="Workplace" @selected(old('organization_type') === 'Workplace')>Workplace</option>
-                        <option value="Other" @selected(old('organization_type') === 'Other')>Other</option>
+                    <label for="demo-organization-type">{{ __('marketing.demo.form.organization_type') }}</label>
+                    <select id="demo-organization-type" name="organization_type" required>
+                        <option value="" disabled {{ old('organization_type') ? '' : 'selected' }}>{{ __('marketing.demo.form.organization_type_placeholder') }}</option>
+                        <option value="School" @selected(old('organization_type') === 'School')>{{ __('marketing.demo.form.organization_type_school') }}</option>
+                        <option value="Church" @selected(old('organization_type') === 'Church')>{{ __('marketing.demo.form.organization_type_church') }}</option>
+                        <option value="Workplace" @selected(old('organization_type') === 'Workplace')>{{ __('marketing.demo.form.organization_type_workplace') }}</option>
+                        <option value="Other" @selected(old('organization_type') === 'Other')>{{ __('marketing.demo.form.organization_type_other') }}</option>
 
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Role</label>
-                    <input type="text" placeholder="Enter role" name="role" value="{{ old('role') }}">
+                    <label for="demo-role">{{ __('marketing.demo.form.role') }}</label>
+                    <input id="demo-role" type="text" placeholder="{{ __('marketing.demo.form.role_placeholder') }}" name="role" value="{{ old('role') }}">
                 </div>
 
                 <div class="form-group">
-                    <label>Work Email</label>
-                    <input type="email" placeholder="Enter your email" name="email" value="{{ old('email') }}" required>
-                    <small>Please use your work or organization email.</small>
+                    <label for="demo-email">{{ __('marketing.demo.form.email') }}</label>
+                    <input id="demo-email" type="email" placeholder="{{ __('marketing.demo.form.email_placeholder') }}" name="email" value="{{ old('email') }}" required>
+                    <small>{{ __('marketing.demo.form.email_hint') }}</small>
                 </div>
 
                 <div class="form-group">
-                    <label>Phone Number <span>(optional)</span></label>
-                    <input type="tel" placeholder="Enter Phone Number" name="phone" value="{{ old('phone') }}">
+                    <label for="demo-phone">{{ __('marketing.demo.form.phone') }} <span>{{ __('marketing.demo.form.optional') }}</span></label>
+                    <input id="demo-phone" type="tel" placeholder="{{ __('marketing.demo.form.phone_placeholder') }}" name="phone" value="{{ old('phone') }}">
                 </div>
 
                 <div class="form-group g1">
-                    <label>Preferred Meeting Type</label>
+                    <label>{{ __('marketing.demo.form.meeting_type') }}</label>
                     <div class="radio-group custom-radio">
                         <label class="radio-box">
                             <input type="radio" name="meeting" value="15-minute intro" @checked(old('meeting') === '15-minute intro')>
                             <span class="radio-custom"></span>
-                            <span class="radio-text">15-minute intro</span>
+                            <span class="radio-text">{{ __('marketing.demo.form.meeting_type_intro') }}</span>
                         </label>
 
                         <label class="radio-box">
                             <input type="radio" name="meeting" value="30-minute full demo" @checked(old('meeting') === '30-minute full demo')>
                             <span class="radio-custom"></span>
-                            <span class="radio-text">30-minute full demo</span>
+                            <span class="radio-text">{{ __('marketing.demo.form.meeting_type_full') }}</span>
                         </label>
                     </div>
                 </div>
 
                 <div class="form-group full">
-                    <label>Preferred Time Window (CST)</label>
-                    <select name="time_window">
-                        <option value="" disabled {{ old('time_window') ? '' : 'selected' }}>Select</option>
-                        <option value="Morning" @selected(old('time_window') === 'Morning')>Morning</option>
-                        <option value="Afternoon" @selected(old('time_window') === 'Afternoon')>Afternoon</option>
-                        <option value="Evening" @selected(old('time_window') === 'Evening')>Evening</option>
+                    <label for="demo-time-window">{{ __('marketing.demo.form.time_window') }}</label>
+                    <select id="demo-time-window" name="time_window">
+                        <option value="" disabled {{ old('time_window') ? '' : 'selected' }}>{{ __('marketing.demo.form.time_window_placeholder') }}</option>
+                        <option value="Morning" @selected(old('time_window') === 'Morning')>{{ __('marketing.demo.form.time_window_morning') }}</option>
+                        <option value="Afternoon" @selected(old('time_window') === 'Afternoon')>{{ __('marketing.demo.form.time_window_afternoon') }}</option>
+                        <option value="Evening" @selected(old('time_window') === 'Evening')>{{ __('marketing.demo.form.time_window_evening') }}</option>
 
                     </select>
                 </div>
 
                 <div class="form-group full">
-                    <label>What are your top 1-2 concerns right now?</label>
-                    <textarea placeholder="Type here" name="concerns">{{ old('concerns') }}</textarea>
+                    <label for="demo-concerns">{{ __('marketing.demo.form.concerns') }}</label>
+                    <textarea id="demo-concerns" placeholder="{{ __('marketing.demo.form.concerns_placeholder') }}" name="concerns">{{ old('concerns') }}</textarea>
                 </div>
             </div>
 
-            <button type="submit" class="site-btn-dark">Book Demo</button>
+            <button type="submit" class="site-btn-dark">{{ __('frontend.cta.book_demo') }}</button>
         </form>
     </div>
 </section>

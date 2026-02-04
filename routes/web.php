@@ -34,6 +34,21 @@ use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as VerifyCsrfTokenMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/locale/{locale}', function (string $locale) {
+    $languages = array_keys(config('asylon.languages', []));
+
+    if (! in_array($locale, $languages, true)) {
+        return redirect()->back();
+    }
+
+    session(['asylon.locale' => $locale]);
+
+    $redirectTo = url()->previous() ?: route('marketing.home');
+
+    return redirect($redirectTo)
+        ->withCookie(cookie('asylon_locale', $locale, 60 * 24 * 365));
+})->name('locale.switch');
+
 Route::middleware(['setLocale'])->name('marketing.')->group(function () {
     Route::get('/', fn () => view('marketing.index'))->name('home');
     Route::get('/about', fn () => view('marketing.about'))->name('about');

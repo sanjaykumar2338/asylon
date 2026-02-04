@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | Solutions - Organization')
+@section('title', __('marketing.titles.solutions_organization'))
 
 @section('content')
 @php($assetBase = asset('asylonhtml/asylon'))
@@ -8,14 +8,14 @@
     <div class="site-container">
         <div class="page-header">
             <div class="section-title">
-                <h2>Solutions</h2>
+                <h2>{{ __('frontend.nav.solutions') }}</h2>
             </div>
             <div class="page-link">
-                <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.organizations') }}">Solutions</a></span>
+                <span><a href="{{ route('marketing.solutions.organizations') }}">{{ __('frontend.nav.solutions') }}</a></span>
                 <span>/</span>
-                <span><a href="{{ route('marketing.solutions.organizations') }}">Organizations</a></span>
+                <span><a href="{{ route('marketing.solutions.organizations') }}">{{ __('frontend.nav.solutions_organizations') }}</a></span>
 
             </div>
 
@@ -32,17 +32,16 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>Organization</span>
+                        <span>{{ __('marketing.solutions.organization.hero_label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>A Trusted Channel for <br> Workplace Safety and <br> Conduct</h2>
+                        <h2>{!! __('marketing.solutions.organization.hero_title') !!}</h2>
                     </div>
-                    <p>Enable employees to report threats, harassment, and policy violations while HR, legal, and
-                        security teams see every case in one secure system.</p>
+                    <p>{{ __('marketing.solutions.organization.hero_body') }}</p>
 
                     <div class="action-btn">
-                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Schedule an Organization Safety Consultation</a>
+                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.schedule_org_consultation') }}</a>
                     </div>
                 </div>
             </div>
@@ -72,18 +71,18 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>THE PROBLEM</span>
+                        <span>{{ __('marketing.solutions.organization.problem_label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>Real Challenges <br> Organizations Faces</h2>
+                        <h2>{!! __('marketing.solutions.organization.problem_title') !!}</h2>
                     </div>
 
                     <ul class="site-list">
-                        <li>Workplace violence and threats that go unreported</li>
-                        <li>Harassment and discrimination concerns</li>
-                        <li>Stalking or domestic issues that follow employees to work</li>
-                        <li>Policy violations that are handled through scattered emails</li>
+                        <li>{{ __('marketing.solutions.organization.problem_item_1') }}</li>
+                        <li>{{ __('marketing.solutions.organization.problem_item_2') }}</li>
+                        <li>{{ __('marketing.solutions.organization.problem_item_3') }}</li>
+                        <li>{{ __('marketing.solutions.organization.problem_item_4') }}</li>
                     </ul>
 
                 </div>
@@ -98,10 +97,10 @@
     <div class="site-container">
         <div class="section-header text-center">
             <div class="section-subtitle">
-                <span>Why</span>
+                <span>{{ __('marketing.solutions.organization.why_label') }}</span>
             </div>
             <div class="section-title">
-                <h2>Organization Need Asylon</h2>
+                <h2>{{ __('marketing.solutions.organization.why_title') }}</h2>
             </div>
         </div>
         <div class="why-grid">
@@ -110,7 +109,7 @@
                     <img src="{{ $assetBase }}/images/123Group.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Safe reporting channel for employees (anonymous or named).</p>
+                    <p>{{ __('marketing.solutions.organization.why_item_1') }}</p>
                 </div>
             </div>
 
@@ -121,7 +120,7 @@
                     <img src="{{ $assetBase }}/images/eyVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Single system for HR, security, and legal collaboration.</p>
+                    <p>{{ __('marketing.solutions.organization.why_item_2') }}</p>
                 </div>
             </div>
 
@@ -130,7 +129,7 @@
                     <img src="{{ $assetBase }}/images/bxVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Clear documentation that supports compliance and audits.</p>
+                    <p>{{ __('marketing.solutions.organization.why_item_3') }}</p>
                 </div>
             </div>
 
@@ -139,7 +138,7 @@
                     <img src="{{ $assetBase }}/images/haVector.png" alt="">
                 </div>
                 <div class="text-bx">
-                    <p>Better early detection of workplace conflict or unsafe behavior.</p>
+                    <p>{{ __('marketing.solutions.organization.why_item_4') }}</p>
                 </div>
             </div>
 
@@ -157,18 +156,18 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>How It</span>
+                        <span>{{ __('marketing.solutions.organization.process_label') }}</span>
                     </div>
 
                     <div class="section-title">
-                        <h2>Fits Organizational <br> Processes</h2>
+                        <h2>{!! __('marketing.solutions.organization.process_title') !!}</h2>
                     </div>
 
                     <ul class="site-list">
-                       <li>Integrates with existing HR and safety workflows.</li>
-                       <li>Supports role-based routing for HR, corporate security, and legal.</li>
-                       <li>Tracks communication and follow-up steps.</li>
-                       <li>Makes policy enforcement more consistent.</li>
+                       <li>{{ __('marketing.solutions.organization.process_item_1') }}</li>
+                       <li>{{ __('marketing.solutions.organization.process_item_2') }}</li>
+                       <li>{{ __('marketing.solutions.organization.process_item_3') }}</li>
+                       <li>{{ __('marketing.solutions.organization.process_item_4') }}</li>
                     </ul>
 
                 </div>
@@ -189,7 +188,7 @@
     <div class="site-container">
         <div class="section-header text-center">
             <div class="section-title">
-                <h2>Example Scenarios</h2>
+                <h2>{{ __('marketing.solutions.organization.examples_title') }}</h2>
             </div>
         </div>
         <div class="example-grid">
@@ -198,8 +197,8 @@
                     01
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 1</h2>
-                    <p>Employee reports threatening messages from a coworker.</p>
+                    <h2>{{ __('marketing.solutions.organization.example_1_title') }}</h2>
+                    <p>{{ __('marketing.solutions.organization.example_1_body') }}</p>
                 </div>
             </div>
 
@@ -208,8 +207,8 @@
                     02
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 2</h2>
-                    <p>Anonymous tip about harassment or discrimination.</p>
+                    <h2>{{ __('marketing.solutions.organization.example_2_title') }}</h2>
+                    <p>{{ __('marketing.solutions.organization.example_2_body') }}</p>
                 </div>
             </div>
 
@@ -218,8 +217,8 @@
                     03
                 </div>
                 <div class="text-block">
-                    <h2>Scenario 3</h2>
-                    <p>Concern about domestic issues spilling into the workplace.</p>
+                    <h2>{{ __('marketing.solutions.organization.example_3_title') }}</h2>
+                    <p>{{ __('marketing.solutions.organization.example_3_body') }}</p>
                 </div>
             </div>
 
@@ -241,23 +240,23 @@
                 <div class="section-header">
 
                     <div class="section-subtitle">
-                        <span>THE Outcome</span>
+                        <span>{{ __('marketing.solutions.organization.outcome_label') }}</span>
                     </div>
 
                     <div class="section-title">
 
-                        <h2>Outcomes / Benefits</h2>
+                        <h2>{{ __('marketing.solutions.organization.outcome_title') }}</h2>
                     </div>
 
                     <ul class="site-list">
-                      <li>Reduced risk of workplace incidents</li>
-                      <li>Stronger compliance and audit readiness</li>
-                      <li>Better HR-security-legal collaboration</li>
-                      <li>Faster response to escalating behavior</li>
-                      <li>Clear case history for future reference</li>
+                      <li>{{ __('marketing.solutions.organization.outcome_item_1') }}</li>
+                      <li>{{ __('marketing.solutions.organization.outcome_item_2') }}</li>
+                      <li>{{ __('marketing.solutions.organization.outcome_item_3') }}</li>
+                      <li>{{ __('marketing.solutions.organization.outcome_item_4') }}</li>
+                      <li>{{ __('marketing.solutions.organization.outcome_item_5') }}</li>
                     </ul>
                     <div class="action-btn" style="margin-top: 10px;">
-                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">Get Consultation for Your Organization</a>
+                        <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.get_org_consultation') }}</a>
                     </div>
 
                 </div>

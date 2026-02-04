@@ -5,15 +5,32 @@
 
     @include('admin.partials.flash')
 
+    @php
+        $languages = config('asylon.languages', []);
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $currentLocale = old('locale', $formLocale ?? $defaultLocale);
+        $localeRoute = route('admin.blog-categories.index');
+    @endphp
+
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-3 admin-page-header">
             <div>
                 <h1 class="h4 mb-1">{{ __('Blog Categories') }}</h1>
                 <p class="text-muted mb-0 small">{{ __('Create and edit categories for organizing blog posts.') }}</p>
             </div>
-            <span class="badge badge-info badge-pill px-3 py-2">
-                {{ __('Total') }}: {{ $categories->count() }}
-            </span>
+            <div class="d-flex align-items-center" style="gap: 0.75rem;">
+                <select name="locale" id="category-locale" class="form-control"
+                        onchange="window.location='{{ $localeRoute }}?lang=' + this.value;">
+                    @foreach($languages as $code => $label)
+                        <option value="{{ $code }}" {{ $currentLocale === $code ? 'selected' : '' }}>
+                            {{ strtoupper($code) }} - {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+                <span class="badge badge-info badge-pill px-3 py-2">
+                    {{ __('Total') }}: {{ $categories->count() }}
+                </span>
+            </div>
         </div>
 
         <div class="row">
@@ -23,13 +40,14 @@
                         <h2 class="h6 mb-3 text-uppercase text-muted">{{ __('Add Category') }}</h2>
                         <form action="{{ route('admin.blog-categories.store') }}" method="POST">
                             @csrf
+                            <input type="hidden" name="locale" value="{{ $currentLocale }}">
                             <div class="form-group">
                                 <label>{{ __('Name') }}</label>
-                                <input type="text" name="name" class="form-control" required>
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
                             </div>
                             <div class="form-group">
                                 <label>{{ __('Slug') }} ({{ __('optional') }})</label>
-                                <input type="text" name="slug" class="form-control" placeholder="{{ __('auto-generated') }}">
+                                <input type="text" name="slug" class="form-control" value="{{ old('slug') }}" placeholder="{{ __('auto-generated') }}">
                             </div>
                             <div class="text-right">
                                 <button type="submit" class="btn btn-primary btn-sm">
@@ -81,14 +99,15 @@
                                                     <form action="{{ route('admin.blog-categories.update', $category) }}" method="POST">
                                                         @csrf
                                                         @method('PUT')
+                                                        <input type="hidden" name="locale" value="{{ $currentLocale }}">
                                                         <div class="row g-3">
                                                             <div class="col-md-6">
                                                                 <label class="small text-muted">{{ __('Name') }}</label>
-                                                                <input type="text" name="name" class="form-control" value="{{ $category->name }}" required>
+                                                                <input type="text" name="name" class="form-control" value="{{ old('name', $category->getTranslation('name', $currentLocale)) }}" {{ $currentLocale === $defaultLocale ? 'required' : '' }}>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label class="small text-muted">{{ __('Slug') }}</label>
-                                                                <input type="text" name="slug" class="form-control" value="{{ $category->slug }}">
+                                                                <input type="text" name="slug" class="form-control" value="{{ old('slug', $category->slug) }}">
                                                             </div>
                                                         </div>
                                                         <div class="d-flex justify-content-end mt-3">

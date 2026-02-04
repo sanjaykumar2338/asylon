@@ -1,6 +1,6 @@
 @extends('marketing.layout')
 
-@section('title', 'Asylon | Submit a Report')
+@section('title', __('report.page_title'))
 
 @section('content')
     @php
@@ -115,12 +115,12 @@
         <div class="site-container">
             <div class="page-header">
                 <div class="section-title">
-                    <h2>Submit a Report</h2>
+                    <h2>{{ __('report.page_heading') }}</h2>
                 </div>
                 <div class="page-link">
-                    <span><a href="{{ route('marketing.home') }}">Home </a></span>
+                    <span><a href="{{ route('marketing.home') }}">{{ __('frontend.nav.home') }} </a></span>
                     <span>/</span>
-                    <span><a href="{{ route('report.create') }}">Submit a Report </a></span>
+                    <span><a href="{{ route('report.create') }}">{{ __('report.breadcrumb.submit') }} </a></span>
                 </div>
             </div>
         </div>
@@ -143,14 +143,11 @@
             </div>
         @else
             <div class="text-muted mb-3">
-                <p class="mb-2">You stay anonymous unless YOU choose to share your information.<br>
-                    Your identity is completely protected.</p>
+                <p class="mb-2">{!! __('report.intro_anonymous') !!}</p>
 
-                <p class="mb-2">Your voice matters.<br>
-                    Use this form to report a concern, share information, or speak up about something that doesn't feel right.<br>
-                    You may remain anonymous if you prefer.</p>
+                <p class="mb-2">{!! __('report.intro_voice') !!}</p>
 
-                <p class="mb-0">If this is an emergency, please contact 911 immediately.</p>
+                <p class="mb-0">{{ __('report.intro_emergency') }}</p>
             </div>
             @if ($portalDescription && $portalDescription !== __('report.submit_description'))
                 <p class="text-muted">
@@ -165,9 +162,9 @@
             </a>.
         </p>
         <p class="text-primary small mb-2">
-            <a href="{{ route('privacy.anonymity') }}" class="text-primary">Learn how privacy &amp; anonymity work</a>
+            <a href="{{ route('privacy.anonymity') }}" class="text-primary">{{ __('report.links.privacy') }}</a>
             &middot;
-            <a href="{{ route('security.overview') }}" class="text-primary">Security overview</a>
+            <a href="{{ route('security.overview') }}" class="text-primary">{{ __('report.links.security_overview') }}</a>
         </p>
         <p class="fw-semibold text-primary small mb-0">
             {{ __('report.privacy_header') }}
@@ -253,7 +250,7 @@
             <div>
                 <x-input-label :value="__('report.severity_label')" />
                 <div class="mt-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
-                    {{ __('Automatically assigned after submission') }}
+                    {{ __('report.severity_auto') }}
                 </div>
             </div>
         </div>
@@ -287,10 +284,10 @@
         <div>
             <x-input-label for="description" :value="__('report.description_label')" />
             <textarea id="description" name="description" rows="6"
-                placeholder="Please describe what happened or what you've noticed.&#10;(Share as much as you feel comfortable.)"
+                placeholder="{{ __('report.description_placeholder') }}"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
             <small class="mt-2 block text-xs text-gray-500">
-                Please describe what happened or what you've noticed. Share as much as you feel comfortable.
+                {{ __('report.description_hint') }}
             </small>
             <x-input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
@@ -400,7 +397,7 @@
                     value="1"
                     class="form-checkbox h-4 w-4 text-indigo-600">
                 <span class="text-sm text-gray-700">
-                    {{ __('This attachment may contain nudity or graphic content.') }}
+                    {{ __('report.attachments_sensitive_warning') }}
                 </span>
             </label>
             <x-input-error class="mt-2" :messages="$errors->get('attachment_may_contain_sensitive_content')" />
@@ -409,35 +406,35 @@
         <template id="attachment-template">
             <div class="rounded-md border border-gray-200 bg-white p-4 shadow-sm attachment-item" data-attachment-index="__INDEX__">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700" for="attachment-file-__INDEX__">File</label>
+                    <label class="block text-sm font-medium text-gray-700" for="attachment-file-__INDEX__">{{ __('report.attachments_file_label') }}</label>
                     <input id="attachment-file-__INDEX__" name="attachments[__INDEX__][file]" type="file"
                         accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 attachment-file-input" />
                 </div>
                 <div class="mt-3">
-                    <label class="block text-sm font-medium text-gray-700" for="attachment-comment-__INDEX__">Comment (optional)</label>
+                    <label class="block text-sm font-medium text-gray-700" for="attachment-comment-__INDEX__">{{ __('report.attachments_comment_label') }}</label>
                     <textarea id="attachment-comment-__INDEX__" name="attachments[__INDEX__][comment]" rows="2" maxlength="500"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 attachment-comment-input"></textarea>
                 </div>
                 <div class="mt-3 text-end">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-attachment-btn"
                         data-remove-index="__INDEX__">
-                        <i class="fas fa-times me-1"></i> Remove attachment
+                        <i class="fas fa-times me-1"></i> {{ __('report.attachments_remove') }}
                     </button>
                 </div>
             </div>
         </template>
 
         <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-            <h3 class="text-sm font-semibold text-gray-800">Optional Voice Message (3 minutes per recording)</h3>
+            <h3 class="text-sm font-semibold text-gray-800">{{ __('report.voice_heading') }}</h3>
             <p class="mt-1 text-sm text-gray-600">
-                You can speak instead of typing if that feels easier for you.
+                {{ __('report.voice_intro_1') }}
             </p>
             <p class="mt-1 text-sm text-gray-600">
-                Recordings are limited to 3 minutes each, but you can upload as many separate recordings as you need.
+                {{ __('report.voice_intro_2') }}
             </p>
             <p class="mt-1 text-sm text-gray-600">
-                <strong>Your voice WILL be altered</strong> to protect your identity.
+                {!! __('report.voice_privacy_notice') !!}
             </p>
             <div class="mt-4 voice-recorder-wrap">
                 <div class="voice-recorder-control">
@@ -494,8 +491,8 @@
 
     <footer class="mt-8 text-center text-xs text-gray-600 space-y-2 border-t border-gray-200 pt-4">
         <p class="flex flex-col sm:flex-row items-center justify-center gap-2">
-            <span>{{ __('New organization?') }}</span>
-            <a href="{{ route('signup.show') }}" class="text-indigo-600 underline font-semibold">{{ __('Get Started') }}</a>
+            <span>{{ __('report.new_org_prompt') }}</span>
+            <a href="{{ route('signup.show') }}" class="text-indigo-600 underline font-semibold">{{ __('report.get_started') }}</a>
         </p>
     </footer>
     <script>
@@ -1355,7 +1352,7 @@
             {{ __('report.footer_monitoring') }}
         </p>
         <p class="mb-1">
-            Need help? Email <a href="mailto:{{ $infoEmail }}" class="text-primary">{{ $infoEmail }}</a> or <a href="mailto:{{ $supportEmail }}" class="text-primary">{{ $supportEmail }}</a>.
+            {!! __('report.need_help_html', ['info_email' => $infoEmail, 'support_email' => $supportEmail]) !!}
         </p>
       
     </footer>

@@ -15,12 +15,16 @@ class SetLocaleFromRequest
         $languages = array_keys(config('asylon.languages', []));
         $queryLocale = $request->query('lang');
         $sessionLocale = session('asylon.locale');
+        $cookieLocale = $request->cookie('asylon_locale');
 
         if ($queryLocale && in_array($queryLocale, $languages, true)) {
             app()->setLocale($queryLocale);
             session(['asylon.locale' => $queryLocale]);
         } elseif ($sessionLocale && in_array($sessionLocale, $languages, true)) {
             app()->setLocale($sessionLocale);
+        } elseif ($cookieLocale && in_array($cookieLocale, $languages, true)) {
+            app()->setLocale($cookieLocale);
+            session(['asylon.locale' => $cookieLocale]);
         }
 
         return $next($request);

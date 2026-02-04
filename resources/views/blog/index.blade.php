@@ -22,6 +22,8 @@
 
     $pageKeywords = $seoKeywords
         ?? optional($page)->meta_keywords;
+
+    $blogImageFallback = asset('asylonhtml/asylon/images/mobile-pic.jpg');
 @endphp
 
 @section('title', $pageTitle)
@@ -36,8 +38,6 @@
 @endpush
 
 @section('page-content')
-    @php($blogImageFallback = asset('asylonhtml/asylon/images/mobile-pic.jpg'))
-
     <section class="pt-4 pb-4 bg-light border-bottom mt-4 mt-lg-5">
         <div class="site-container">
             <p class="text-uppercase text-primary small mb-2">Asylon</p>

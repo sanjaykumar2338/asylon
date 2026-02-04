@@ -1,5 +1,9 @@
 @php
     $isEdit = isset($post) && $post->exists;
+    $languages = config('asylon.languages', []);
+    $defaultLocale = config('app.fallback_locale', 'en');
+    $currentLocale = old('locale', $formLocale ?? $defaultLocale);
+    $localeRoute = $isEdit ? route('admin.blog-posts.edit', $post) : route('admin.blog-posts.create');
 @endphp
 
 @push('styles')
@@ -10,10 +14,23 @@
     <script src="https://cdn.jsdelivr.net/npm/trix@2.0.0/dist/trix.umd.min.js"></script>
 @endpush
 
+<div class="form-group">
+    <label>Content Language</label>
+    <select name="locale" class="form-control"
+            onchange="window.location='{{ $localeRoute }}?lang=' + this.value;">
+        @foreach($languages as $code => $label)
+            <option value="{{ $code }}" {{ $currentLocale === $code ? 'selected' : '' }}>
+                {{ strtoupper($code) }} - {{ $label }}
+            </option>
+        @endforeach
+    </select>
+    <small class="text-muted">Switching language reloads the editor for that locale.</small>
+</div>
+
 <div class="form-row">
     <div class="form-group col-md-8">
         <label>Title</label>
-        <input type="text" name="title" class="form-control" value="{{ old('title', $post->title) }}" required>
+        <input type="text" name="title" class="form-control" value="{{ old('title', $post->getTranslation('title', $currentLocale)) }}" {{ $currentLocale === $defaultLocale ? 'required' : '' }}>
     </div>
     <div class="form-group col-md-4">
         <label>Slug</label>
@@ -47,13 +64,13 @@
 
 <div class="form-group">
     <label>Excerpt</label>
-    <textarea name="excerpt" rows="2" class="form-control">{{ old('excerpt', $post->excerpt) }}</textarea>
+    <textarea name="excerpt" rows="2" class="form-control">{{ old('excerpt', $post->getTranslation('excerpt', $currentLocale)) }}</textarea>
     <small class="text-muted">Short summary for list/SEO.</small>
 </div>
 
 <div class="form-group">
     <label>Content</label>
-    <input id="content" type="hidden" name="content" value="{{ old('content', $post->content) }}">
+    <input id="content" type="hidden" name="content" value="{{ old('content', $post->getTranslation('content', $currentLocale)) }}">
     <trix-editor input="content"></trix-editor>
 </div>
 
@@ -73,27 +90,27 @@
 </div>
 <div class="form-group">
     <label>Featured Image Alt</label>
-    <input type="text" name="featured_image_alt" class="form-control" value="{{ old('featured_image_alt', $post->featured_image_alt) }}">
+    <input type="text" name="featured_image_alt" class="form-control" value="{{ old('featured_image_alt', $post->getTranslation('featured_image_alt', $currentLocale)) }}">
 </div>
 
 <div class="form-group">
     <label>Author (optional)</label>
-    <input type="text" name="author_name" class="form-control" value="{{ old('author_name', $post->author_name) }}">
+    <input type="text" name="author_name" class="form-control" value="{{ old('author_name', $post->getTranslation('author_name', $currentLocale)) }}">
 </div>
 
 <div class="form-row">
     <div class="form-group col-md-6">
         <label>Meta Title</label>
-        <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title', $post->meta_title) }}">
+        <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title', $post->getTranslation('meta_title', $currentLocale)) }}">
     </div>
     <div class="form-group col-md-6">
         <label>Meta Description</label>
-        <textarea name="meta_description" rows="2" class="form-control">{{ old('meta_description', $post->meta_description) }}</textarea>
+        <textarea name="meta_description" rows="2" class="form-control">{{ old('meta_description', $post->getTranslation('meta_description', $currentLocale)) }}</textarea>
     </div>
 </div>
 
 <div class="form-group">
     <label>Meta Keywords</label>
-    <textarea name="meta_keywords" rows="2" class="form-control">{{ old('meta_keywords', $post->meta_keywords) }}</textarea>
+    <textarea name="meta_keywords" rows="2" class="form-control">{{ old('meta_keywords', $post->getTranslation('meta_keywords', $currentLocale)) }}</textarea>
     <small class="text-muted">Comma-separated</small>
 </div>

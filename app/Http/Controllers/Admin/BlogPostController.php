@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\RedirectResponse;
@@ -36,45 +37,141 @@ class BlogPostController extends Controller
         return view('admin.blog.posts.index', compact('posts', 'categories'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $formLocale = $this->resolveLocale($request);
         $categories = BlogCategory::orderBy('name')->get();
         $post = new BlogPost(['status' => 'draft']);
 
-        return view('admin.blog.posts.create', compact('post', 'categories'));
+        return view('admin.blog.posts.create', compact('post', 'categories', 'formLocale'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePost($request);
 
+        $locale = $data['locale'];
+        unset($data['locale']);
+
         $post = BlogPost::create($data);
+
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+
+        $translatable = [
+            'title',
+            'excerpt',
+            'content',
+            'featured_image_alt',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'author_name',
+        ];
+        $translationPayload = Arr::only($data, $translatable);
+
+        foreach ($translatable as $field) {
+            if (array_key_exists($field, $translationPayload)) {
+                $post->setTranslation($field, $locale, $translationPayload[$field]);
+            }
+        }
+
+        if ($locale === $defaultLocale) {
+            foreach ($languages as $language) {
+                foreach ($translatable as $field) {
+                    if (! filled($post->getTranslationValue($field, $language))) {
+                        $post->setTranslation($field, $language, $translationPayload[$field] ?? null);
+                    }
+                }
+            }
+        } else {
+            foreach ($translatable as $field) {
+                if (! filled($post->getTranslationValue($field, $defaultLocale))) {
+                    $post->setTranslation($field, $defaultLocale, $translationPayload[$field] ?? null);
+                }
+            }
+        }
+
+        $post->save();
 
         if ($post->status === 'published' && ! $post->published_at) {
             $post->update(['published_at' => now()]);
         }
 
-        return redirect()->route('admin.blog-posts.edit', $post)->with('ok', 'Post created.');
+        return redirect()
+            ->route('admin.blog-posts.edit', ['blog_post' => $post, 'lang' => $locale])
+            ->with('ok', 'Post created.');
     }
 
-    public function edit(BlogPost $blog_post): View
+    public function edit(Request $request, BlogPost $blog_post): View
     {
+        $formLocale = $this->resolveLocale($request);
         $categories = BlogCategory::orderBy('name')->get();
 
-        return view('admin.blog.posts.edit', ['post' => $blog_post, 'categories' => $categories]);
+        return view('admin.blog.posts.edit', ['post' => $blog_post, 'categories' => $categories, 'formLocale' => $formLocale]);
     }
 
     public function update(Request $request, BlogPost $blog_post): RedirectResponse
     {
         $data = $this->validatePost($request, $blog_post);
 
-        $blog_post->update($data);
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $locale = $data['locale'];
+        unset($data['locale']);
+
+        $translatable = [
+            'title',
+            'excerpt',
+            'content',
+            'featured_image_alt',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'author_name',
+        ];
+        $translationPayload = Arr::only($data, $translatable);
+        $baseData = Arr::except($data, $translatable);
+
+        if ($locale === $defaultLocale) {
+            $blog_post->fill($baseData + $translationPayload);
+        } else {
+            $blog_post->fill($baseData);
+        }
+
+        $blog_post->save();
+
+        foreach ($translatable as $field) {
+            if (array_key_exists($field, $translationPayload)) {
+                $blog_post->setTranslation($field, $locale, $translationPayload[$field]);
+            }
+        }
+
+        if ($locale === $defaultLocale) {
+            foreach ($translatable as $field) {
+                if (array_key_exists($field, $translationPayload)) {
+                    $blog_post->setTranslation($field, $defaultLocale, $translationPayload[$field]);
+                }
+            }
+
+            foreach ($languages as $language) {
+                foreach ($translatable as $field) {
+                    if (! filled($blog_post->getTranslationValue($field, $language))) {
+                        $blog_post->setTranslation($field, $language, $translationPayload[$field] ?? null);
+                    }
+                }
+            }
+        }
+
+        $blog_post->save();
 
         if ($blog_post->status === 'published' && ! $blog_post->published_at) {
             $blog_post->update(['published_at' => now()]);
         }
 
-        return back()->with('ok', 'Post updated.');
+        return redirect()
+            ->route('admin.blog-posts.edit', ['blog_post' => $blog_post, 'lang' => $locale])
+            ->with('ok', 'Post updated.');
     }
 
     public function destroy(BlogPost $blog_post): RedirectResponse
@@ -87,9 +184,14 @@ class BlogPostController extends Controller
     protected function validatePost(Request $request, ?BlogPost $post = null): array
     {
         $postId = $post?->id;
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $locale = $request->input('locale', $defaultLocale);
+        $titleRule = $post ? ($locale === $defaultLocale ? 'required' : 'nullable') : 'required';
 
         $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'locale' => ['required', 'string', Rule::in($languages)],
+            'title' => [$titleRule, 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'alpha_dash', Rule::unique('blog_posts', 'slug')->ignore($postId)],
             'category_id' => ['nullable', 'exists:blog_categories,id'],
             'excerpt' => ['nullable', 'string'],
@@ -106,7 +208,12 @@ class BlogPostController extends Controller
         ]);
 
         if (blank($data['slug'] ?? null)) {
-            $data['slug'] = Str::slug($data['title']);
+            if (! $post || $locale === $defaultLocale) {
+                $baseTitle = $data['title'] ?? $post?->getRawOriginal('title') ?? '';
+                $data['slug'] = Str::slug($baseTitle);
+            } else {
+                unset($data['slug']);
+            }
         }
 
         $this->handleFeaturedImage($request, $data);
@@ -120,5 +227,20 @@ class BlogPostController extends Controller
             $path = $request->file('featured_image_upload')->store('blog', 'public');
             $data['featured_image'] = $path;
         }
+    }
+
+    protected function resolveLocale(Request $request): string
+    {
+        $languages = array_keys(config('asylon.languages', []));
+        $defaultLocale = config('app.fallback_locale', 'en');
+        $locale = $request->query('lang', $defaultLocale);
+
+        if (! in_array($locale, $languages, true)) {
+            $locale = $defaultLocale;
+        }
+
+        app()->setLocale($locale);
+
+        return $locale;
     }
 }
