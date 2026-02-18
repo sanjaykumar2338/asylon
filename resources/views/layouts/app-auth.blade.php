@@ -263,6 +263,48 @@
                                         <span class="text">{{ __('Contact Messages') }}</span>
                                     </a>
                                 </li>
+                                <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.users.index') }}">
+                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol5.png') }}"
+                                                alt=""></span>
+                                        <span class="text">{{ __('Users') }}</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.alerts.index') }}">
+                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol6.png') }}"
+                                                alt=""></span>
+                                        <span class="text">{{ __('Alert Contacts') }}</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item {{ request()->routeIs('admin.notifications.templates.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.notifications.templates.edit') }}">
+                                        <span class="icon"><img src="{{ asset('admin-theme/images/Symbol7.png') }}"
+                                                alt=""></span>
+                                        <span class="text">{{ __('Notification Templates') }}</span>
+                                    </a>
+                                </li>
+                                @if ($canViewAnalytics)
+                                    <li class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                                        <a href="{{ route('admin.analytics') }}">
+                                            <span class="icon"><img src="{{ asset('admin-theme/images/Symbol9.png') }}"
+                                                    alt=""></span>
+                                            <span class="text">{{ __('Analytics') }}</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                <li class="sidebar-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
+                                    <a href="{{ route('billing.overview') }}">
+                                        <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
+                                        <span class="text">{{ __('Billing') }}</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item {{ request()->routeIs('settings.organization.*') ? 'active' : '' }}">
+                                    <a href="{{ route('settings.organization.edit') }}">
+                                        <span class="icon"><i class="fa-solid fa-building"></i></span>
+                                        <span class="text">{{ __('Org Settings') }}</span>
+                                    </a>
+                                </li>
                                 <li class="sidebar-item {{ request()->routeIs('platform.organizations.*') ? 'active' : '' }}">
                                     <a href="{{ route('platform.organizations.index') }}">
                                         <span class="icon"><i class="fa-solid fa-layer-group"></i></span>
