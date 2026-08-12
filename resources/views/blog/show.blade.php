@@ -20,7 +20,9 @@
 @endpush
 
 @section('page-content')
-    @php($blogImageFallback = asset('asylonhtml/asylon/images/mobile-pic.jpg'))
+    @php
+        $blogImageFallback = asset('asylonhtml/asylon/images/mobile-pic.jpg');
+    @endphp
 
     <section class="pt-5 pb-5 bg-light border-bottom mt-5 mt-lg-5">
         <div class="site-container">

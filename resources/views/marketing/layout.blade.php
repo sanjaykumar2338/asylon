@@ -21,6 +21,74 @@
             padding: 6px 12px;
             font-size: 0.85rem;
         }
+        .asylon-overview-modal {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .asylon-overview-modal .modal-dialog {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: min(1080px, calc(100% - 32px));
+            width: min(1080px, calc(100% - 32px));
+        }
+        .asylon-overview-modal .modal-content {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            position: relative;
+        }
+        .asylon-overview-modal .modal-body {
+            padding: 0;
+        }
+        .asylon-overview-video-frame {
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 8px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            width: 100%;
+        }
+        .asylon-overview-video-frame video {
+            background: #000;
+            display: block;
+            height: 100%;
+            width: 100%;
+        }
+        .asylon-overview-modal-close {
+            align-items: center;
+            background: #fff;
+            border: 0;
+            border-radius: 999px;
+            color: #0C2448;
+            display: flex;
+            font-size: 32px;
+            height: 44px;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            position: absolute;
+            right: 0;
+            top: -54px;
+            width: 44px;
+            z-index: 2;
+        }
+        .asylon-overview-modal-close:hover,
+        .asylon-overview-modal-close:focus {
+            background: #4AB178;
+            color: #fff;
+            outline: none;
+        }
+        @media (max-width: 575.98px) {
+            .asylon-overview-modal .modal-dialog {
+                max-width: calc(100% - 24px);
+                width: calc(100% - 24px);
+            }
+            .asylon-overview-modal-close {
+                height: 40px;
+                top: -48px;
+                width: 40px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -136,6 +204,8 @@
 
 @yield('content')
 
+@include('marketing.partials.overview-video-modal')
+
 <footer class="site-footer">
     <div class="site-container">
         <div class="footer-grid">
@@ -235,6 +305,55 @@
         closeMenu.addEventListener('click', closeAll);
         overlay.addEventListener('click', closeAll);
     }
+
+    (() => {
+        const modalElement = document.getElementById('asylonOverviewVideoModal');
+        const videoElement = document.getElementById('asylonOverviewVideo');
+        const triggers = document.querySelectorAll('[data-overview-video-trigger]');
+
+        if (!modalElement || !videoElement || !triggers.length || !(window.bootstrap && window.bootstrap.Modal)) {
+            return;
+        }
+
+        const videoModal = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        const playVideo = () => {
+            const playRequest = videoElement.play();
+
+            if (playRequest && typeof playRequest.catch === 'function') {
+                playRequest.catch(() => {});
+            }
+        };
+        const resetVideo = () => {
+            videoElement.pause();
+
+            try {
+                if (videoElement.readyState > 0) {
+                    videoElement.currentTime = 0;
+                } else {
+                    videoElement.load();
+                }
+            } catch (error) {
+                videoElement.load();
+            }
+        };
+
+        triggers.forEach((trigger) => {
+            trigger.addEventListener('click', (event) => {
+                event.preventDefault();
+                resetVideo();
+                videoModal.show();
+                playVideo();
+            });
+        });
+
+        modalElement.addEventListener('shown.bs.modal', () => {
+            if (videoElement.paused) {
+                playVideo();
+            }
+        });
+
+        modalElement.addEventListener('hide.bs.modal', resetVideo);
+    })();
 </script>
 @stack('scripts')
 </body>

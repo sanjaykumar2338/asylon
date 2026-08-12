@@ -17,7 +17,7 @@
 
                 <div class="hero-actions">
                     <a href="{{ route('marketing.demo') }}" class="site-btn-dark">{{ __('frontend.cta.schedule_call') }}</a>
-                    <a href="{{ route('marketing.resources') }}" class="site-btn-light">{{ __('frontend.cta.watch_overview') }}</a>
+                    <a href="{{ asset('asylon-explainer-video.mp4') }}" class="site-btn-light" data-overview-video-trigger>{{ __('frontend.cta.watch_overview') }}</a>
                 </div>
             </div>
 

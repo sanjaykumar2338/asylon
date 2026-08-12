@@ -4,6 +4,10 @@ return [
     'language' => [
         'label' => 'Language',
     ],
+    'video_modal' => [
+        'close' => 'Close video',
+        'unsupported' => 'Your browser does not support the video element.',
+    ],
     'nav' => [
         'home' => 'Home',
         'about' => 'About',
